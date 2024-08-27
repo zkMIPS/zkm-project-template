@@ -1,15 +1,33 @@
-# Host Program Examples
+# ZKM Project Template
 
-## 0. Build guest program ELF
+This is a template for creating an end-to-end ZKM project which can generate the EVM-Compatible proof and the on chain verification contract.
+
+There are two ways to prove the guest program: 
+1. Use your local machine
+2. Use ZKM Proving network 
+
+## Local Proving
+
+### Requirements
+* Hardware: X86 CPU, 32 cores, 32G memory
+
+* OS: Ubuntu22
+
+* Rust:
+  
+* Go :
+  
+
+### 0. Build guest program ELF
 
 Please refer to : guest-program/README.md
 
-## 1. Generate plonky2 proof
+### 1. Generate plonky2 proof
 
 > [!NOTE]
-> If the program proves succussfully, it will generate three result files in the directory verifier/data/test_circuit/.(common_circuit_data.json  proof_with_public_inputs.json  verifier_only_circuit_data.json)  
+> If the program excutes succussfully, it will generate three  files in the directory verifier/data/test_circuit/.(common_circuit_data.json  proof_with_public_inputs.json  verifier_only_circuit_data.json)  
 
-### Prove Go  program
+### Go program
 
 * Run the host program 
 
@@ -17,7 +35,7 @@ Please refer to : guest-program/README.md
 RUST_LOG=info  SEG_OUTPUT=/tmp/zkm SEG_SIZE=262144 cargo run --release add-go-prove 
 ```
 
-### Prove the Rust program 
+### Rust program 
 
 * Run the host program
 
@@ -27,7 +45,7 @@ RUST_LOG=info   SEG_OUTPUT=/tmp/zkm SEG_SIZE=262144 cargo run --release revme-pr
 
 ## 2. Convert plonky2 proof to groth16 proof
 
-Copy the three files generated in the previous step to the testdata/mips directory. 
+Copy the  three files generated in the previous step to the testdata/mips directory. 
 
 ```
 cp verifier/data/test_circuit/* testdata/mips
