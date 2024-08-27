@@ -13,9 +13,9 @@ There are two ways to prove the guest program:
 
 * OS: Ubuntu22
 
-* Rust:
+* Rust: 1.81.0-nightly
   
-* Go :
+* Go : 1.22.1
   
 ### Running the project
 
@@ -28,21 +28,21 @@ Please refer to : guest-program/README.md
 > [!NOTE]
 > If the program excutes succussfully, it will generate three  files in the directory verifier/data/test_circuit/.(common_circuit_data.json  proof_with_public_inputs.json  verifier_only_circuit_data.json)  
 
-##### Go program
-
-* Run the host program 
+* Go program
 
 ```
 RUST_LOG=info  SEG_OUTPUT=/tmp/zkm SEG_SIZE=262144 cargo run --release add-go-prove 
 ```
 
-##### Rust program 
+If the memory is insufficient, please reduce the SEG_SIZE to 131072 .
 
-* Run the host program
+* Rust program 
 
 ```
 RUST_LOG=info   SEG_OUTPUT=/tmp/zkm SEG_SIZE=262144 cargo run --release revme-prove
 ```
+If the memory is insufficient, please reduce the SEG_SIZE to 131072 .
+
 
 #### 2. Convert plonky2 proof to groth16 proof
 
