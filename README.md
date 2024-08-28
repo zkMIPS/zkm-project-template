@@ -99,24 +99,24 @@ We use the following tool to download the block.
 * Compile the tool. 
 
 ```
-$ git clone https://github.com/zkMIPS/cannon-mips
-$ cd cannon-mips && make 
+ git clone https://github.com/zkMIPS/cannon-mips
+ cd cannon-mips && make 
 ```
 
 * Config the tool. 
   
 ```
-$ mkdir -p /tmp/cannon
-$ export BASEDIR=/tmp/cannon; 
-$ export NODE=https://eth-sepolia.g.alchemy.com/v2/RH793ZL_pQkZb7KttcWcTlOjPrN0BjOW 
+ mkdir -p /tmp/cannon
+ export BASEDIR=/tmp/cannon; 
+ export NODE=https://eth-sepolia.g.alchemy.com/v2/RH793ZL_pQkZb7KttcWcTlOjPrN0BjOW 
 ```
 
 * Download some block. 
 
 ```
-$ minigeth/go-ethereum 13284491
+ minigeth/go-ethereum 13284491
 ```
-If it excutes successfully, you will see the block infomation in the directory /tmp/cannon/0_13284491 .
+If it executes successfully, you will see the block information in the directory /tmp/cannon/0_13284491 .
 
 #### 2. Config your CA certificate
 
@@ -124,10 +124,37 @@ Put the ca.key and  ca.pem to some directory , such as , host-program/tool/ .
 
 If you don't have a CA certificate, you can generate it using the  certgen.sh in the director zkm-project-template/host-program/tool/.
 ```
-$ cd zkm-project-template/host-program/tool/
-$ chmod +x certgen.sh
-$ ./certgen.sh
+ cd zkm-project-template/host-program/tool/
+ chmod +x certgen.sh
+ ./certgen.sh
 ```
 
+#### 3. Generate the groth16 proof and  verifier Contract
 
+* Set the Environment  parameters. 
+  
+```
+export CA_CERT_PATH=host-program/tool/ca.pem    ## in the directory zkm-project-template
+export  PRIVATE_KEY=df4bc5647fdb9600ceb4943d4adff3749956a8512e5707716357b13d5ee687d9   ##For testing, No changing the key!
+
+export RUST_LOG=info
+export ENDPOINT=https://152.32.186.45:20002    ##the test entry of zkm proving network 
+export SEG_SIZE=131072
+export BLOCK_PATH=/tmp/cannon/0_13284491
+export ELF_PATH=guest-program/mips-elf/zkm-mips-elf-revme-rust
+```
+
+* Run the host program. 
+
+```
+ARGS='12345678 654321'   cargo run --release revme-network-prove
+```
+
+If it executes successfully,  it will output the similar message:
+```
+[2024-08-28T03:20:55Z INFO  stage] request: "1509d5b6-a9e3-4b2f-85b8-5739c35a1310"
+[2024-08-28T03:20:58Z INFO  stage] generate_proof response: GenerateProofResponse { status: 2, error_message: "", proof_id: "1509d5b6-a9e3-4b2f-85b8-5739c35a1310", proof_url: "http://152.32.186.45:20001/1509d5b6-a9e3-4b2f-85b8-5739c35a1310/final/proof_with_public_inputs.json", stark_proof_url: "http://152.32.186.45:20001/1509d5b6-a9e3-4b2f-85b8-5739c35a1310/aggregate/proof_with_public_inputs.json", solidity_verifier_url: "http://152.32.186.45:20001/verifier.sol", output_stream: [] }
+[2024-08-28T03:21:52Z INFO  stage] generate_proof success public_inputs_size: 1546, output_size: 0
+[2024-08-28T03:21:52Z INFO  stage] Elapsed time: 56 secs
+```
 
