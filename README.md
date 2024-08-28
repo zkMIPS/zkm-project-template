@@ -83,7 +83,7 @@ Then, deploy the contract  refering to contracts/README.md
 > The proving network is demo at present. The production version is coming soon.
 
 ### Requirements
-* CA certificate:  ca.pem
+* CA certificate:  ca.pem, ca.key
 
 ### Running the project
 
