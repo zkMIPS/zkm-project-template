@@ -134,7 +134,8 @@ If you don't have a CA certificate, you can generate it using the  certgen.sh in
 * Set the Environment  parameters. 
   
 ```
-export CA_CERT_PATH=host-program/tool/ca.pem    ## in the directory zkm-project-template
+cd zkm-project-template
+export CA_CERT_PATH=host-program/tool/ca.pem   
 export  PRIVATE_KEY=df4bc5647fdb9600ceb4943d4adff3749956a8512e5707716357b13d5ee687d9   ##For testing, No changing the key!
 
 export RUST_LOG=info
@@ -157,4 +158,29 @@ If it executes successfully,  it will output the similar message:
 [2024-08-28T03:21:52Z INFO  stage] generate_proof success public_inputs_size: 1546, output_size: 0
 [2024-08-28T03:21:52Z INFO  stage] Elapsed time: 56 secs
 ```
+
+* Download the proof and contract
+
+In the above output, we need the proof_url: "http://152.32.186.45:20001/1509d5b6-a9e3-4b2f-85b8-5739c35a1310/final/proof_with_public_inputs.json" and solidity_verifier_url: "http://152.32.186.45:20001/verifier.sol" .
+
+```
+wget http://152.32.186.45:20001/1509d5b6-a9e3-4b2f-85b8-5739c35a1310/final/proof_with_public_inputs.json
+wget http://152.32.186.45:20001/verifier.sol
+```
+Then, move the proof and verifier.sol to contracts directory.
+```
+mv proof_with_public_inputs.json  contracts/verifier/
+mv verifier.sol contracts/src/
+```
+
+#### 4. Deploy Verifier Contract.
+
+If your system does not has  Foundry,please install it.
+
+```
+curl -L https://foundry.paradigm.xyz | bash
+```
+
+Then, deploy the contract  refering to contracts/README.md
+
 
