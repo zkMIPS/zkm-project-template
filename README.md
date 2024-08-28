@@ -3,8 +3,8 @@
 This is a template for creating an end-to-end ZKM project which can generate the EVM-Compatible proof and the on chain verification contract.
 
 There are two ways to prove the guest program: 
-1. Use your local machine
-2. Use ZKM Proving network 
+* Use your local machine
+* Use ZKM Proving network 
 
 ## Local Proving
 
@@ -79,5 +79,55 @@ Then, deploy the contract  refering to contracts/README.md
 
 ## Network Proving
 
+> [!NOTE]
+> The proving network is demo at present. The production version is coming soon.
+
 ### Requirements
+* CA certificate:  ca.pem
+
+### Running the project
+
+#### 0. Build guest program ELF
+
+Please refer to : guest-program/README.md
+
+#### 1. Download the block 
+
+The block has your transaction.
+We use the following tool to download the block.
+
+* Compile the tool. 
+
+```
+$ git clone https://github.com/zkMIPS/cannon-mips
+$ cd cannon-mips && make 
+```
+
+* Config the tool. 
+  
+```
+$ mkdir -p /tmp/cannon
+$ export BASEDIR=/tmp/cannon; 
+$ export NODE=https://eth-sepolia.g.alchemy.com/v2/RH793ZL_pQkZb7KttcWcTlOjPrN0BjOW 
+```
+
+* Download some block. 
+
+```
+$ minigeth/go-ethereum 13284491
+```
+If it excutes successfully, you will see the block infomation in the directory /tmp/cannon/0_13284491 .
+
+#### 2. Config your CA certificate
+
+Put the ca.key and  ca.pem to some directory , such as , host-program/tool/ .
+
+If you don't have a CA certificate, you can generate it using the  certgen.sh in the director zkm-project-template/host-program/tool/.
+```
+$ cd zkm-project-template/host-program/tool/
+$ chmod +x certgen.sh
+$ ./certgen.sh
+```
+
+
 
