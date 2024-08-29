@@ -75,27 +75,27 @@ contract VerifierTest is Test {
     function test_ValidProof() public {
         ProofPublicData memory proof = loadProof();
         uint256  [65] memory input;
-        for (uint256 i = 0; i < proof.PublicWitness.length; i++ ){
-		    input[i]= proof.PublicWitness[i];
+        for (uint256 i = 0; i < proof.publicWitness.length; i++ ){
+		    input[i]= proof.publicWitness[i];
 	    }
 
         VerifierProof memory verifierProof;
 
-        verifierProof.A.X = proof.Proof.Ar.X;
-        verifierProof.A.Y = proof.Proof.Ar.Y;
+        verifierProof.A.X = proof.proof.ar.X;
+        verifierProof.A.Y = proof.proof.ar.Y;
 
-        verifierProof.B.X[0] = proof.Proof.Bs.X.A0;
-        verifierProof.B.X[1] = proof.Proof.Bs.X.A1;
+        verifierProof.B.X[0] = proof.proof.bs.X.A0;
+        verifierProof.B.X[1] = proof.proof.bs.X.A1;
 
-        verifierProof.B.Y[0] = proof.Proof.Bs.Y.A0;
-        verifierProof.B.Y[1] = proof.Proof.Bs.Y.A1;
+        verifierProof.B.Y[0] = proof.proof.bs.Y.A0;
+        verifierProof.B.Y[1] = proof.proof.bs.Y.A1;
 
-        verifierProof.C.X = proof.Proof.Krs.X;
-        verifierProof.C.Y = proof.Proof.Krs.Y;
+        verifierProof.C.X = proof.proof.krs.X;
+        verifierProof.C.Y = proof.proof.krs.Y;
 
         uint256  [2] memory proofCommitment;
-        proofCommitment[0] = proof.Proof.Commitments[0].X;
-        proofCommitment[1] = proof.Proof.Commitments[0].Y;
+        proofCommitment[0] = proof.proof.Commitments[0].X;
+        proofCommitment[1] = proof.proof.Commitments[0].Y;
 
         bool ret ;
         ret = verifier.verifyTx(verifierProof, input, proofCommitment);
