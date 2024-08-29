@@ -1,6 +1,6 @@
 [workspace]
 members = [
 
-   "host-program/src/bin"
+   "host-program"
   ]
 resolver = "2"
