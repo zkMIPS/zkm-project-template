@@ -51,7 +51,7 @@ lazy_static = "1.4.0"
 
 elf = { version = "0.7", default-features = false }
 
-[dev-dependencies]
+##[dev-dependencies]
 env_logger = "0.10.0"
 keccak-hash = "0.10.0"
 plonky2x = { git = "https://github.com/zkMIPS/succinctx.git", package = "plonky2x", branch = "zkm" }
