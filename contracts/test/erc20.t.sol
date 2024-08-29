@@ -7,7 +7,7 @@ import {Verifier} from "../src/verifier.sol";
 
 
 struct X {
-	bytes A0 sring;
+	bytes A0 ;
 	bytes A1 ;
 }
 
