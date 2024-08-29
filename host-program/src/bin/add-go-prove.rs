@@ -30,7 +30,7 @@ const DEGREE_BITS_RANGE: [Range<usize>; 6] = [10..21, 12..22, 12..21, 8..21, 6..
 fn split_segments() {
     // 1. split ELF into segs
     let basedir = env::var("BASEDIR").unwrap_or("/tmp/zkm".to_string());
-    let elf_path = env::var("ELF_PATH").unwrap_or("../../../guest-program/mips-elf/zkm-mips-elf-add-go".to_string());
+    let elf_path = env::var("ELF_PATH").unwrap_or("guest-program/mips-elf/zkm-mips-elf-add-go".to_string());
     let block_no = env::var("BLOCK_NO").unwrap_or("".to_string());
     let seg_path = env::var("SEG_OUTPUT").expect("Segment output path is missing");
     let seg_size = env::var("SEG_SIZE").unwrap_or(format!("{SEGMENT_STEPS}"));
@@ -226,7 +226,7 @@ fn prove_multi_seg_common(
     );
     let result = all_circuits.verify_block(&block_proof);
 
-    let build_path = "../verifier/data".to_string();
+    let build_path = "verifier/data".to_string();
     let path = format!("{}/test_circuit/", build_path);
     let builder = WrapperBuilder::<DefaultParameters, 2>::new();
     let mut circuit = builder.build();
@@ -304,7 +304,7 @@ impl Data {
 fn main() {
     env_logger::try_init().unwrap_or_default();
      // 1. split ELF into segs
-     let elf_path = env::var("ELF_PATH").unwrap_or("../../../guest-program/mips-elf/zkm-mips-elf-add-go".to_string());
+     let elf_path = env::var("ELF_PATH").unwrap_or("guest-program/mips-elf/zkm-mips-elf-add-go".to_string());
      let seg_path = env::var("SEG_OUTPUT").expect("Segment output path is missing");
      let seg_size = env::var("SEG_SIZE").unwrap_or("0".to_string());
      let seg_size = seg_size.parse::<_>().unwrap_or(0);
