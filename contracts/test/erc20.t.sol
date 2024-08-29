@@ -71,12 +71,20 @@ contract VerifierTest is Test {
         return abi.decode(jsonBytes, (ProofPublicData));
     }
 
+    function bytesToUint(bytes memory b) internal pure returns (uint256) {
+        require(b.length == 32, "Invalid input length");
+        uint256 result;
+        for (uint256 i = 0; i < 32; i++) {
+            result |= uint256(uint8(b[i])) >> (i * 8);
+        }
+        return result;
+    }
 
     function test_ValidProof() public {
         ProofPublicData memory proof = loadProof();
         uint256  [65] memory input;
         for (uint256 i = 0; i < proof.publicWitness.length; i++ ){
-		    input[i]= proof.publicWitness[i];
+		    input[i]= bytesToUint(proof.publicWitness[i]);
 	    }
 
         VerifierProof memory verifierProof;
