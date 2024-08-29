@@ -95,8 +95,8 @@ contract VerifierTest is Test {
         verifierProof.C.Y = StdUtils.bytesToUint(proof.proof.krs.Y);
 
         uint256  [2] memory proofCommitment;
-        proofCommitment[0] = proof.proof.Commitments[0].X;
-        proofCommitment[1] = proof.proof.Commitments[0].Y;
+        proofCommitment[0] = StdUtils.bytesToUint(proof.proof.commitments[0].X);
+        proofCommitment[1] = StdUtils.bytesToUint(proof.proof.commitments[0].Y);
 
         bool ret ;
         ret = verifier.verifyTx(verifierProof, input, proofCommitment);
