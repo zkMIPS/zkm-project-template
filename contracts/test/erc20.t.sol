@@ -93,7 +93,7 @@ contract VerifierTest is Test {
         verifierProof.C.X = proof.Proof.Krs.X;
         verifierProof.C.Y = proof.Proof.Krs.Y;
 
-        uint256 memory [2]proofCommitment;
+        uint256  [2] memory proofCommitment;
         proofCommitment[0] = proof.Proof.Commitments[0].X;
         proofCommitment[1] = proof.Proof.Commitments[0].Y;
 
