@@ -88,8 +88,8 @@ contract VerifierTest is Test {
         verifierProof.B.X[0] = StdUtils.bytesToUint(proof.proof.bs.x.A0);
         verifierProof.B.X[1] = StdUtils.bytesToUint(proof.proof.bs.x.A1);
 
-        verifierProof.B.Y[0] = StdUtils.bytesToUint(proof.proof.bs.y.A0;
-        verifierProof.B.Y[1] = StdUtils.bytesToUint(proof.proof.bs.y.A1;
+        verifierProof.B.Y[0] = StdUtils.bytesToUint(proof.proof.bs.y.A0);
+        verifierProof.B.Y[1] = StdUtils.bytesToUint(proof.proof.bs.y.A1);
 
         verifierProof.C.X = StdUtils.bytesToUint(proof.proof.krs.X);
         verifierProof.C.Y = StdUtils.bytesToUint(proof.proof.krs.Y);
