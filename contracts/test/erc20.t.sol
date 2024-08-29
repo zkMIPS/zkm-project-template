@@ -82,14 +82,14 @@ contract VerifierTest is Test {
 
         VerifierProof memory verifierProof;
 
-        verifierProof.A.X = proof.proof.ar.X;
-        verifierProof.A.Y = proof.proof.ar.Y;
+        verifierProof.A.X = StdUtils.bytesToUint(proof.proof.ar.X);
+        verifierProof.A.Y = StdUtils.bytesToUint(proof.proof.ar.Y);
 
-        verifierProof.B.X[0] = proof.proof.bs.X.A0;
-        verifierProof.B.X[1] = proof.proof.bs.X.A1;
+        verifierProof.B.X[0] = proof.proof.bs.x.A0;
+        verifierProof.B.X[1] = proof.proof.bs.x.A1;
 
-        verifierProof.B.Y[0] = proof.proof.bs.Y.A0;
-        verifierProof.B.Y[1] = proof.proof.bs.Y.A1;
+        verifierProof.B.Y[0] = proof.proof.bs.y.A0;
+        verifierProof.B.Y[1] = proof.proof.bs.y.A1;
 
         verifierProof.C.X = proof.proof.krs.X;
         verifierProof.C.Y = proof.proof.krs.Y;
