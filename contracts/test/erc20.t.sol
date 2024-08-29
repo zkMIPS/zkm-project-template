@@ -74,12 +74,12 @@ contract VerifierTest is Test {
 
     function test_ValidProof() public {
         ProofPublicData memory proof = loadProof();
-        uint256 [65]input;
+        uint256 memory [65]input;
         for (uint256 i = 0; i < proof.PublicWitness.length; i++ ){
 		    input[i]= proof.PublicWitness[i];
 	    }
 
-        VerifierProof  verifierProof;
+        VerifierProof memory verifierProof;
 
         verifierProof.A.X = proof.Proof.Ar.X;
         verifierProof.A.Y = proof.Proof.Ar.Y;
@@ -93,7 +93,7 @@ contract VerifierTest is Test {
         verifierProof.C.X = proof.Proof.Krs.X;
         verifierProof.C.Y = proof.Proof.Krs.Y;
 
-        uint256 [2]proofCommitment;
+        uint256 memory [2]proofCommitment;
         proofCommitment[0] = proof.Proof.Commitments[0].X;
         proofCommitment[1] = proof.Proof.Commitments[0].Y;
 
