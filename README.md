@@ -31,7 +31,8 @@ Please refer to : guest-program/README.md
 * Go program
 
 ```
-RUST_LOG=info  SEG_OUTPUT=/tmp/zkm SEG_SIZE=262144 cargo run --release add-go-prove 
+cd zkm-project-template
+RUST_LOG=info  SEG_OUTPUT=/tmp/zkm SEG_SIZE=262144 cargo run --release --bin add-go-prove 
 ```
 
 If the memory is insufficient, please reduce the SEG_SIZE to 131072 .
@@ -39,7 +40,8 @@ If the memory is insufficient, please reduce the SEG_SIZE to 131072 .
 * Rust program 
 
 ```
-RUST_LOG=info   SEG_OUTPUT=/tmp/zkm SEG_SIZE=262144 cargo run --release revme-prove
+cd zkm-project-template
+RUST_LOG=info   SEG_OUTPUT=/tmp/zkm SEG_SIZE=262144 cargo run --release --bin revme-prove
 ```
 If the memory is insufficient, please reduce the SEG_SIZE to 131072 .
 
