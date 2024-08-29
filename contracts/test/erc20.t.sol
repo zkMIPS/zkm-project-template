@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 import {Test, console} from "forge-std/Test.sol";
 import {stdJson} from "forge-std/StdJson.sol";
 import {Verifier} from "../src/verifier.sol";
-import {StdUtils} from  "forge-std/src/StdUtils.sol";
+import {StdUtils} from  "forge-std/StdUtils.sol";
 
 struct X {
 	bytes A0 ;
