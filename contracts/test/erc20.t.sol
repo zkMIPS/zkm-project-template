@@ -74,7 +74,7 @@ contract VerifierTest is Test {
 
     function test_ValidProof() public {
         ProofPublicData memory proof = loadProof();
-        uint256 memory [65]input;
+        uint256  [65] memory input;
         for (uint256 i = 0; i < proof.PublicWitness.length; i++ ){
 		    input[i]= proof.PublicWitness[i];
 	    }
