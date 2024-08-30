@@ -63,16 +63,6 @@ contract VerifierTest is Test {
     //address verifier;
     Verifier public verifier;
 
-   using Pairing for *;
-
-
-    struct Proof {
-        Pairing.G1Point a;
-        Pairing.G2Point b;
-        Pairing.G1Point c;
-    }
-
-
 
     function loadProof() public view returns (ProofPublicData memory) {
         string memory root = vm.projectRoot();
@@ -91,7 +81,7 @@ contract VerifierTest is Test {
 		    input[i]= StdUtils.bytesToUint(proof.publicWitness[i]);
 	    }
 
-        VerifierProof memory verifierProof;
+        Proof memory verifierProof;
 
         verifierProof.A.X = StdUtils.bytesToUint(proof.proof.ar.X);
         verifierProof.A.Y = StdUtils.bytesToUint(proof.proof.ar.Y);
