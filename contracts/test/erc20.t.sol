@@ -101,7 +101,7 @@ contract VerifierTest is Test {
         proofCommitment[1] = StdUtils.bytesToUint(proof.proof.commitments[0].Y);
 
         bool ret ;
-        ret = verifier.verifyTx(verifierProof, input, proofCommitment);
+        ret = Verifier.verifyTx(verifierProof, input, proofCommitment);
 
          assert(ret == true);
     }
