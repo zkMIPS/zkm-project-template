@@ -63,6 +63,17 @@ contract VerifierTest is Test {
     //address verifier;
     Verifier public verifier;
 
+   using Pairing for *;
+
+
+    struct Proof {
+        Pairing.G1Point a;
+        Pairing.G2Point b;
+        Pairing.G1Point c;
+    }
+
+
+
     function loadProof() public view returns (ProofPublicData memory) {
         string memory root = vm.projectRoot();
         string memory path = string.concat(root, "/verifier/snark_proof_with_public_inputs.json");
