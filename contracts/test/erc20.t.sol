@@ -62,12 +62,7 @@ contract VerifierTest is Test {
 
     //address verifier;
     //Verifier public verifier;
-    using Pairing for *;
-     struct VerifyProof {
-        Pairing.G1Point a;
-        Pairing.G2Point b;
-        Pairing.G1Point c;
-    }
+    
 
 
     function loadProof() public view returns (ProofPublicData memory) {
@@ -87,7 +82,7 @@ contract VerifierTest is Test {
 		    input[i]= StdUtils.bytesToUint(proof.publicWitness[i]);
 	    }
         
-        VerifyProof memory verifierProof;
+         Verifier.Proof memory verifierProof;
 
         verifierProof.a.X = StdUtils.bytesToUint(proof.proof.ar.X);
         verifierProof.a.Y = StdUtils.bytesToUint(proof.proof.ar.Y);
