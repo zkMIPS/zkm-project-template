@@ -60,8 +60,7 @@ struct VerifierProof {
 contract VerifierTest is Test {
     using stdJson for string;
 
-    //address verifier;
-    //Verifier public verifier;
+    Verifier public verifier;
     
 
 
@@ -101,7 +100,7 @@ contract VerifierTest is Test {
         proofCommitment[1] = StdUtils.bytesToUint(proof.proof.commitments[0].Y);
 
         bool ret ;
-        ret = Verifier.verifyTx(verifierProof, input, proofCommitment);
+        ret = verifier.verifyTx(verifierProof, input, proofCommitment);
 
          assert(ret == true);
     }
