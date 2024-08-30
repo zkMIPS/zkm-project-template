@@ -62,7 +62,7 @@ contract VerifierTest is Test {
 
     //address verifier;
     //Verifier public verifier;
-    using Verifier.Pairing for *;
+    using Pairing for *;
      struct VerifyProof {
         Pairing.G1Point a;
         Pairing.G2Point b;
