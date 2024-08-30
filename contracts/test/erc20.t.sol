@@ -86,7 +86,7 @@ contract VerifierTest is Test {
         for (uint256 i = 0; i < proof.publicWitness.length; i++ ){
 		    input[i]= StdUtils.bytesToUint(proof.publicWitness[i]);
 	    }
-
+        using Pairing for *;
         VerifyProof memory verifierProof;
 
         verifierProof.a.X = StdUtils.bytesToUint(proof.proof.ar.X);
