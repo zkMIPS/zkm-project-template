@@ -62,7 +62,7 @@ contract VerifierTest is Test {
 
     //address verifier;
     //Verifier public verifier;
-
+    using Verifier.Pairing for *;
      struct VerifyProof {
         Pairing.G1Point a;
         Pairing.G2Point b;
@@ -86,7 +86,7 @@ contract VerifierTest is Test {
         for (uint256 i = 0; i < proof.publicWitness.length; i++ ){
 		    input[i]= StdUtils.bytesToUint(proof.publicWitness[i]);
 	    }
-        using Pairing for *;
+        
         VerifyProof memory verifierProof;
 
         verifierProof.a.X = StdUtils.bytesToUint(proof.proof.ar.X);
