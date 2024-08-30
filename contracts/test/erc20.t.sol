@@ -83,17 +83,17 @@ contract VerifierTest is Test {
 
         Proof memory verifierProof;
 
-        verifierProof.A.X = StdUtils.bytesToUint(proof.proof.ar.X);
-        verifierProof.A.Y = StdUtils.bytesToUint(proof.proof.ar.Y);
+        verifierProof.a.X = StdUtils.bytesToUint(proof.proof.ar.X);
+        verifierProof.a.Y = StdUtils.bytesToUint(proof.proof.ar.Y);
 
-        verifierProof.B.X[0] = StdUtils.bytesToUint(proof.proof.bs.x.A0);
-        verifierProof.B.X[1] = StdUtils.bytesToUint(proof.proof.bs.x.A1);
+        verifierProof.b.X[0] = StdUtils.bytesToUint(proof.proof.bs.x.A0);
+        verifierProof.b.X[1] = StdUtils.bytesToUint(proof.proof.bs.x.A1);
 
-        verifierProof.B.Y[0] = StdUtils.bytesToUint(proof.proof.bs.y.A0);
-        verifierProof.B.Y[1] = StdUtils.bytesToUint(proof.proof.bs.y.A1);
+        verifierProof.b.Y[0] = StdUtils.bytesToUint(proof.proof.bs.y.A0);
+        verifierProof.b.Y[1] = StdUtils.bytesToUint(proof.proof.bs.y.A1);
 
-        verifierProof.C.X = StdUtils.bytesToUint(proof.proof.krs.X);
-        verifierProof.C.Y = StdUtils.bytesToUint(proof.proof.krs.Y);
+        verifierProof.c.X = StdUtils.bytesToUint(proof.proof.krs.X);
+        verifierProof.c.Y = StdUtils.bytesToUint(proof.proof.krs.Y);
 
         uint256  [2] memory proofCommitment;
         proofCommitment[0] = StdUtils.bytesToUint(proof.proof.commitments[0].X);
