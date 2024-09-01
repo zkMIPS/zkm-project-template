@@ -88,6 +88,7 @@ Then, deploy the contract  refering to "### Deploy" in the contracts/README.md .
 
 ### Requirements
 * CA certificate:  ca.pem, ca.key
+* Register in the https://www.zkm.io/apply (Let your key in the whitelist)
 
 ### Running the project
 
