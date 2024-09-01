@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::env;
 use std::fs::File;
-use std::io::prelude::*;
+
 use std::io::BufReader;
 use std::ops::Range;
 use std::time::Duration;
@@ -27,24 +27,6 @@ use zkm_prover::verifier::verify_proof;
 
 const DEGREE_BITS_RANGE: [Range<usize>; 6] = [10..21, 12..22, 12..21, 8..21, 6..21, 13..23];
 
-fn split_segments() {
-    // 1. split ELF into segs
-    let basedir = env::var("BASEDIR").unwrap_or("/tmp/zkm".to_string());
-    let elf_path = env::var("ELF_PATH").unwrap_or("guest-program/mips-elf/zkm-mips-elf-add-go".to_string());
-    let block_no = env::var("BLOCK_NO").unwrap_or("".to_string());
-    let seg_path = env::var("SEG_OUTPUT").expect("Segment output path is missing");
-    let seg_size = env::var("SEG_SIZE").unwrap_or(format!("{SEGMENT_STEPS}"));
-    let seg_size = seg_size.parse::<_>().unwrap_or(SEGMENT_STEPS);
-    let args = env::var("ARGS").unwrap_or("".to_string());
-    let args = args.split_whitespace().collect();
-
-    let mut state = load_elf_with_patch(&elf_path, args);
-    let block_path = get_block_path(&basedir, &block_no, "");
-    if !block_no.is_empty() {
-        state.load_input(&block_path);
-    }
-    let _ = split_prog_into_segs(state, &seg_path, &block_path, seg_size);
-}
 
 fn prove_single_seg_common(
     seg_file: &str,
