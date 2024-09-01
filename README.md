@@ -31,6 +31,8 @@ Please refer to : guest-program/README.md
 * Go program
 
 ```
+mkdir -p /tmp/zkm
+git clone https://github.com/zkMIPS/zkm-project-template.git
 cd zkm-project-template
 RUST_LOG=info  SEG_OUTPUT=/tmp/zkm SEG_SIZE=262144 cargo run --release --bin add-go-prove 
 ```
@@ -41,7 +43,7 @@ If the memory is insufficient, please reduce the SEG_SIZE to 131072 .
 
 ```
 cd zkm-project-template
-RUST_LOG=info   SEG_OUTPUT=/tmp/zkm SEG_SIZE=262144 cargo run --release --bin revme-prove
+RUST_LOG=info   SEG_OUTPUT=/tmp/zkm  JSON_PATH=host-program/test-vectors/test.json SEG_SIZE=262144 cargo run --release --bin revme-prove
 ```
 If the memory is insufficient, please reduce the SEG_SIZE to 131072 .
 
