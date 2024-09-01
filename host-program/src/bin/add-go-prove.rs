@@ -14,7 +14,7 @@ use plonky2x::backend::wrapper::wrap::WrappedCircuit;
 use plonky2x::frontend::builder::CircuitBuilder as WrapperBuilder;
 use plonky2x::prelude::DefaultParameters;
 use zkm_emulator::utils::{
-    get_block_path, load_elf_with_patch, split_prog_into_segs, SEGMENT_STEPS,
+     load_elf_with_patch, split_prog_into_segs, 
 };
 use zkm_prover::all_stark::AllStark;
 use zkm_prover::config::StarkConfig;
