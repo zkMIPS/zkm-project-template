@@ -1,5 +1,4 @@
 /target
 /verifier/data/test_circuit
 /test-vectors/mips
-contracts/lib/forge-std
 push.sh
