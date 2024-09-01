@@ -43,7 +43,7 @@ If the memory is insufficient, please reduce the SEG_SIZE to 131072 .
 
 ```
 cd zkm-project-template
-RUST_LOG=info   SEG_OUTPUT=/tmp/zkm  JSON_PATH=host-program/test-vectors/test.json SEG_SIZE=262144 cargo run --release --bin revme-prove
+RUST_LOG=info   SEG_OUTPUT=/tmp/zkm   SEG_SIZE=262144 cargo run --release --bin revme-prove
 ```
 If the memory is insufficient, please reduce the SEG_SIZE to 131072 .
 
@@ -79,7 +79,7 @@ If your system does not has  Foundry,please install it.
 curl -L https://foundry.paradigm.xyz | bash
 ```
 
-Then, deploy the contract  refering to contracts/README.md
+Then, deploy the contract  refering to "### Deploy" in the contracts/README.md .
 
 ## Network Proving
 
@@ -146,13 +146,14 @@ export RUST_LOG=info
 export ENDPOINT=https://152.32.186.45:20002    ##the test entry of zkm proving network 
 export SEG_SIZE=131072
 export BLOCK_PATH=/tmp/cannon/0_13284491
+export OUTPUT_DIR=/tmp/zkm
 export ELF_PATH=guest-program/mips-elf/zkm-mips-elf-revme-rust
 ```
 
 * Run the host program. 
 
 ```
-ARGS='12345678 654321'   cargo run --release revme-network-prove
+ARGS='12345678 654321'   cargo run --release  --bin revme-network-prove
 ```
 
 If it executes successfully,  it will output the similar message:

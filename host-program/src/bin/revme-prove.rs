@@ -226,7 +226,7 @@ fn prove_multi_seg_common(
     );
     let result = all_circuits.verify_block(&block_proof);
 
-    let build_path = "../verifier/data".to_string();
+    let build_path = "verifier/data".to_string();
     let path = format!("{}/test_circuit/", build_path);
     let builder = WrapperBuilder::<DefaultParameters, 2>::new();
     let mut circuit = builder.build();
