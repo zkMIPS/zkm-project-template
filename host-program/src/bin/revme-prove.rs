@@ -30,7 +30,7 @@ const DEGREE_BITS_RANGE: [Range<usize>; 6] = [10..21, 12..22, 12..21, 8..21, 6..
 fn split_segments() {
     // 1. split ELF into segs
     let basedir = env::var("BASEDIR").unwrap_or("/tmp/zkm".to_string());
-    let elf_path = env::var("ELF_PATH").unwrap_or("../../../guest-program/mips-elf/zkm-mips-elf-revme-rust".to_string());
+    let elf_path = env::var("ELF_PATH").unwrap_or("guest-program/mips-elf/zkm-mips-elf-revme-rust".to_string());
     let block_no = env::var("BLOCK_NO").unwrap_or("".to_string());
     let seg_path = env::var("SEG_OUTPUT").expect("Segment output path is missing");
     let seg_size = env::var("SEG_SIZE").unwrap_or(format!("{SEGMENT_STEPS}"));
@@ -305,8 +305,8 @@ fn main() {
     // 1. split ELF into segs
     let elf_path = env::var("ELF_PATH").unwrap_or("guest-program/mips-elf/zkm-mips-elf-revme-rust".to_string());
     let seg_path = env::var("SEG_OUTPUT").expect("Segment output path is missing");
-    let json_path = env::var("JSON_PATH").expect("JSON file is missing");
-    let seg_size = env::var("SEG_SIZE").unwrap_or("0".to_string());
+    let json_path = env::var("JSON_PATH").unwrap_or("host-program/test-vectors/test.json".to_string());
+    let seg_size = env::var("SEG_SIZE").unwrap_or("131072".to_string());
     let seg_size = seg_size.parse::<_>().unwrap_or(0);
     let mut f = File::open(json_path).unwrap();
     let mut data = vec![];
