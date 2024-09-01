@@ -5,18 +5,19 @@ import {Test, console} from "forge-std/Test.sol";
 import {stdJson} from "forge-std/StdJson.sol";
 import {Verifier} from "../src/verifier.sol";
 import {StdUtils} from  "forge-std/StdUtils.sol";
+import {console}  from "forge-std/console.sol";
 
-struct X {
+struct XX {
 	bytes A0 ;
 	bytes A1 ;
 }
 
-struct Bs {
-	X x;
-	X y;
+struct BS {
+	XX X;
+	XX Y;
 }
 
-struct Ar {
+struct AR {
 	bytes X ;
 	bytes Y ;
 }
@@ -26,16 +27,17 @@ struct Commitment {
 	bytes Y ;
 }
 
-struct Proof {
-	Ar  ar;
-	Ar  krs;
-	Bs  bs;
-	Commitment[] commitments;
+struct PROOF {
+	AR  Ar ;
+	AR  Krs;
+	BS  Bs;
+	Commitment[] Commitments;
+    Commitment   CommitmentPok;
 }
 
 struct ProofPublicData{
-    Proof proof;
-    bytes[] publicWitness;
+    PROOF Proof;
+    bytes[] PublicWitness;
 }
 
 ////////
@@ -63,7 +65,6 @@ contract VerifierTest is Test {
     Verifier public verifier;
     
 
-
     function loadProof() public view returns (ProofPublicData memory) {
         string memory root = vm.projectRoot();
         string memory path = string.concat(root, "/verifier/snark_proof_with_public_inputs.json");
@@ -72,28 +73,32 @@ contract VerifierTest is Test {
         return abi.decode(jsonBytes, (ProofPublicData));
     }
 
-  
+    function setUp() public {
+        ProofPublicData memory proof = loadProof();
 
+        verifier = new Verifier();
+    }
+  
     function test_ValidProof() public {
         ProofPublicData memory proof = loadProof();
         uint256  [65] memory input;
-        for (uint256 i = 0; i < proof.publicWitness.length; i++ ){
-		    input[i]= StdUtils.bytesToUint(proof.publicWitness[i]);
+        for (uint256 i = 0; i < proof.PublicWitness.length; i++ ){
+		    input[i]= StdUtils.bytesToUint(proof.PublicWitness[i]);
 	    }
         
          Verifier.Proof memory verifierProof;
 
-        verifierProof.a.X = StdUtils.bytesToUint(proof.proof.ar.X);
-        verifierProof.a.Y = StdUtils.bytesToUint(proof.proof.ar.Y);
+        verifierProof.a.X = StdUtils.bytesToUint(proof.proof.Ar.X);
+        verifierProof.a.Y = StdUtils.bytesToUint(proof.proof.Ar.Y);
 
-        verifierProof.b.X[0] = StdUtils.bytesToUint(proof.proof.bs.x.A0);
-        verifierProof.b.X[1] = StdUtils.bytesToUint(proof.proof.bs.x.A1);
+        verifierProof.b.X[0] = StdUtils.bytesToUint(proof.proof.Bs.X.A0);
+        verifierProof.b.X[1] = StdUtils.bytesToUint(proof.proof.Bs.X.A1);
 
-        verifierProof.b.Y[0] = StdUtils.bytesToUint(proof.proof.bs.y.A0);
-        verifierProof.b.Y[1] = StdUtils.bytesToUint(proof.proof.bs.y.A1);
+        verifierProof.b.Y[0] = StdUtils.bytesToUint(proof.proof.Bs.Y.A0);
+        verifierProof.b.Y[1] = StdUtils.bytesToUint(proof.proof.Bs.Y.A1);
 
-        verifierProof.c.X = StdUtils.bytesToUint(proof.proof.krs.X);
-        verifierProof.c.Y = StdUtils.bytesToUint(proof.proof.krs.Y);
+        verifierProof.c.X = StdUtils.bytesToUint(proof.proof.Krs.X);
+        verifierProof.c.Y = StdUtils.bytesToUint(proof.proof.Krs.Y);
 
         uint256  [2] memory proofCommitment;
         proofCommitment[0] = StdUtils.bytesToUint(proof.proof.commitments[0].X);
