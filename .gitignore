@@ -1,0 +1,4 @@
+/target
+/verifier/data/test_circuit
+/test-vectors/mips
+push.sh

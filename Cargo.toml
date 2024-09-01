@@ -1,0 +1,6 @@
+[workspace]
+members = [
+
+   "host-program"
+  ]
+resolver = "2"
