@@ -13,9 +13,7 @@ use plonky2x::backend::circuit::Groth16WrapperParameters;
 use plonky2x::backend::wrapper::wrap::WrappedCircuit;
 use plonky2x::frontend::builder::CircuitBuilder as WrapperBuilder;
 use plonky2x::prelude::DefaultParameters;
-use zkm_emulator::utils::{
-     load_elf_with_patch, split_prog_into_segs,
-};
+use zkm_emulator::utils::{load_elf_with_patch, split_prog_into_segs};
 use zkm_prover::all_stark::AllStark;
 use zkm_prover::config::StarkConfig;
 use zkm_prover::cpu::kernel::assembler::segment_kernel;
@@ -228,8 +226,6 @@ fn prove_multi_seg_common(
     result
 }
 
-
-
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum DataId {
     TYPE1,
@@ -278,8 +274,6 @@ impl Data {
         }
     }
 }
-
-
 
 fn main() {
     env_logger::try_init().unwrap_or_default();
