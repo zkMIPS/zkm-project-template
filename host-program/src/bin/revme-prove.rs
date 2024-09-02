@@ -293,7 +293,14 @@ fn main() {
         return; 
     };
     let mut data = vec![];
-    f.read_to_end(&mut data).unwrap();
+    //f.read_to_end(&mut data).unwrap();
+    match f.read_to_end(&mut data) {
+        Ok(_) => log::info!("File read successfully."),
+        Err(e) => {
+            log::info!("Failed to read file: {}", e);
+            return; 
+        }
+    };
 
     let mut state = load_elf_with_patch(&elf_path, vec![]);
     // load input
