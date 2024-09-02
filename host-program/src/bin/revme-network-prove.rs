@@ -31,8 +31,8 @@ async fn sign_ecdsa(request: &mut GenerateProofRequest, private_key: &str) {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::try_init().unwrap_or_default();
-    let elf_path = env::var("ELF_PATH").
-        unwrap_or("guest-program/mips-elf/zkm-mips-elf-revme-rust".to_string());
+    let elf_path = env::var("ELF_PATH")
+        .unwrap_or("guest-program/mips-elf/zkm-mips-elf-revme-rust".to_string());
     let output_dir = env::var("OUTPUT_DIR").unwrap_or("/tmp/zkm".to_string());
     let block_path = env::var("BLOCK_PATH").unwrap_or("".to_string());
     let block_no = env::var("BLOCK_NO").unwrap_or("0".to_string());
