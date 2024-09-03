@@ -89,6 +89,7 @@ Then, deploy the contract  refering to "### Deploy" in the contracts/README.md .
 ### Requirements
 * CA certificate:  ca.pem, ca.key
 * Register in the https://www.zkm.io/apply (Let your key be in the whitelist)
+* Set up a local node for some blockchain(eg, sepolia)
 
 ### Running the project
 
@@ -96,42 +97,25 @@ Then, deploy the contract  refering to "### Deploy" in the contracts/README.md .
 
 Please refer to : guest-program/README.md
 
-#### 1. Download the block 
-
-The block has your transaction.
-We use the following tool to download the block.
-
-* Compile the tool. 
-
-```
- git clone https://github.com/zkMIPS/cannon-mips
- cd cannon-mips && make 
-```
-
-* Config the tool. 
-  
-```
- mkdir -p /tmp/cannon
- export BASEDIR=/tmp/cannon; 
- export NODE=https://eth-sepolia.g.alchemy.com/v2/RH793ZL_pQkZb7KttcWcTlOjPrN0BjOW 
-```
-
-* Download some block. 
-
-```
- minigeth/go-ethereum 13284491
-```
-If it executes successfully, you will see the block information in the directory /tmp/cannon/0_13284491 .
-
-#### 2. Config your CA certificate
+#### 1. Config your CA certificate
 
 Put the ca.key and  ca.pem to some directory , such as , host-program/tool/ .
 
-If you don't have a CA certificate, you can generate it using the  certgen.sh in the director zkm-project-template/host-program/tool/.
+If you don't have a CA certificate, you can use the ca.key and  ca.pem in the  zkm-project-template/host-program/tool/.
+
+#### 2. Generate the public input for some block to be proving in some blockchain
+> [!NOTE]
+> The local node is GOAT chain in the following example.
+
 ```
- cd zkm-project-template/host-program/tool/
- chmod +x certgen.sh
- ./certgen.sh
+git clone https://github.com/zkMIPS/revme
+cd  revme
+RPC_URL=http://localhost:8545 CHAIN_ID=1337 BLOCK_NO=244 RUST_LOG=debug SUITE_JSON_PATH=./test-vectors/244.json cargo run --example process
+```
+If it executes successfully,  it will generate the 244.json in the director test-vectors.
+
+```
+cp test-vectors/244.json   zkm-project-template/host-program/test-vectors/
 ```
 
 #### 3. Generate the groth16 proof and  verifier Contract
@@ -146,18 +130,17 @@ export  PRIVATE_KEY=df4bc5647fdb9600ceb4943d4adff3749956a8512e5707716357b13d5ee6
 export RUST_LOG=info
 export ENDPOINT=https://152.32.186.45:20002    ##the test entry of zkm proving network 
 export SEG_SIZE=131072
-export BLOCK_PATH=/tmp/cannon/0_13284491
-export OUTPUT_DIR=/tmp/zkm
 export ELF_PATH=guest-program/mips-elf/zkm-mips-elf-revme-rust
+export PUBLIC_INPUT_PATH=host-program/test-vectors/244.json
 ```
 
 * Run the host program. 
 
 ```
-ARGS='12345678 654321'   cargo run --release  --bin revme-network-prove
+  cargo run --release  --bin revme-network-prove
 ```
 
-If it executes successfully,  it will output the similar message:
+If it executes successfully(about 13 minutes),  it will output the similar message:
 ```
 [2024-08-28T03:20:55Z INFO  stage] request: "1509d5b6-a9e3-4b2f-85b8-5739c35a1310"
 [2024-08-28T03:20:58Z INFO  stage] generate_proof response: GenerateProofResponse { status: 2, error_message: "", proof_id: "1509d5b6-a9e3-4b2f-85b8-5739c35a1310", proof_url: "http://152.32.186.45:20001/1509d5b6-a9e3-4b2f-85b8-5739c35a1310/final/proof_with_public_inputs.json", stark_proof_url: "http://152.32.186.45:20001/1509d5b6-a9e3-4b2f-85b8-5739c35a1310/aggregate/proof_with_public_inputs.json", solidity_verifier_url: "http://152.32.186.45:20001/verifier.sol", output_stream: [] }

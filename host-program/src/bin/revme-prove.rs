@@ -13,9 +13,7 @@ use plonky2x::backend::circuit::Groth16WrapperParameters;
 use plonky2x::backend::wrapper::wrap::WrappedCircuit;
 use plonky2x::frontend::builder::CircuitBuilder as WrapperBuilder;
 use plonky2x::prelude::DefaultParameters;
-use zkm_emulator::utils::{
-     load_elf_with_patch, split_prog_into_segs,
-};
+use zkm_emulator::utils::{load_elf_with_patch, split_prog_into_segs};
 use zkm_prover::all_stark::AllStark;
 use zkm_prover::config::StarkConfig;
 use zkm_prover::cpu::kernel::assembler::segment_kernel;
@@ -228,8 +226,6 @@ fn prove_multi_seg_common(
     result
 }
 
-
-
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum DataId {
     TYPE1,
@@ -279,20 +275,19 @@ impl Data {
     }
 }
 
-
-
 fn main() {
     env_logger::try_init().unwrap_or_default();
     // 1. split ELF into segs
-    let elf_path = env::var("ELF_PATH").unwrap_or("guest-program/mips-elf/zkm-mips-elf-revme-rust".to_string());
+    let elf_path = env::var("ELF_PATH")
+        .unwrap_or("guest-program/mips-elf/zkm-mips-elf-revme-rust".to_string());
     let seg_path = env::var("SEG_OUTPUT").expect("Segment output path is missing");
-    let json_path = env::var("JSON_PATH").unwrap_or("host-program/test-vectors/test.json".to_string());
+    let json_path =
+        env::var("JSON_PATH").unwrap_or("host-program/test-vectors/244.json".to_string());
     let seg_size = env::var("SEG_SIZE").unwrap_or("131072".to_string());
     let seg_size = seg_size.parse::<_>().unwrap_or(0);
     let mut f = File::open(json_path).unwrap();
     let mut data = vec![];
     f.read_to_end(&mut data).unwrap();
-
     let mut state = load_elf_with_patch(&elf_path, vec![]);
     // load input
     state.add_input_stream(&data);

@@ -13,9 +13,7 @@ use plonky2x::backend::circuit::Groth16WrapperParameters;
 use plonky2x::backend::wrapper::wrap::WrappedCircuit;
 use plonky2x::frontend::builder::CircuitBuilder as WrapperBuilder;
 use plonky2x::prelude::DefaultParameters;
-use zkm_emulator::utils::{
-     load_elf_with_patch, split_prog_into_segs, 
-};
+use zkm_emulator::utils::{load_elf_with_patch, split_prog_into_segs};
 use zkm_prover::all_stark::AllStark;
 use zkm_prover::config::StarkConfig;
 use zkm_prover::cpu::kernel::assembler::segment_kernel;
@@ -26,7 +24,6 @@ use zkm_prover::prover::prove;
 use zkm_prover::verifier::verify_proof;
 
 const DEGREE_BITS_RANGE: [Range<usize>; 6] = [10..21, 12..22, 12..21, 8..21, 6..21, 13..23];
-
 
 fn prove_single_seg_common(
     seg_file: &str,
@@ -229,8 +226,6 @@ fn prove_multi_seg_common(
     result
 }
 
-
-
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum DataId {
     TYPE1,
@@ -280,43 +275,35 @@ impl Data {
     }
 }
 
-
-
-
 fn main() {
     env_logger::try_init().unwrap_or_default();
-     // 1. split ELF into segs
-     let elf_path = env::var("ELF_PATH").unwrap_or("guest-program/mips-elf/zkm-mips-elf-add-go".to_string());
-     let seg_path = env::var("SEG_OUTPUT").expect("Segment output path is missing");
-     let seg_size = env::var("SEG_SIZE").unwrap_or("131072".to_string());
-     let seg_size = seg_size.parse::<_>().unwrap_or(0);
- 
-     let mut state = load_elf_with_patch(&elf_path, vec![]);
- 
-     let data = Data::new();
-     state.add_input_stream(&data);
-     log::info!(
-         "enum {} {} {}",
-         DataId::TYPE1 as u8,
-         DataId::TYPE2 as u8,
-         DataId::TYPE3 as u8
-     );
-     log::info!("public input: {:X?}", data);
- 
-     let (total_steps, mut state) = split_prog_into_segs(state, &seg_path, "", seg_size);
- 
-     let value = state.read_public_values::<Data>();
-     log::info!("public value: {:X?}", value);
- 
-     let mut seg_num = 1usize;
-     if seg_size != 0 {
-         seg_num = (total_steps + seg_size - 1) / seg_size;
-     }
- 
-     if seg_num == 1 {
-         let seg_file = format!("{seg_path}/{}", 0);
-         prove_single_seg_common(&seg_file, "", "", "", total_steps)
-     } else {
-         prove_multi_seg_common(&seg_path, "", "", "", seg_size, seg_num, 0).unwrap()
-     }
+    // 1. split ELF into segs
+    let elf_path =
+        env::var("ELF_PATH").unwrap_or("guest-program/mips-elf/zkm-mips-elf-add-go".to_string());
+    let seg_path = env::var("SEG_OUTPUT").expect("Segment output path is missing");
+    let seg_size = env::var("SEG_SIZE").unwrap_or("131072".to_string());
+    let seg_size = seg_size.parse::<_>().unwrap_or(0);
+    let mut state = load_elf_with_patch(&elf_path, vec![]);
+    let data = Data::new();
+    state.add_input_stream(&data);
+    log::info!(
+        "enum {} {} {}",
+        DataId::TYPE1 as u8,
+        DataId::TYPE2 as u8,
+        DataId::TYPE3 as u8
+    );
+    log::info!("public input: {:X?}", data);
+    let (total_steps, mut state) = split_prog_into_segs(state, &seg_path, "", seg_size);
+    let value = state.read_public_values::<Data>();
+    log::info!("public value: {:X?}", value);
+    let mut seg_num = 1usize;
+    if seg_size != 0 {
+        seg_num = (total_steps + seg_size - 1) / seg_size;
+    }
+    if seg_num == 1 {
+        let seg_file = format!("{seg_path}/{}", 0);
+        prove_single_seg_common(&seg_file, "", "", "", total_steps)
+    } else {
+        prove_multi_seg_common(&seg_path, "", "", "", seg_size, seg_num, 0).unwrap()
+    }
 }
