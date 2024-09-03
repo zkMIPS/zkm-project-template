@@ -285,23 +285,10 @@ fn main() {
         .unwrap_or("host-program/test-vectors/244.json".to_string());
     let seg_size = env::var("SEG_SIZE").unwrap_or("131072".to_string());
     let seg_size = seg_size.parse::<_>().unwrap_or(0);
-    //let mut f = File::open(json_path).unwrap();
-    let mut f = if let Ok(file) = File::open(json_path) {
-        file
-    } else {
-        log::info!("Failed to open file");
-        return; 
-    };
+    let mut f = File::open(json_path).unwrap();
+    
     let mut data = vec![];
-    //f.read_to_end(&mut data).unwrap();
-    match f.read_to_end(&mut data) {
-        Ok(_) => log::info!("File read successfully."),
-        Err(e) => {
-            log::info!("Failed to read file: {}", e);
-            return; 
-        }
-    };
-
+    f.read_to_end(&mut data).unwrap();
     let mut state = load_elf_with_patch(&elf_path, vec![]);
     // load input
     state.add_input_stream(&data);
