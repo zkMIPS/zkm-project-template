@@ -140,7 +140,7 @@ export PUBLIC_INPUT_PATH=host-program/test-vectors/244.json
   cargo run --release  --bin revme-network-prove
 ```
 
-If it executes successfully,  it will output the similar message:
+If it executes successfully(about 13 minutes),  it will output the similar message:
 ```
 [2024-08-28T03:20:55Z INFO  stage] request: "1509d5b6-a9e3-4b2f-85b8-5739c35a1310"
 [2024-08-28T03:20:58Z INFO  stage] generate_proof response: GenerateProofResponse { status: 2, error_message: "", proof_id: "1509d5b6-a9e3-4b2f-85b8-5739c35a1310", proof_url: "http://152.32.186.45:20001/1509d5b6-a9e3-4b2f-85b8-5739c35a1310/final/proof_with_public_inputs.json", stark_proof_url: "http://152.32.186.45:20001/1509d5b6-a9e3-4b2f-85b8-5739c35a1310/aggregate/proof_with_public_inputs.json", solidity_verifier_url: "http://152.32.186.45:20001/verifier.sol", output_stream: [] }
