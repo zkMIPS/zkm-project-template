@@ -1,8 +1,7 @@
-
-use tokio::time::Duration;
 use async_trait::async_trait;
-use serde::Serialize;
 use serde::Deserialize;
+use serde::Serialize;
+use tokio::time::Duration;
 
 #[derive(Debug, Default, Deserialize, Serialize)]
 pub struct ProverInput {
@@ -23,6 +22,14 @@ pub struct ProverResult {
 #[async_trait]
 pub trait Prover {
     async fn request_proof<'a>(&self, input: &'a ProverInput) -> anyhow::Result<String>;
-    async fn wait_proof<'a>(&self, proof_id: &'a str, timeout: Option<Duration>) -> anyhow::Result<Option<ProverResult>>;
-    async fn prover<'a>(&self, input: &'a ProverInput, timeout: Option<Duration>) -> anyhow::Result<Option<ProverResult>>;
+    async fn wait_proof<'a>(
+        &self,
+        proof_id: &'a str,
+        timeout: Option<Duration>,
+    ) -> anyhow::Result<Option<ProverResult>>;
+    async fn prover<'a>(
+        &self,
+        input: &'a ProverInput,
+        timeout: Option<Duration>,
+    ) -> anyhow::Result<Option<ProverResult>>;
 }

@@ -1,11 +1,10 @@
-
-pub mod prover;
 pub mod local;
 pub mod network;
+pub mod prover;
 
-use std::env;
-use prover::Prover;
 use network::prover::NetworkProver;
+use prover::Prover;
+use std::env;
 
 pub struct ProverClient {
     pub prover: Box<dyn Prover>,
@@ -14,7 +13,11 @@ pub struct ProverClient {
 impl ProverClient {
     pub fn new() -> Self {
         #[allow(unreachable_code)]
-        match env::var("ZKM_PROVER").unwrap_or("network".to_string()).to_lowercase().as_str() {
+        match env::var("ZKM_PROVER")
+            .unwrap_or("network".to_string())
+            .to_lowercase()
+            .as_str()
+        {
             // "local" => Self {
             //     prover: Box::new(CpuProver::new()),
             // },
@@ -32,7 +35,9 @@ impl ProverClient {
     // }
 
     pub fn network() -> Self {
-        Self { prover: Box::new(NetworkProver::default()) }
+        Self {
+            prover: Box::new(NetworkProver::default()),
+        }
     }
 }
 

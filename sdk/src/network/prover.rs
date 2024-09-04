@@ -3,13 +3,13 @@ use stage_service::stage_service_client::StageServiceClient;
 use stage_service::{GenerateProofRequest, GetStatusRequest};
 use std::env;
 use std::time::Instant;
-use tonic::transport::{Channel, ClientTlsConfig};
 use tonic::transport::Endpoint;
+use tonic::transport::{Channel, ClientTlsConfig};
 
-use ethers::signers::{LocalWallet, Signer};
 use crate::prover::{Prover, ProverInput, ProverResult};
-use tokio::time::Duration;
+use ethers::signers::{LocalWallet, Signer};
 use tokio::time::sleep;
+use tokio::time::Duration;
 
 use async_trait::async_trait;
 
@@ -33,7 +33,8 @@ impl NetworkProver {
         let ca_cert_path = env::var("CA_CERT_PATH").unwrap_or("".to_string());
         let cert_path = env::var("CERT_PATH").unwrap_or("".to_string());
         let key_path = env::var("KEY_PATH").unwrap_or("".to_string());
-        let domain_name = env::var("DOMAIN_NAME").unwrap_or(DEFALUT_PROVER_NETWORK_DOMAIN.to_string());
+        let domain_name =
+            env::var("DOMAIN_NAME").unwrap_or(DEFALUT_PROVER_NETWORK_DOMAIN.to_string());
         let private_key = env::var("PRIVATE_KEY").unwrap_or("".to_string());
 
         let ssl_config = if ca_cert_path.is_empty() {
@@ -41,7 +42,7 @@ impl NetworkProver {
         } else {
             Some(Config::new(ca_cert_path, cert_path, key_path).await?)
         };
-    
+
         let endpoint = match ssl_config {
             Some(config) => {
                 let mut tls_config = ClientTlsConfig::new().domain_name(domain_name);
@@ -57,7 +58,10 @@ impl NetworkProver {
         };
         let stage_client = StageServiceClient::connect(endpoint).await?;
         let wallet = private_key.parse::<LocalWallet>().unwrap();
-        Ok(NetworkProver { stage_client, wallet })
+        Ok(NetworkProver {
+            stage_client,
+            wallet,
+        })
     }
 
     pub async fn sign_ecdsa(&self, request: &mut GenerateProofRequest) {
@@ -72,7 +76,7 @@ impl NetworkProver {
 
 impl Default for NetworkProver {
     fn default() -> Self {
-        let rt = tokio::runtime::Runtime::new().unwrap();  
+        let rt = tokio::runtime::Runtime::new().unwrap();
         let result = rt.block_on(Self::new());
         result.unwrap()
     }
@@ -97,7 +101,11 @@ impl Prover for NetworkProver {
         Ok(response.proof_id)
     }
 
-    async fn wait_proof<'a>(&self, proof_id: &'a str, timeout: Option<Duration>) -> anyhow::Result<Option<ProverResult> > {
+    async fn wait_proof<'a>(
+        &self,
+        proof_id: &'a str,
+        timeout: Option<Duration>,
+    ) -> anyhow::Result<Option<ProverResult>> {
         let start_time = Instant::now();
         let mut client = self.stage_client.clone();
         loop {
@@ -110,10 +118,7 @@ impl Prover for NetworkProver {
             let get_status_request = GetStatusRequest {
                 proof_id: proof_id.to_string(),
             };
-            let get_status_response = client
-                .get_status(get_status_request)
-                .await?
-                .into_inner();
+            let get_status_response = client.get_status(get_status_request).await?.into_inner();
 
             match Status::from_i32(get_status_response.status as i32) {
                 Some(Status::Computing) => {
@@ -138,7 +143,11 @@ impl Prover for NetworkProver {
         }
     }
 
-    async fn prover<'a>(&self, input: &'a ProverInput, timeout: Option<Duration>) -> anyhow::Result<Option<ProverResult> > {
+    async fn prover<'a>(
+        &self,
+        input: &'a ProverInput,
+        timeout: Option<Duration>,
+    ) -> anyhow::Result<Option<ProverResult>> {
         let proof_id = self.request_proof(input).await?;
         self.wait_proof(&proof_id, timeout).await
     }
