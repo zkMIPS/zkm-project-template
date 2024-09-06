@@ -65,48 +65,66 @@ contract VerifierTest is Test {
     Verifier public verifier;
     
 
-    function loadProof() public view returns (ProofPublicData memory) {
-        string memory root = vm.projectRoot();
-        string memory path = string.concat(root, "/verifier/snark_proof_with_public_inputs.json");
-        string memory json = vm.readFile(path);
-        bytes memory jsonBytes = json.parseRaw(".");
-        return abi.decode(jsonBytes, (ProofPublicData));
-    }
+    
 
     function setUp() public {
-        ProofPublicData memory proof = loadProof();
-
         verifier = new Verifier();
     }
   
     function test_ValidProof() public {
-        ProofPublicData memory proof = loadProof();
-        uint256  [65] memory input;
-        for (uint256 i = 0; i < proof.PublicWitness.length; i++ ){
-		    input[i]= StdUtils.bytesToUint(proof.PublicWitness[i]);
-	    }
+        string memory root = vm.projectRoot();
+        string memory path = string.concat(root, "/verifier/snark_proof_with_public_inputs.json");
+        string memory json = vm.readFile(path);
+
+        ProofPublicData memory proofData;
+
+        bytes memory ProofAr = json.parseRaw(".Proof.Ar");
+        proofData.proof.ar = abi.decode(ProofAr, (AR));
         
-         Verifier.Proof memory verifierProof;
+        bytes memory ProofKrs = json.parseRaw(".Proof.Krs");
+        proofData.proof.krs = abi.decode(ProofKrs, (AR));
 
-        verifierProof.a.X = StdUtils.bytesToUint(proof.Proof.Ar.X);
-        verifierProof.a.Y = StdUtils.bytesToUint(proof.Proof.Ar.Y);
+        bytes memory ProofBs = json.parseRaw(".Proof.Bs");
+        proofData.proof.bs = abi.decode(ProofBs, (BS));
 
-        verifierProof.b.X[0] = StdUtils.bytesToUint(proof.Proof.Bs.X.A0);
-        verifierProof.b.X[1] = StdUtils.bytesToUint(proof.Proof.Bs.X.A1);
+        bytes memory ProofCommitments = json.parseRaw(".Proof.Commitments[0]");
+        proofData.proof.commitments[0] = abi.decode(ProofCommitments, (Commitment));
 
-        verifierProof.b.Y[0] = StdUtils.bytesToUint(proof.Proof.Bs.Y.A0);
-        verifierProof.b.Y[1] = StdUtils.bytesToUint(proof.Proof.Bs.Y.A1);
+        bytes memory ProofCommitment = json.parseRaw(".Proof.CommitmentPok");
+        proofData.proof.commitmentPok = abi.decode(ProofCommitment, (Commitment));
 
-        verifierProof.c.X = StdUtils.bytesToUint(proof.Proof.Krs.X);
-        verifierProof.c.Y = StdUtils.bytesToUint(proof.Proof.Krs.Y);
+        bytes memory publicWitness = json.parseRaw(".PublicWitness");
+        string[] memory pubwit = abi.decode(publicWitness, ( string[]));
+        
+        uint256  [65] memory input;
+         for (uint256 i = 0; i < pubwit.length; i++ ){
+            input[i]  =  vm.parseUint(pubwit[i]);
+	    }
+
+        //
+        Verifier.Proof memory verifierProof;
+
+        verifierProof.a.X =  vm.parseUint(proofData.proof.ar.x);
+        verifierProof.a.Y = vm.parseUint(proofData.proof.ar.y);
+
+        verifierProof.b.X[0] = vm.parseUint(proofData.proof.bs.x.a0);
+        verifierProof.b.X[1] = vm.parseUint(proofData.proof.bs.x.a1);
+
+        verifierProof.b.Y[0] = vm.parseUint(proofData.proof.bs.y.a0);
+        verifierProof.b.Y[1] = vm.parseUint(proofData.proof.bs.y.a1);
+
+        verifierProof.c.X = vm.parseUint(proofData.proof.krs.x);
+        verifierProof.c.Y = vm.parseUint(proofData.proof.krs.y);
 
         uint256  [2] memory proofCommitment;
-        proofCommitment[0] = StdUtils.bytesToUint(proof.Proof.Commitments[0].X);
-        proofCommitment[1] = StdUtils.bytesToUint(proof.Proof.Commitments[0].Y);
+        proofCommitment[0] = vm.parseUint(proofData.proof.commitments[0].x);
+        proofCommitment[1] =vm.parseUint(proofData.proof.commitments[0].y);
 
         bool ret ;
-        ret = verifier.verifyTx(verifierProof, input, proofCommitment);
+        ret = verifier.verifyTx(verifierProof, input, proofCommitment); 
+       
+         assert(ret == true); 
 
-         assert(ret == true);
     }
+
 }
