@@ -24,7 +24,7 @@ $ forge build
 ### Test
 
 ```shell
-$ forge test (TBD)
+$ forge test 
 ```
 
 ### Format
