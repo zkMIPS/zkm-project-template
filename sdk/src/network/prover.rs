@@ -128,7 +128,6 @@ impl Prover for NetworkProver {
                     let proof_result = ProverResult {
                         output_stream: get_status_response.output_stream,
                         proof_with_public_inputs: get_status_response.proof_with_public_inputs,
-                        ..Default::default()
                     };
                     return Ok(Some(proof_result));
                 }
