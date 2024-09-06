@@ -8,39 +8,37 @@ import {StdUtils} from  "forge-std/StdUtils.sol";
 import {console}  from "forge-std/console.sol";
 
 struct XX {
-	bytes A0 ;
-	bytes A1 ;
+	string a0 ;
+	string a1 ;
 }
 
 struct BS {
-	XX X;
-	XX Y;
+	XX x;
+	XX y;
 }
 
 struct AR {
-	bytes X ;
-	bytes Y ;
+	string x ;
+	string y ;
 }
 
 struct Commitment {
-	bytes X ;
-	bytes Y ;
+	string x ;
+	string y ;
 }
 
 struct PROOF {
-	AR  Ar ;
-	AR  Krs;
-	BS  Bs;
-	Commitment[] Commitments;
-    Commitment   CommitmentPok;
+	AR  ar ;
+	AR  krs;
+	BS  bs;
+	Commitment[1] commitments;
+    Commitment   commitmentPok;
 }
 
 struct ProofPublicData{
-    PROOF Proof;
-    bytes[] PublicWitness;
+    PROOF proof;
+    string[65] publicWitness;
 }
-
-////////
 
 struct PairingG1Point {
    uint256 X;
@@ -58,15 +56,11 @@ struct VerifierProof {
 	PairingG1Point C ;
 }
 
-
 contract VerifierTest is Test {
     using stdJson for string;
 
     Verifier public verifier;
     
-
-    
-
     function setUp() public {
         verifier = new Verifier();
     }
@@ -101,7 +95,6 @@ contract VerifierTest is Test {
             input[i]  =  vm.parseUint(pubwit[i]);
 	    }
 
-        //
         Verifier.Proof memory verifierProof;
 
         verifierProof.a.X =  vm.parseUint(proofData.proof.ar.x);
@@ -120,8 +113,7 @@ contract VerifierTest is Test {
         proofCommitment[0] = vm.parseUint(proofData.proof.commitments[0].x);
         proofCommitment[1] =vm.parseUint(proofData.proof.commitments[0].y);
 
-        bool ret ;
-        ret = verifier.verifyTx(verifierProof, input, proofCommitment); 
+        bool ret = verifier.verifyTx(verifierProof, input, proofCommitment); 
        
          assert(ret == true); 
 
