@@ -11,7 +11,7 @@ pub struct ProverClient {
 }
 
 impl ProverClient {
-    pub fn new() -> Self {
+    pub async fn new() -> Self {
         #[allow(unreachable_code)]
         match env::var("ZKM_PROVER")
             .unwrap_or("network".to_string())
@@ -22,7 +22,7 @@ impl ProverClient {
             //     prover: Box::new(CpuProver::new()),
             // },
             "network" => Self {
-                prover: Box::new(NetworkProver::default()),
+                prover: Box::new(NetworkProver::new().await.unwrap()),
             },
             _ => panic!(
                 "invalid value for ZKM_PROVER enviroment variable: expected 'local', or 'network'"
@@ -34,15 +34,9 @@ impl ProverClient {
     //     Self { prover: Box::new(CpuProver::new()) }
     // }
 
-    pub fn network() -> Self {
+    pub async fn network() -> Self {
         Self {
-            prover: Box::new(NetworkProver::default()),
+            prover: Box::new(NetworkProver::new().await.unwrap()),
         }
-    }
-}
-
-impl Default for ProverClient {
-    fn default() -> Self {
-        Self::new()
     }
 }

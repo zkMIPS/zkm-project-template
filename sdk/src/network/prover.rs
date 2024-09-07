@@ -74,14 +74,6 @@ impl NetworkProver {
     }
 }
 
-impl Default for NetworkProver {
-    fn default() -> Self {
-        let rt = tokio::runtime::Runtime::new().unwrap();
-        let result = rt.block_on(Self::new());
-        result.unwrap()
-    }
-}
-
 #[async_trait]
 impl Prover for NetworkProver {
     async fn request_proof<'a>(&self, input: &'a ProverInput) -> anyhow::Result<String> {
