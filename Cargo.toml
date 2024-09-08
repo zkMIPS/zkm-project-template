@@ -1,7 +1,8 @@
 [workspace]
 members = [
 
-   "host-program"
+   "host-program",
+   "sdk"
   ]
 resolver = "2"
 
