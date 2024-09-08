@@ -26,18 +26,16 @@ message BlockFileItem {
 }
 
 message GenerateProofRequest {
-    uint64 chain_id = 1;
-    uint64 timestamp = 2;
-    string proof_id = 3;
-    bytes elf_data = 4;
-    repeated BlockFileItem block_data = 5;
-    uint64 block_no = 6;
-    uint32 seg_size = 7;
-    string args = 8;
-    string signature = 9; 
-    bytes public_input_stream = 10;
-    bytes private_input_stream = 11;
-    bool execute_only = 12;
+    string proof_id = 1;
+    bytes elf_data = 2;
+    repeated BlockFileItem block_data = 3;
+    optional uint64 block_no = 4;
+    uint32 seg_size = 5;
+    string args = 6;
+    string signature = 7;
+    bytes public_input_stream = 8;
+    bytes private_input_stream = 9;
+    bool execute_only = 10;
 }
 
 message GenerateProofResponse {

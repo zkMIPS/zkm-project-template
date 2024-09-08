@@ -65,10 +65,17 @@ impl NetworkProver {
     }
 
     pub async fn sign_ecdsa(&self, request: &mut GenerateProofRequest) {
-        let sign_data = format!(
-            "{}&{}&{}&{}",
-            request.proof_id, request.block_no, request.seg_size, request.args
-        );
+        let sign_data = match request.block_no {
+            Some(block_no) => {
+                format!(
+                    "{}&{}&{}&{}",
+                    request.proof_id, block_no, request.seg_size, request.args
+                )
+            }
+            None => {
+                format!("{}&{}&{}", request.proof_id, request.seg_size, request.args)
+            }
+        };
         let signature = self.wallet.sign_message(sign_data).await.unwrap();
         request.signature = signature.to_string();
     }
