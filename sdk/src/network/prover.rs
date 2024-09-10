@@ -79,6 +79,12 @@ impl NetworkProver {
         let signature = self.wallet.sign_message(sign_data).await.unwrap();
         request.signature = signature.to_string();
     }
+
+    pub async fn download_file(url: &str) -> anyhow::Result<Vec<u8>> {
+        let response = reqwest::get(url).await?;
+        let content = response.bytes().await?;
+        Ok(content.to_vec())
+    }
 }
 
 #[async_trait]
@@ -121,12 +127,20 @@ impl Prover for NetworkProver {
 
             match Status::from_i32(get_status_response.status as i32) {
                 Some(Status::Computing) => {
+                    log::debug!("generate_proof step: {}", get_status_response.step);
                     sleep(Duration::from_secs(2)).await;
                 }
                 Some(Status::Success) => {
+                    let stark_proof =
+                        NetworkProver::download_file(&get_status_response.stark_proof_url).await?;
+                    let solidity_verifier =
+                        NetworkProver::download_file(&get_status_response.solidity_verifier_url)
+                            .await?;
                     let proof_result = ProverResult {
                         output_stream: get_status_response.output_stream,
                         proof_with_public_inputs: get_status_response.proof_with_public_inputs,
+                        stark_proof,
+                        solidity_verifier,
                     };
                     return Ok(Some(proof_result));
                 }

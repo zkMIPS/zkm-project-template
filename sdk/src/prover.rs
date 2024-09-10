@@ -15,8 +15,9 @@ pub struct ProverInput {
 #[derive(Debug, Default, Deserialize, Serialize)]
 pub struct ProverResult {
     pub output_stream: Vec<u8>,
-    // pub stark_proof: Vec<u8>,
     pub proof_with_public_inputs: Vec<u8>,
+    pub stark_proof: Vec<u8>,
+    pub solidity_verifier: Vec<u8>,
 }
 
 #[async_trait]
