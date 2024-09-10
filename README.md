@@ -50,6 +50,9 @@ If the memory is insufficient, please reduce the SEG_SIZE to 131072 .
 
 #### 2. Convert plonky2 proof to groth16 proof
 
+> [!NOTE]
+> If the  benchmark or gnark_sol_caller dees not work, you can compile them using the repo: https://github.com/zkMIPS/gnark-plonky2-verifier .
+
 Copy the  three files generated in the previous step to the testdata/mips directory. 
 
 ```
@@ -128,38 +131,38 @@ export CA_CERT_PATH=host-program/tool/ca.pem
 export  PRIVATE_KEY=df4bc5647fdb9600ceb4943d4adff3749956a8512e5707716357b13d5ee687d9   ##For testing, No changing the key!
 
 export RUST_LOG=info
-export ENDPOINT=https://152.32.186.45:20002    ##the test entry of zkm proving network 
+export ENDPOINT=https://152.32.186.45:20002    ##The test entry of zkm proving network 
 export SEG_SIZE=131072
 export ELF_PATH=guest-program/mips-elf/zkm-mips-elf-revme-rust
 export PUBLIC_INPUT_PATH=host-program/test-vectors/244.json
+export ZKM_PROVER=network
+export OUTPUT_DIR=/tmp                 ##Setting the paht for saving the proof and contract
 ```
 
 * Run the host program. 
+  
+> [!NOTE]
+> The proving network may sometimes experience high traffic, causing proof tasks to be queued for hours; therefore, it is advisable to run the client in the background (or utilize a screen session).
+
 
 ```
-  cargo run --release  --bin revme-network-prove
+ cd zkm-project-template
+ cargo build --release
+ nohup ./target/release/revme-network-prove  >./network_proving.log 2>&1 &
 ```
 
-If it executes successfully(about 13 minutes),  it will output the similar message:
+If it executes successfully,  it will output the similar message:
 ```
-[2024-08-28T03:20:55Z INFO  stage] request: "1509d5b6-a9e3-4b2f-85b8-5739c35a1310"
-[2024-08-28T03:20:58Z INFO  stage] generate_proof response: GenerateProofResponse { status: 2, error_message: "", proof_id: "1509d5b6-a9e3-4b2f-85b8-5739c35a1310", proof_url: "http://152.32.186.45:20001/1509d5b6-a9e3-4b2f-85b8-5739c35a1310/final/proof_with_public_inputs.json", stark_proof_url: "http://152.32.186.45:20001/1509d5b6-a9e3-4b2f-85b8-5739c35a1310/aggregate/proof_with_public_inputs.json", solidity_verifier_url: "http://152.32.186.45:20001/verifier.sol", output_stream: [] }
-[2024-08-28T03:21:52Z INFO  stage] generate_proof success public_inputs_size: 1546, output_size: 0
-[2024-08-28T03:21:52Z INFO  stage] Elapsed time: 56 secs
-```
-
-* Download the proof and contract
-
-In the above output, we need the proof_url: "http://152.32.186.45:20001/1509d5b6-a9e3-4b2f-85b8-5739c35a1310/final/proof_with_public_inputs.json" and solidity_verifier_url: "http://152.32.186.45:20001/verifier.sol" .
+tail -f network_proving.log
 
 ```
-wget http://152.32.186.45:20001/1509d5b6-a9e3-4b2f-85b8-5739c35a1310/final/proof_with_public_inputs.json
-wget http://152.32.186.45:20001/verifier.sol
+
+* Move the proof and contract
+
 ```
-Then, move the proof and verifier.sol to contracts directory.
-```
-mv proof_with_public_inputs.json  contracts/verifier/
-mv verifier.sol contracts/src/
+cd zkm-project-template
+mv $OUTPUT_DIR/snark_proof_with_public_inputs.json  contracts/verifier/
+mv $OUTPUT_DIR/verifier.sol contracts/src/
 ```
 
 #### 4. Deploy Verifier Contract.
