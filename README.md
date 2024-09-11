@@ -128,15 +128,15 @@ cp test-vectors/244.json   zkm-project-template/host-program/test-vectors/
 ```
 cd zkm-project-template
 export CA_CERT_PATH=host-program/tool/ca.pem   
-export  PRIVATE_KEY=xxxxxxxxxx   ## The public key's private key when registering in the https://www.zkm.io/apply
+export  PRIVATE_KEY=xxxxxxxxxx   ## The private key corresponding to the public key when registering in the https://www.zkm.io/apply
 
 export RUST_LOG=info
-export ENDPOINT=https://152.32.186.45:20002    ##The test entry of zkm proving network 
+export ENDPOINT=https://152.32.186.45:20002    
 export SEG_SIZE=131072
 export ELF_PATH=guest-program/mips-elf/zkm-mips-elf-revme-rust
 export PUBLIC_INPUT_PATH=host-program/test-vectors/244.json
 export ZKM_PROVER=network
-export OUTPUT_DIR=/tmp                 ##Setting the paht for saving the proof and contract
+export OUTPUT_DIR=/tmp/zkm                 ##Setting the path for saving the proof and contract
 ```
 
 * Run the host program. 
