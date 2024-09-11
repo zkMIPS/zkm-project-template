@@ -25,7 +25,7 @@ GOOS=linux GOARCH=mips GOMIPS=softfloat go build .
   
 ```
 cd zkm-project-template/guest-program/revme
-cargo build --target=mips-unknown-linux-musl
+cargo build --target=mips-unknown-linux-musl --release
 ```
-The compiled mips ELF is in  zkm-project-template/guest-program/revme/target/mips-unknown-linux-musl/debug/
+The compiled mips ELF is in the zkm-project-template/guest-program/revme/target/mips-unknown-linux-musl/release/zkm-mips-elf-revme-rust
 
