@@ -172,7 +172,7 @@ impl Prover for NetworkProver {
     ) -> anyhow::Result<Option<ProverResult>> {
         log::info!("calling request_proof.");
         let proof_id = self.request_proof(input).await?;
-        log::info!("calling wait_proof, proof_id={}",proof_id);
+        log::info!("calling wait_proof, proof_id={}", proof_id);
         self.wait_proof(&proof_id, timeout).await
     }
 }

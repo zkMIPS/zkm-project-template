@@ -4,7 +4,7 @@ use std::env;
 use std::path::Path;
 use std::time::Instant;
 
-use zkm_sdk::{ProverClient, prover::ProverInput};
+use zkm_sdk::{prover::ProverInput, ProverClient};
 
 use std::fs::read;
 
@@ -12,8 +12,7 @@ use std::fs::read;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::try_init().unwrap_or_default();
     log::info!("new prover client.");
-    let prover_lient = ProverClient::new().await;  //ENV ：ZKM_PROVER=network
-
+    let prover_client = ProverClient::new().await;  //ENV : ZKM_PROVER=network
     log::info!("new prover client,ok.");
 
     let seg_size = env::var("SEG_SIZE").unwrap_or("131072".to_string());
@@ -25,7 +24,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let public_input_path = env::var("PUBLIC_INPUT_PATH").unwrap_or("".to_string());
     let private_input_path = env::var("PRIVATE_INPUT_PATH").unwrap_or("".to_string());
         
-    let input = ProverInput{
+    let input = ProverInput {
         elf: read(elf_path).unwrap(),
         public_inputstream: read(public_input_path).unwrap_or("".into()),
         private_inputstream: read(private_input_path).unwrap_or("".into()),
@@ -35,7 +34,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //
     let start = Instant::now();
     let output_dir = env::var("OUTPUT_DIR").unwrap_or("/tmp/zkm".to_string());
-    let proving_result = prover_lient.prover.prove(&input,None).await;
+    let proving_result = prover_client.prover.prove(&input, None).await;
     //match proverClient.await.prover.prover(&input,None).await {
     match proving_result {
         Ok(Some(prover_result)) => {
@@ -50,14 +49,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let contract_path = output_path.join("verifier.sol");
             let _ = file::new(&contract_path.to_string_lossy())
                 .write(prover_result.solidity_verifier.as_slice());
-        },
+        }
         Ok(None) => {
             log::info!("Failed to generate proof.The result is None.");
-        },
+        }
         Err(e) => {     
             log::info!("Failed to generate proof. error: {}", e);
             return Ok(());
-        },
+        }
     }
 
     let end = Instant::now();
