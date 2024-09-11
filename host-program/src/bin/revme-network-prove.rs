@@ -41,7 +41,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let output_path = Path::new(&output_dir);
             let proof_result_path = output_path.join("snark_proof_with_public_inputs.json");
             let _ = file::new(&proof_result_path.to_string_lossy())
-                .write(prover_result.proof_with_public_inputs.as_slice());            
+                .write(prover_result.proof_with_public_inputs.as_slice());
+                      
             //contract
             let output_path = Path::new(&output_dir);
             let contract_path = output_path.join("verifier.sol");
