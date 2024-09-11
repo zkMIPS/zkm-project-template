@@ -16,9 +16,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     log::info!("new prover client,ok.");
 
     let seg_size = env::var("SEG_SIZE").unwrap_or("131072".to_string());
-    let seg_size = seg_size.parse::<_>().unwrap_or(131072);
+    let seg_size2 = seg_size.parse::<_>().unwrap_or(131072);
     let execute_only = env::var("EXECUTE_ONLY").unwrap_or("false".to_string());
-    let execute_only = execute_only.parse::<bool>().unwrap_or(false);
+    let execute_only2 = execute_only.parse::<bool>().unwrap_or(false);
     let elf_path = env::var("ELF_PATH")
         .unwrap_or("guest-program/mips-elf/zkm-mips-elf-revme-rust".to_string());
     let public_input_path = env::var("PUBLIC_INPUT_PATH").unwrap_or("".to_string());
@@ -27,8 +27,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         elf: read(elf_path).unwrap(),
         public_inputstream: read(public_input_path).unwrap_or("".into()),
         private_inputstream: read(private_input_path).unwrap_or("".into()),
-        seg_size: seg_size,
-        execute_only: execute_only,
+        seg_size: seg_size2,
+        execute_only: execute_only2,
     };
     //
     let start = Instant::now();
