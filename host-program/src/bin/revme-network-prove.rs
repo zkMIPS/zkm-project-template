@@ -35,7 +35,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //
     let start = Instant::now();
     let output_dir = env::var("OUTPUT_DIR").unwrap_or("/tmp/zkm".to_string());
-    let proving_result = prover_lient.prover.prover(&input,None).await;
+    let proving_result = prover_lient.prover.prove(&input,None).await;
     //match proverClient.await.prover.prover(&input,None).await {
     match proving_result {
         Ok(Some(prover_result)) => {
