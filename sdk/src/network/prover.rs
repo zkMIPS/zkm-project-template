@@ -129,13 +129,13 @@ impl Prover for NetworkProver {
                 Some(Status::Computing) => {
                     //log::info!("generate_proof step: {}", get_status_response.step);
                     match get_status_response.step {
-                        Step::Init => log::info!("generate_proof : queuing the task."),
-                        Step::InSplit => log::info!("generate_proof : splitting the task."),
-                        Step::InProve => log::info!("generate_proof : proving the task."),
-                        Step::InAgg => log::info!("generate_proof : aggregating the proof."),
-                        Step::InAggAll => log::info!("generate_proof : aggregating the proof."),
-                        Step::InFinal => log::info!("generate_proof : finalizing the proof."),
-                        Step::End => log::info!("generate_proof : completing the proof."),
+                        0 => log::info!("generate_proof : queuing the task."),
+                        1 => log::info!("generate_proof : splitting the task."),
+                        2 => log::info!("generate_proof : proving the task."),
+                        3 => log::info!("generate_proof : aggregating the proof."),
+                        4 => log::info!("generate_proof : aggregating the proof."),
+                        5 => log::info!("generate_proof : finalizing the proof."),
+                        6 => log::info!("generate_proof : completing the proof."),
                     }
                     sleep(Duration::from_secs(30)).await;
                 }
