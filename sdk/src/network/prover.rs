@@ -136,6 +136,7 @@ impl Prover for NetworkProver {
                         4 => log::info!("generate_proof : aggregating the proof."),
                         5 => log::info!("generate_proof : finalizing the proof."),
                         6 => log::info!("generate_proof : completing the proof."),
+                        i32::MIN..=-1_i32 | 7_i32..=i32::MAX => todo!(),
                     }
                     sleep(Duration::from_secs(30)).await;
                 }
