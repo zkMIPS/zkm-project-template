@@ -49,7 +49,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let output_path = Path::new(&output_dir);
             let contract_path = output_path.join("verifier.sol");
             let _ = file::new(&contract_path.to_string_lossy())
-                .write(prover_result.output_stream.as_slice());
+                .write(prover_result.solidity_verifier.as_slice());
         },
         Ok(None) => {
             log::info!("Failed to generate proof.The result is None.");

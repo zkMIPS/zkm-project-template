@@ -127,7 +127,7 @@ impl Prover for NetworkProver {
 
             match Status::from_i32(get_status_response.status as i32) {
                 Some(Status::Computing) => {
-                    log::debug!("generate_proof step: {}", get_status_response.step);
+                    log::info!("generate_proof step: {}", get_status_response.step);
                     sleep(Duration::from_secs(2)).await;
                 }
                 Some(Status::Success) => {
@@ -155,7 +155,7 @@ impl Prover for NetworkProver {
         }
     }
 
-    async fn prover<'a>(
+    async fn prove<'a>(
         &self,
         input: &'a ProverInput,
         timeout: Option<Duration>,

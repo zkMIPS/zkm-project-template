@@ -28,7 +28,7 @@ pub trait Prover {
         proof_id: &'a str,
         timeout: Option<Duration>,
     ) -> anyhow::Result<Option<ProverResult>>;
-    async fn prover<'a>(
+    async fn prove<'a>(
         &self,
         input: &'a ProverInput,
         timeout: Option<Duration>,
