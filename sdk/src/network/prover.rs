@@ -127,8 +127,17 @@ impl Prover for NetworkProver {
 
             match Status::from_i32(get_status_response.status as i32) {
                 Some(Status::Computing) => {
-                    log::info!("generate_proof step: {}", get_status_response.step);
-                    sleep(Duration::from_secs(2)).await;
+                    //log::info!("generate_proof step: {}", get_status_response.step);
+                    match get_status_response.step {
+                        Step::Init => log::info!("generate_proof : queuing the task."),
+                        Step::InSplit => log::info!("generate_proof : splitting the task."),
+                        Step::InProve => log::info!("generate_proof : proving the task."),
+                        Step::InAgg => log::info!("generate_proof : aggregating the proof."),
+                        Step::InAggAll => log::info!("generate_proof : aggregating the proof."),
+                        Step::InFinal => log::info!("generate_proof : finalizing the proof."),
+                        Step::End => log::info!("generate_proof : completing the proof."),
+                    }
+                    sleep(Duration::from_secs(30)).await;
                 }
                 Some(Status::Success) => {
                     let stark_proof =
@@ -162,7 +171,7 @@ impl Prover for NetworkProver {
     ) -> anyhow::Result<Option<ProverResult>> {
         log::info!("calling request_proof.");
         let proof_id = self.request_proof(input).await?;
-        log::info!("calling wait_proof.");
+        log::info!("calling wait_proof, proof_id={}",proof_id);
         self.wait_proof(&proof_id, timeout).await
     }
 }
