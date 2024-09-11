@@ -12,7 +12,7 @@ use std::fs::read;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::try_init().unwrap_or_default();
     log::info!("new prover client.");
-    let prover_client = ProverClient::new().await;  
+    let prover_client = ProverClient::new().await;
     log::info!("new prover client,ok.");
 
     let seg_size = env::var("SEG_SIZE").unwrap_or("131072".to_string());
@@ -22,7 +22,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let elf_path = env::var("ELF_PATH")
         .unwrap_or("guest-program/mips-elf/zkm-mips-elf-revme-rust".to_string());
     let public_input_path = env::var("PUBLIC_INPUT_PATH").unwrap_or("".to_string());
-    let private_input_path = env::var("PRIVATE_INPUT_PATH").unwrap_or("".to_string());    
+    let private_input_path = env::var("PRIVATE_INPUT_PATH").unwrap_or("".to_string());
     let input = ProverInput {
         elf: read(elf_path).unwrap(),
         public_inputstream: read(public_input_path).unwrap_or("".into()),
