@@ -34,7 +34,9 @@ fi
 echo && echo "Cleaning up..."
 rm "mips-linux-muslsf-cross.tgz"
 
-CONFIG_FILE="$HOME/.cargo/config2"
+CONFIG_FILE="$HOME/.cargo/config"
+
+touch CONFIG_FILE
 
 TARGET_CONFIG="[target.mips-unknown-linux-musl]
 linker = \"$MIPS_BIN_DIR/mips-linux-muslsf-gcc\"

@@ -4,15 +4,25 @@ ZKM can generate proof for  Go and Rust (guest) Programs.
 
 > [!NOTE]
 > In the mips-elf directory, We have prepared the relative mips ELF which are ready for proof use.  
+> If you want to compile the guest programs, you should use a x86 Ubuntu22 machine with Rust: 1.81.0-nightly and Go : 1.22.1
 
-We will provide users with Go and Rust tools to facilitate the building of guest programs. 
-But you should use the zkm repo to build the Go/Rust guest programs at present. Please refer to  https://github.com/zkMIPS/zkm/blob/main/prover/examples/README.md 
+* Install the mips-rust tool(the cargo should be ~/.cargo).
+
+```
+cd zkm-project-template
+chmod +x install_mips_rust_tool
+./install_mips_rust_tool
+```
+
+* Compile the go guest program
  
 ```
 cd prover/examples/add-go
 GOOS=linux GOARCH=mips GOMIPS=softfloat go build .
 ```
-or
+
+* Compile the rust guest program
+  
 ```
 cargo build --target=mips-unknown-linux-musl
 ```

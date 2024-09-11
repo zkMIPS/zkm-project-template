@@ -128,7 +128,7 @@ cp test-vectors/244.json   zkm-project-template/host-program/test-vectors/
 ```
 cd zkm-project-template
 export CA_CERT_PATH=host-program/tool/ca.pem   
-export  PRIVATE_KEY=df4bc5647fdb9600ceb4943d4adff3749956a8512e5707716357b13d5ee687d9   ##For testing, No changing the key!
+export  PRIVATE_KEY=xxxxxxxxxx   ## The public key's private key when registering in the https://www.zkm.io/apply
 
 export RUST_LOG=info
 export ENDPOINT=https://152.32.186.45:20002    ##The test entry of zkm proving network 
