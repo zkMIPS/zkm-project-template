@@ -51,7 +51,7 @@ If the memory is insufficient, please reduce the SEG_SIZE to 131072 .
 #### 2. Convert plonky2 proof to groth16 proof
 
 > [!NOTE]
-> If the  benchmark or gnark_sol_caller dees not work, you can compile them using the repo: https://github.com/zkMIPS/gnark-plonky2-verifier .
+> If the  benchmark or gnark_sol_caller does not work, you can compile them using the repo: https://github.com/zkMIPS/gnark-plonky2-verifier .
 
 Copy the  three files generated in the previous step to the testdata/mips directory. 
 
@@ -91,7 +91,7 @@ Then, deploy the contract  refering to "### Deploy" in the contracts/README.md .
 
 ### Requirements
 * CA certificate:  ca.pem, ca.key
-* Register in the https://www.zkm.io/apply (Let your key be in the whitelist)
+* Register in the https://www.zkm.io/apply (Let your public key be in the whitelist)
 * Set up a local node for some blockchain(eg, sepolia)
 
 ### Running the project
@@ -108,7 +108,7 @@ If you don't have a CA certificate, you can use the ca.key and  ca.pem in the  z
 
 #### 2. Generate the public input for some block to be proving in some blockchain
 > [!NOTE]
-> The local node is GOAT chain in the following example.
+> The local node is the GOAT test chain in the following example.
 
 ```
 git clone https://github.com/zkMIPS/revme
