@@ -24,7 +24,8 @@ GOOS=linux GOARCH=mips GOMIPS=softfloat go build .
 * Compile the rust guest program
   
 ```
+cd zkm-project-template/guest-program/revme
 cargo build --target=mips-unknown-linux-musl
 ```
-
+The compiled mips ELF is in  zkm-project-template/guest-program/revme/target/mips-unknown-linux-musl/debug/
 

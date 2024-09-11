@@ -143,6 +143,7 @@ export OUTPUT_DIR=/tmp                 ##Setting the paht for saving the proof a
   
 > [!NOTE]
 > The proving network may sometimes experience high traffic, causing proof tasks to be queued for hours; therefore, it is advisable to run the client in the background (or utilize a screen session).
+> The proving task requires several stages: queuing, splitting, proving, aggregating and finalizing. Each stage involves a varying duration.
 
 
 ```
@@ -154,6 +155,43 @@ export OUTPUT_DIR=/tmp                 ##Setting the paht for saving the proof a
 If it executes successfully,  it will output the similar message:
 ```
 tail -f network_proving.log
+
+[2024-09-11T02:33:27Z INFO  revme_network_prove] new prover client.
+[2024-09-11T02:33:28Z INFO  revme_network_prove] new prover client,ok.
+[2024-09-11T02:33:28Z INFO  zkm_sdk::network::prover] calling request_proof.
+[2024-09-11T02:33:45Z INFO  zkm_sdk::network::prover] calling wait_proof, proof_id=cbac84b8-d5bc-4d39-a7f2-be8ffccd91bc
+[2024-09-11T02:33:45Z INFO  zkm_sdk::network::prover] generate_proof : queuing the task.
+[2024-09-11T02:34:16Z INFO  zkm_sdk::network::prover] generate_proof : splitting the task.
+[2024-09-11T02:34:46Z INFO  zkm_sdk::network::prover] generate_proof : splitting the task.
+[2024-09-11T02:35:16Z INFO  zkm_sdk::network::prover] generate_proof : splitting the task.
+[2024-09-11T02:35:46Z INFO  zkm_sdk::network::prover] generate_proof : splitting the task.
+[2024-09-11T02:36:17Z INFO  zkm_sdk::network::prover] generate_proof : splitting the task.
+[2024-09-11T02:36:47Z INFO  zkm_sdk::network::prover] generate_proof : splitting the task.
+[2024-09-11T02:37:17Z INFO  zkm_sdk::network::prover] generate_proof : splitting the task.
+[2024-09-11T02:37:47Z INFO  zkm_sdk::network::prover] generate_proof : splitting the task.
+[2024-09-11T02:38:18Z INFO  zkm_sdk::network::prover] generate_proof : splitting the task.
+[2024-09-11T02:38:48Z INFO  zkm_sdk::network::prover] generate_proof : proving the task.
+[2024-09-11T02:39:18Z INFO  zkm_sdk::network::prover] generate_proof : proving the task.
+[2024-09-11T02:39:48Z INFO  zkm_sdk::network::prover] generate_proof : proving the task.
+[2024-09-11T02:40:18Z INFO  zkm_sdk::network::prover] generate_proof : proving the task.
+[2024-09-11T02:40:49Z INFO  zkm_sdk::network::prover] generate_proof : proving the task.
+[2024-09-11T02:41:19Z INFO  zkm_sdk::network::prover] generate_proof : proving the task.
+//...
+[2024-09-11T07:22:08Z INFO  zkm_sdk::network::prover] generate_proof : proving the task.
+[2024-09-11T07:22:38Z INFO  zkm_sdk::network::prover] generate_proof : aggregating the proof.
+[2024-09-11T07:23:08Z INFO  zkm_sdk::network::prover] generate_proof : aggregating the proof.
+[2024-09-11T07:23:38Z INFO  zkm_sdk::network::prover] generate_proof : aggregating the proof.
+[2024-09-11T07:24:09Z INFO  zkm_sdk::network::prover] generate_proof : aggregating the proof.
+[2024-09-11T07:24:39Z INFO  zkm_sdk::network::prover] generate_proof : aggregating the proof.
+[2024-09-11T07:25:09Z INFO  zkm_sdk::network::prover] generate_proof : aggregating the proof.
+[2024-09-11T07:25:39Z INFO  zkm_sdk::network::prover] generate_proof : aggregating the proof.
+[2024-09-11T07:28:41Z INFO  zkm_sdk::network::prover] generate_proof : aggregating the proof.
+[2024-09-11T07:29:11Z INFO  zkm_sdk::network::prover] generate_proof : aggregating the proof.
+[2024-09-11T07:29:41Z INFO  zkm_sdk::network::prover] generate_proof : aggregating the proof.
+[2024-09-11T07:30:11Z INFO  zkm_sdk::network::prover] generate_proof : aggregating the proof.
+[2024-09-11T07:30:42Z INFO  zkm_sdk::network::prover] generate_proof : finalizing the proof.
+[2024-09-11T07:31:14Z INFO  revme_network_prove] Generating proof successfully .The proof file and verifier contract are in the path /tmp/zkm.
+[2024-09-11T07:31:14Z INFO  revme_network_prove] Elapsed time: 17866 secs
 
 ```
 
