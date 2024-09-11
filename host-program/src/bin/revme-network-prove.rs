@@ -22,7 +22,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let elf_path = env::var("ELF_PATH")
         .unwrap_or("guest-program/mips-elf/zkm-mips-elf-revme-rust".to_string());
     let public_input_path = env::var("PUBLIC_INPUT_PATH").unwrap_or("".to_string());
-    let private_input_path = env::var("PRIVATE_INPUT_PATH").unwrap_or("".to_string());     
+    let private_input_path = env::var("PRIVATE_INPUT_PATH").unwrap_or("".to_string());    
     let input = ProverInput {
         elf: read(elf_path).unwrap(),
         public_inputstream: read(public_input_path).unwrap_or("".into()),
@@ -52,7 +52,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Ok(None) => {
             log::info!("Failed to generate proof.The result is None.");
         }
-        Err(e) => {     
+        Err(e) => {
             log::info!("Failed to generate proof. error: {}", e);
             return Ok(());
         }
