@@ -2,6 +2,7 @@ pub mod local;
 pub mod network;
 pub mod prover;
 
+use local::local::LocalProver;
 use network::prover::NetworkProver;
 use prover::Prover;
 use std::env;
@@ -18,9 +19,9 @@ impl ProverClient {
             .to_lowercase()
             .as_str()
         {
-            // "local" => Self {
-            //     prover: Box::new(CpuProver::new()),
-            // },
+            "local" => Self {
+                prover: Box::new(LocalProver::new()),
+            },
             "network" => Self {
                 prover: Box::new(NetworkProver::new().await.unwrap()),
             },
@@ -30,9 +31,11 @@ impl ProverClient {
         }
     }
 
-    // pub fn local() -> Self {
-    //     Self { prover: Box::new(CpuProver::new()) }
-    // }
+    pub fn local() -> Self {
+        Self {
+            prover: Box::new(LocalProver::new()),
+        }
+    }
 
     pub async fn network() -> Self {
         Self {
