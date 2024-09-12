@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+
+# Reference: https://github.com/foundry-rs/foundry/blob/master/foundryup/install
+
+set -e
+
+echo "🚀 Installing mips-linux-muslsf-cross..." && echo 
+
+BASE_DIR=$HOME
+MIPS_DIR=${MIPS_DIR-"$BASE_DIR/.mipsrust"}
+MIPS_BIN_DIR="$MIPS_DIR/mips-linux-muslsf-cross/bin"
+
+MIPS_TOOL_URL="http://musl.cc/mips-linux-muslsf-cross.tgz"
+
+# Create the mips tool directory .
+mkdir -p $MIPS_DIR
+
+echo && echo "Downloading $MIPS_TOOL_URL..."
+wget "$MIPS_TOOL_URL" -O "mips-linux-muslsf-cross.tgz"
+
+if [ ! -f "mips-linux-muslsf-cross.tgz" ]; then
+    echo && echo "Download failed."
+    exit 1
+fi
+
+echo && echo "Unpacking to $MIPS_DIR..."
+tar -xzf "mips-linux-muslsf-cross.tgz" -C "$MIPS_DIR"
+
+if [ ! -d "$MIPS_BIN_DIR" ]; then
+    echo && echo "Unpack failed."
+    exit 1
+fi
+
+echo && echo "Cleaning up..."
+rm "mips-linux-muslsf-cross.tgz"
+
+CONFIG_FILE="$HOME/.cargo/config"
+
+touch $CONFIG_FILE
+
+TARGET_CONFIG="[target.mips-unknown-linux-musl]
+linker = \"$MIPS_BIN_DIR/mips-linux-muslsf-gcc\"
+rustflags = [\"--cfg\", 'target_os=\"zkvm\"',\"-C\", \"target-feature=+crt-static\", \"-C\", \"link-arg=-g\"]"
+
+
+if [ -f "$CONFIG_FILE" ]; then
+    
+    if grep -q "target.mips-unknown-linux-musl" "$CONFIG_FILE"; then
+        echo && echo "Target configuration already exists in $CONFIG_FILE."
+    else
+        
+        echo && echo "$TARGET_CONFIG" >> "$CONFIG_FILE"
+        echo && echo "Target configuration added to $CONFIG_FILE."
+    fi
+else
+    echo && echo "$CONFIG_FILE does not exists, please check your rust setting."
+    exit 1
+fi
+
+echo && echo "✅ Installation complete!"
+

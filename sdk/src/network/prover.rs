@@ -127,8 +127,18 @@ impl Prover for NetworkProver {
 
             match Status::from_i32(get_status_response.status as i32) {
                 Some(Status::Computing) => {
-                    log::debug!("generate_proof step: {}", get_status_response.step);
-                    sleep(Duration::from_secs(2)).await;
+                    //log::info!("generate_proof step: {}", get_status_response.step);
+                    match get_status_response.step {
+                        0 => log::info!("generate_proof : queuing the task."),
+                        1 => log::info!("generate_proof : splitting the task."),
+                        2 => log::info!("generate_proof : proving the task."),
+                        3 => log::info!("generate_proof : aggregating the proof."),
+                        4 => log::info!("generate_proof : aggregating the proof."),
+                        5 => log::info!("generate_proof : finalizing the proof."),
+                        6 => log::info!("generate_proof : completing the proof."),
+                        i32::MIN..=-1_i32 | 7_i32..=i32::MAX => todo!(),
+                    }
+                    sleep(Duration::from_secs(30)).await;
                 }
                 Some(Status::Success) => {
                     let stark_proof =
@@ -155,12 +165,14 @@ impl Prover for NetworkProver {
         }
     }
 
-    async fn prover<'a>(
+    async fn prove<'a>(
         &self,
         input: &'a ProverInput,
         timeout: Option<Duration>,
     ) -> anyhow::Result<Option<ProverResult>> {
+        log::info!("calling request_proof.");
         let proof_id = self.request_proof(input).await?;
+        log::info!("calling wait_proof, proof_id={}", proof_id);
         self.wait_proof(&proof_id, timeout).await
     }
 }

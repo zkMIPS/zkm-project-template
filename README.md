@@ -50,6 +50,9 @@ If the memory is insufficient, please reduce the SEG_SIZE to 131072 .
 
 #### 2. Convert plonky2 proof to groth16 proof
 
+> [!NOTE]
+> If the  benchmark or gnark_sol_caller does not work, you can compile them using the repo: https://github.com/zkMIPS/gnark-plonky2-verifier .
+
 Copy the  three files generated in the previous step to the testdata/mips directory. 
 
 ```
@@ -88,7 +91,7 @@ Then, deploy the contract  refering to "### Deploy" in the contracts/README.md .
 
 ### Requirements
 * CA certificate:  ca.pem, ca.key
-* Register in the https://www.zkm.io/apply (Let your key be in the whitelist)
+* Register in the https://www.zkm.io/apply (Let your public key be in the whitelist)
 * Set up a local node for some blockchain(eg, sepolia)
 
 ### Running the project
@@ -105,7 +108,7 @@ If you don't have a CA certificate, you can use the ca.key and  ca.pem in the  z
 
 #### 2. Generate the public input for some block to be proving in some blockchain
 > [!NOTE]
-> The local node is GOAT chain in the following example.
+> The local node is the GOAT test chain in the following example.
 
 ```
 git clone https://github.com/zkMIPS/revme
@@ -125,41 +128,79 @@ cp test-vectors/244.json   zkm-project-template/host-program/test-vectors/
 ```
 cd zkm-project-template
 export CA_CERT_PATH=host-program/tool/ca.pem   
-export  PRIVATE_KEY=df4bc5647fdb9600ceb4943d4adff3749956a8512e5707716357b13d5ee687d9   ##For testing, No changing the key!
+export  PRIVATE_KEY=xxxxxxxxxx   ## The private key corresponding to the public key when registering in the https://www.zkm.io/apply
 
 export RUST_LOG=info
-export ENDPOINT=https://152.32.186.45:20002    ##the test entry of zkm proving network 
+export ENDPOINT=https://152.32.186.45:20002    
 export SEG_SIZE=131072
 export ELF_PATH=guest-program/mips-elf/zkm-mips-elf-revme-rust
 export PUBLIC_INPUT_PATH=host-program/test-vectors/244.json
+export ZKM_PROVER=network
+export OUTPUT_DIR=/tmp/zkm                 ##Setting the path for saving the proof and contract
 ```
 
 * Run the host program. 
+  
+> [!NOTE]
+> The proving network may sometimes experience high traffic, causing proof tasks to be queued for hours; therefore, it is advisable to run the client in the background (or utilize a screen session).
+> The proving task requires several stages: queuing, splitting, proving, aggregating and finalizing. Each stage involves a varying duration.
+
 
 ```
-  cargo run --release  --bin revme-network-prove
+ cd zkm-project-template
+ cargo build --release
+ nohup ./target/release/revme-network-prove  >./network_proving.log 2>&1 &
 ```
 
-If it executes successfully(about 13 minutes),  it will output the similar message:
+If it executes successfully,  it will output the similar message:
 ```
-[2024-08-28T03:20:55Z INFO  stage] request: "1509d5b6-a9e3-4b2f-85b8-5739c35a1310"
-[2024-08-28T03:20:58Z INFO  stage] generate_proof response: GenerateProofResponse { status: 2, error_message: "", proof_id: "1509d5b6-a9e3-4b2f-85b8-5739c35a1310", proof_url: "http://152.32.186.45:20001/1509d5b6-a9e3-4b2f-85b8-5739c35a1310/final/proof_with_public_inputs.json", stark_proof_url: "http://152.32.186.45:20001/1509d5b6-a9e3-4b2f-85b8-5739c35a1310/aggregate/proof_with_public_inputs.json", solidity_verifier_url: "http://152.32.186.45:20001/verifier.sol", output_stream: [] }
-[2024-08-28T03:21:52Z INFO  stage] generate_proof success public_inputs_size: 1546, output_size: 0
-[2024-08-28T03:21:52Z INFO  stage] Elapsed time: 56 secs
+tail -f network_proving.log
+
+[2024-09-11T02:33:27Z INFO  revme_network_prove] new prover client.
+[2024-09-11T02:33:28Z INFO  revme_network_prove] new prover client,ok.
+[2024-09-11T02:33:28Z INFO  zkm_sdk::network::prover] calling request_proof.
+[2024-09-11T02:33:45Z INFO  zkm_sdk::network::prover] calling wait_proof, proof_id=cbac84b8-d5bc-4d39-a7f2-be8ffccd91bc
+[2024-09-11T02:33:45Z INFO  zkm_sdk::network::prover] generate_proof : queuing the task.
+[2024-09-11T02:34:16Z INFO  zkm_sdk::network::prover] generate_proof : splitting the task.
+[2024-09-11T02:34:46Z INFO  zkm_sdk::network::prover] generate_proof : splitting the task.
+[2024-09-11T02:35:16Z INFO  zkm_sdk::network::prover] generate_proof : splitting the task.
+[2024-09-11T02:35:46Z INFO  zkm_sdk::network::prover] generate_proof : splitting the task.
+[2024-09-11T02:36:17Z INFO  zkm_sdk::network::prover] generate_proof : splitting the task.
+[2024-09-11T02:36:47Z INFO  zkm_sdk::network::prover] generate_proof : splitting the task.
+[2024-09-11T02:37:17Z INFO  zkm_sdk::network::prover] generate_proof : splitting the task.
+[2024-09-11T02:37:47Z INFO  zkm_sdk::network::prover] generate_proof : splitting the task.
+[2024-09-11T02:38:18Z INFO  zkm_sdk::network::prover] generate_proof : splitting the task.
+[2024-09-11T02:38:48Z INFO  zkm_sdk::network::prover] generate_proof : proving the task.
+[2024-09-11T02:39:18Z INFO  zkm_sdk::network::prover] generate_proof : proving the task.
+[2024-09-11T02:39:48Z INFO  zkm_sdk::network::prover] generate_proof : proving the task.
+[2024-09-11T02:40:18Z INFO  zkm_sdk::network::prover] generate_proof : proving the task.
+[2024-09-11T02:40:49Z INFO  zkm_sdk::network::prover] generate_proof : proving the task.
+[2024-09-11T02:41:19Z INFO  zkm_sdk::network::prover] generate_proof : proving the task.
+//...
+[2024-09-11T07:22:08Z INFO  zkm_sdk::network::prover] generate_proof : proving the task.
+[2024-09-11T07:22:38Z INFO  zkm_sdk::network::prover] generate_proof : aggregating the proof.
+[2024-09-11T07:23:08Z INFO  zkm_sdk::network::prover] generate_proof : aggregating the proof.
+[2024-09-11T07:23:38Z INFO  zkm_sdk::network::prover] generate_proof : aggregating the proof.
+[2024-09-11T07:24:09Z INFO  zkm_sdk::network::prover] generate_proof : aggregating the proof.
+[2024-09-11T07:24:39Z INFO  zkm_sdk::network::prover] generate_proof : aggregating the proof.
+[2024-09-11T07:25:09Z INFO  zkm_sdk::network::prover] generate_proof : aggregating the proof.
+[2024-09-11T07:25:39Z INFO  zkm_sdk::network::prover] generate_proof : aggregating the proof.
+[2024-09-11T07:28:41Z INFO  zkm_sdk::network::prover] generate_proof : aggregating the proof.
+[2024-09-11T07:29:11Z INFO  zkm_sdk::network::prover] generate_proof : aggregating the proof.
+[2024-09-11T07:29:41Z INFO  zkm_sdk::network::prover] generate_proof : aggregating the proof.
+[2024-09-11T07:30:11Z INFO  zkm_sdk::network::prover] generate_proof : aggregating the proof.
+[2024-09-11T07:30:42Z INFO  zkm_sdk::network::prover] generate_proof : finalizing the proof.
+[2024-09-11T07:31:14Z INFO  revme_network_prove] Generating proof successfully .The proof file and verifier contract are in the path /tmp/zkm.
+[2024-09-11T07:31:14Z INFO  revme_network_prove] Elapsed time: 17866 secs
+
 ```
 
-* Download the proof and contract
-
-In the above output, we need the proof_url: "http://152.32.186.45:20001/1509d5b6-a9e3-4b2f-85b8-5739c35a1310/final/proof_with_public_inputs.json" and solidity_verifier_url: "http://152.32.186.45:20001/verifier.sol" .
+* Move the proof and contract
 
 ```
-wget http://152.32.186.45:20001/1509d5b6-a9e3-4b2f-85b8-5739c35a1310/final/proof_with_public_inputs.json
-wget http://152.32.186.45:20001/verifier.sol
-```
-Then, move the proof and verifier.sol to contracts directory.
-```
-mv proof_with_public_inputs.json  contracts/verifier/
-mv verifier.sol contracts/src/
+cd zkm-project-template
+mv $OUTPUT_DIR/snark_proof_with_public_inputs.json  contracts/verifier/
+mv $OUTPUT_DIR/verifier.sol contracts/src/
 ```
 
 #### 4. Deploy Verifier Contract.
