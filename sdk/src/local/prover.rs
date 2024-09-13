@@ -57,6 +57,7 @@ fn prove_single_seg_common(
     log::info!("Prove done");
 }
 
+#[allow(clippy::too_many_arguments)]
 fn prove_multi_seg_common(
     seg_dir: &str,
     basedir: &str,

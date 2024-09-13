@@ -36,18 +36,16 @@ impl ProverTask {
             result.proof_with_public_inputs = vec![];
             result.stark_proof = vec![];
             result.solidity_verifier = vec![];
+        } else if crate::local::snark::prove_snark(&inputdir, &outputdir) {
+            result.stark_proof =
+                std::fs::read(format!("{}/proof_with_public_inputs.json", inputdir)).unwrap();
+            result.proof_with_public_inputs =
+                std::fs::read(format!("{}/snark_proof_with_public_inputs.json", outputdir))
+                    .unwrap();
+            result.solidity_verifier =
+                std::fs::read(format!("{}/verifier.sol", outputdir)).unwrap();
         } else {
-            if crate::local::snark::prove_snark(&inputdir, &outputdir) {
-                result.stark_proof =
-                    std::fs::read(format!("{}/proof_with_public_inputs.json", inputdir)).unwrap();
-                result.proof_with_public_inputs =
-                    std::fs::read(format!("{}/snark_proof_with_public_inputs.json", outputdir))
-                        .unwrap();
-                result.solidity_verifier =
-                    std::fs::read(format!("{}/verifier.sol", outputdir)).unwrap();
-            } else {
-                log::error!("Failed to generate snark proof.");
-            }
+            log::error!("Failed to generate snark proof.");
         }
         self.result = Some(result);
         self.is_done = true;
@@ -60,6 +58,12 @@ impl ProverTask {
 
 pub struct LocalProver {
     tasks: Arc<Mutex<HashMap<String, Arc<Mutex<ProverTask>>>>>,
+}
+
+impl Default for LocalProver {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl LocalProver {
