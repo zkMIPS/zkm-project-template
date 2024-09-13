@@ -10,13 +10,11 @@ case "$OS" in
         echo "Running on Linux"
         # Compile for Linux
         go build -o libsnark.so -buildmode=c-shared *.go
-        cp libsnark.so /usr/local/lib/
         ;;
     Darwin)
         echo "Running on macOS"
         # Compile for macOS
         go build -o libsnark.dylib -buildmode=c-shared *.go
-        cp libsnark.dylib /usr/local/lib/
         ;;
     *)
         echo "Unsupported OS: $OS"
