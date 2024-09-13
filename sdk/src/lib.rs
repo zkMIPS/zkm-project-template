@@ -2,7 +2,7 @@ pub mod local;
 pub mod network;
 pub mod prover;
 
-use local::local::LocalProver;
+use local::prover::LocalProver;
 use network::prover::NetworkProver;
 use prover::Prover;
 use std::env;
