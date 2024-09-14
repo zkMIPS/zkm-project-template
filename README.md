@@ -53,9 +53,36 @@ If it executes successfully,  it will generate the 244.json in the director test
 cp test-vectors/244.json   zkm-project-template/host-program/test-vectors/
 ```
 
-### 3. Generate groth16 proof and verifier contract
+### 3. Compile the host program
+
+```
+cd zkm-project-template/sdk/src/local/libsnark/
+./compile.sh      ##compile snark libary
+
+cd zkm-project-template
+cargo build --release
+```
+If it executes successfully,  it will generate two binary files in target/release : add-go-prove ,revme-prove
+
+> [!NOTE]
+> The host program executes local proving when the environmental variable ZKM_PROVER is set to "local" and performs network proving when ZKM_PROVER is set to "network".
+
+### 4. Generate groth16 proof and verifier contract
 
 #### Local proving 
+
+* Set the Environment  parameters. 
+  
+```
+cd zkm-project-template
+
+export RUST_LOG=info   
+export SEG_SIZE=131072
+export ELF_PATH=guest-program/mips-elf/zkm-mips-elf-revme-rust 
+export PUBLIC_INPUT_PATH=host-program/test-vectors/244.json
+export ZKM_PROVER=local
+export OUTPUT_DIR=/tmp/zkm                 ##Setting the path for saving the proof and contract
+```
 
 * proving go program
 
