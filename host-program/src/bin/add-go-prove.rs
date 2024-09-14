@@ -1,6 +1,15 @@
 use serde::{Deserialize, Serialize};
+use common::file;
+
 use std::env;
-use zkm_emulator::utils::{load_elf_with_patch, split_prog_into_segs};
+use std::path::Path;
+use std::time::Instant;
+
+use zkm_sdk::{prover::ProverInput, ProverClient};
+
+use std::fs::read;
+
+//const DEGREE_BITS_RANGE: [Range<usize>; 6] = [10..21, 12..22, 12..21, 8..21, 6..21, 13..23];
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum DataId {
@@ -51,39 +60,59 @@ impl Data {
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::try_init().unwrap_or_default();
-    // 1. split ELF into segs
-    let elf_path =
-        env::var("ELF_PATH").unwrap_or("guest-program/mips-elf/zkm-mips-elf-add-go".to_string());
-    let seg_path = env::var("SEG_OUTPUT").expect("Segment output path is missing");
+    log::info!("new prover client.");
+    let prover_client = ProverClient::new().await;//ENV: ZKM_PROVER=local
+    log::info!("new prover client,ok.");
+ 
     let seg_size = env::var("SEG_SIZE").unwrap_or("131072".to_string());
-    let seg_size = seg_size.parse::<_>().unwrap_or(0);
-    let mut state = load_elf_with_patch(&elf_path, vec![]);
-    let data = Data::new();
-    state.add_input_stream(&data);
-    log::info!(
-        "enum {} {} {}",
-        DataId::TYPE1 as u8,
-        DataId::TYPE2 as u8,
-        DataId::TYPE3 as u8
-    );
-    log::info!("public input: {:X?}", data);
-    let (total_steps, mut state) = split_prog_into_segs(state, &seg_path, "", seg_size);
-    let value = state.read_public_values::<Data>();
-    log::info!("public value: {:X?}", value);
-    let mut seg_num = 1usize;
-    if seg_size != 0 {
-        seg_num = (total_steps + seg_size - 1) / seg_size;
+    let seg_size2 = seg_size.parse::<_>().unwrap_or(131072);
+    let execute_only = env::var("EXECUTE_ONLY").unwrap_or("false".to_string());
+    let execute_only2 = execute_only.parse::<bool>().unwrap_or(false);
+    let elf_path = env::var("ELF_PATH")
+        .unwrap_or("guest-program/mips-elf/zkm-mips-elf-add-go".to_string());
+    let public_input_path = env::var("PUBLIC_INPUT_PATH").unwrap_or("".to_string());
+    let private_input_path = env::var("PRIVATE_INPUT_PATH").unwrap_or("".to_string());
+    let output_dir = env::var("OUTPUT_DIR").unwrap_or("/tmp/zkm".to_string());
+    let input = ProverInput {
+        elf: read(elf_path).unwrap(),
+        public_inputstream: read(public_input_path).unwrap_or("".into()),
+        private_inputstream: read(private_input_path).unwrap_or("".into()),
+        seg_size: seg_size2,
+        execute_only: execute_only2,
+    };
+    
+    let start = Instant::now();
+    
+    let proving_result = prover_client.prover.prove(&input, None).await;
+    //match proverClient.await.prover.prover(&input,None).await {
+    match proving_result {
+        Ok(Some(prover_result)) => {
+            log::info!("Generating proof successfully .The proof file and verifier contract are in the path {}.",&output_dir);
+            let output_path = Path::new(&output_dir);
+            let proof_result_path = output_path.join("snark_proof_with_public_inputs.json");
+            let _ = file::new(&proof_result_path.to_string_lossy())
+                .write(prover_result.proof_with_public_inputs.as_slice());
+            //contract
+            let output_path = Path::new(&output_dir);
+            let contract_path = output_path.join("verifier.sol");
+            let _ = file::new(&contract_path.to_string_lossy())
+                .write(prover_result.solidity_verifier.as_slice());
+        }
+        Ok(None) => {
+            log::info!("Failed to generate proof.The result is None.");
+        }
+        Err(e) => {
+            log::info!("Failed to generate proof. error: {}", e);
+            return Ok(());
+        }
     }
-    if seg_num == 1 {
-        let seg_file = format!("{seg_path}/{}", 0);
-        zkm_sdk::local::util::prove_single_seg_common(&seg_file, "", "", "", total_steps)
-    } else {
-        let outdir = "verifier/data/test_circuit/".to_string();
-        zkm_sdk::local::util::prove_multi_seg_common(
-            &seg_path, "", "", "", &outdir, seg_size, seg_num, 0,
-        )
-        .unwrap()
-    }
+
+    let end = Instant::now();
+    let elapsed = end.duration_since(start);
+    log::info!("Elapsed time: {:?} secs", elapsed.as_secs());
+    Ok(())
+    
 }
