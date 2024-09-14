@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+//use serde::{Deserialize, Serialize};
 use common::file;
 
 use std::env;
@@ -76,9 +76,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let public_input_path = env::var("PUBLIC_INPUT_PATH").unwrap_or("".to_string());
     let private_input_path = env::var("PRIVATE_INPUT_PATH").unwrap_or("".to_string());
     let output_dir = env::var("OUTPUT_DIR").unwrap_or("/tmp/zkm".to_string());
+    let data = Data::new();
+    let mut buf = Vec::new();
+    bincode::serialize_into(&mut buf, &data).expect("serialization failed");
     let input = ProverInput {
         elf: read(elf_path).unwrap(),
-        public_inputstream: read(public_input_path).unwrap_or("".into()),
+        //public_inputstream: read(public_input_path).unwrap_or("".into()),
+        public_inputstream: buf,
         private_inputstream: read(private_input_path).unwrap_or("".into()),
         seg_size: seg_size2,
         execute_only: execute_only2,
