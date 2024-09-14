@@ -4,12 +4,10 @@ This is a template for creating an end-to-end ZKM project which can generate the
 
 There are two ways to prove the guest program: 
 * Use your local machine
-* Use ZKM Proving network 
+* Use ZKM proof network 
 
-## Local Proving
-
-### Requirements
-* Hardware: X86 CPU, 32 cores, 32G memory
+## Local Proving Requirements
+* Hardware: X86 CPU, 32 cores, 40G memory
 
 * OS: Ubuntu22
 
@@ -17,96 +15,30 @@ There are two ways to prove the guest program:
   
 * Go : 1.22.1
   
-### Running the project
-
-#### 0. Build guest program ELF
-
-Please refer to : guest-program/README.md
-
-#### 1. Generate plonky2 proof
-
-> [!NOTE]
-> If the program excutes succussfully, it will generate three  files in the directory verifier/data/test_circuit/.(common_circuit_data.json  proof_with_public_inputs.json  verifier_only_circuit_data.json)  
-
-* Go program
-
-```
-mkdir -p /tmp/zkm
-git clone https://github.com/zkMIPS/zkm-project-template.git
-cd zkm-project-template
-RUST_LOG=info  SEG_OUTPUT=/tmp/zkm SEG_SIZE=262144 cargo run --release --bin add-go-prove 
-```
-
-If the memory is insufficient, please reduce the SEG_SIZE to 131072 .
-
-* Rust program 
-
-```
-cd zkm-project-template
-RUST_LOG=info   SEG_OUTPUT=/tmp/zkm   SEG_SIZE=262144 cargo run --release --bin revme-prove
-```
-If the memory is insufficient, please reduce the SEG_SIZE to 131072 .
-
-
-#### 2. Convert plonky2 proof to groth16 proof
-
-> [!NOTE]
-> If the  benchmark or gnark_sol_caller does not work, you can compile them using the repo: https://github.com/zkMIPS/gnark-plonky2-verifier .
-
-Copy the  three files generated in the previous step to the testdata/mips directory. 
-
-```
-cp verifier/data/test_circuit/* testdata/mips
-./benchmark
-```
-
-If benchmark excutes succussfully, it will generate a groth16 proof and  verifying.key in the directory testdata/mips/.
-Then, copying the proof file and  verifying.key to contracts/verifier
-
-```
-cp testdata/mips/snark_proof_with_public_inputs.json    contracts/verifier/
-cp testdata/mips/verifying.key  contracts/verifier/
-```
-
-#### 3. Generate the on chain verification contract.
-
-```
-./gnark_sol_caller generate --outputDir contracts/src
-```
-
-#### 4. Deploy Verifier Contract.
-
-If your system does not has  Foundry,please install it.
-
-```
-curl -L https://foundry.paradigm.xyz | bash
-```
-
-Then, deploy the contract  refering to "### Deploy" in the contracts/README.md .
-
-## Network Proving
-
-> [!NOTE]
-> The proving network is demo at present. The production version is coming soon.
-
-### Requirements
+* Set up a local node for some blockchain(eg, sepolia)
+  
+  
+## Network Proving Requirements
 * CA certificate:  ca.pem, ca.key
+  
 * Register in the https://www.zkm.io/apply (Let your public key be in the whitelist)
+  
 * Set up a local node for some blockchain(eg, sepolia)
 
-### Running the project
 
-#### 0. Build guest program ELF
+## Running the project
+
+### 0. Download the repo
+
+```
+git clone https://github.com/zkMIPS/zkm-project-template.git
+```
+
+### 1. Build guest program ELF
 
 Please refer to : guest-program/README.md
 
-#### 1. Config your CA certificate
-
-Put the ca.key and  ca.pem to some directory , such as , host-program/tool/ .
-
-If you don't have a CA certificate, you can use the ca.key and  ca.pem in the  zkm-project-template/host-program/tool/.
-
-#### 2. Generate the public input for some block to be proving in some blockchain
+### 2. Generate the public input for some block to be proving in some blockchain
 > [!NOTE]
 > The local node is the GOAT test chain in the following example.
 
@@ -121,7 +53,36 @@ If it executes successfully,  it will generate the 244.json in the director test
 cp test-vectors/244.json   zkm-project-template/host-program/test-vectors/
 ```
 
-#### 3. Generate the groth16 proof and  verifier Contract
+### 3. Generate groth16 proof and verifier contract
+
+#### Local proving 
+
+* proving go program
+
+```
+mkdir -p /tmp/zkm
+git clone https://github.com/zkMIPS/zkm-project-template.git
+cd zkm-project-template
+RUST_LOG=info  SEG_OUTPUT=/tmp/zkm SEG_SIZE=262144 cargo run --release --bin add-go-prove 
+```
+
+If the memory is insufficient, please reduce the SEG_SIZE to 131072 .
+
+* proving rust program 
+
+```
+cd zkm-project-template
+RUST_LOG=info   SEG_OUTPUT=/tmp/zkm   SEG_SIZE=262144 cargo run --release --bin revme-prove
+```
+If the memory is insufficient, please reduce the SEG_SIZE to 131072 .
+
+#### Network proving 
+
+* Config your CA certificate
+
+Put the ca.key and  ca.pem to some directory , such as , host-program/tool/ .
+
+If you don't have a CA certificate, you can use the ca.key and  ca.pem in the  zkm-project-template/host-program/tool/.
 
 * Set the Environment  parameters. 
   
@@ -194,14 +155,7 @@ tail -f network_proving.log
 [2024-09-11T07:31:14Z INFO  revme_network_prove] Elapsed time: 17866 secs
 
 ```
-
-* Move the proof and contract
-
-```
-cd zkm-project-template
-mv $OUTPUT_DIR/snark_proof_with_public_inputs.json  contracts/verifier/
-mv $OUTPUT_DIR/verifier.sol contracts/src/
-```
+  
 
 #### 4. Deploy Verifier Contract.
 
@@ -211,6 +165,8 @@ If your system does not has  Foundry,please install it.
 curl -L https://foundry.paradigm.xyz | bash
 ```
 
-Then, deploy the contract  refering to contracts/README.md
+Then, deploy the contract  refering to "### Deploy" in the contracts/README.md .
+
+
 
 
