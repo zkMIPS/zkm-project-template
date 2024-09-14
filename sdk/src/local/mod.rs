@@ -2,3 +2,4 @@
 pub mod prover;
 pub mod snark;
 pub mod stark;
+pub mod util;
