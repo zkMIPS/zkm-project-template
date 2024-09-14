@@ -3,7 +3,7 @@ use serde::Deserialize;
 use serde::Serialize;
 use tokio::time::Duration;
 
-#[derive(Debug, Default, Deserialize, Serialize)]
+#[derive(Debug, Default, Deserialize, Serialize, Clone)]
 pub struct ProverInput {
     pub elf: Vec<u8>,
     pub public_inputstream: Vec<u8>,
@@ -12,7 +12,7 @@ pub struct ProverInput {
     pub execute_only: bool,
 }
 
-#[derive(Debug, Default, Deserialize, Serialize)]
+#[derive(Debug, Default, Deserialize, Serialize, Clone)]
 pub struct ProverResult {
     pub output_stream: Vec<u8>,
     pub proof_with_public_inputs: Vec<u8>,
