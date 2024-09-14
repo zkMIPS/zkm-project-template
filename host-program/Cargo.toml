@@ -42,13 +42,12 @@ hashbrown = { version = "0.14.0", default-features = false, features = ["ahash",
 lazy_static = "1.4.0"
 
 elf = { version = "0.7", default-features = false }
-uuid = { version = "1.2", features = ["v4", "fast-rng", "macro-diagnostics"] }
+#uuid = { version = "1.2", features = ["v4", "fast-rng", "macro-diagnostics"] }
 
-##[dev-dependencies]
 env_logger = "0.10.0"
-keccak-hash = "0.10.0"
-plonky2x = { git = "https://github.com/zkMIPS/succinctx.git", package = "plonky2x", branch = "zkm" }
-plonky2x-derive = { git = "https://github.com/zkMIPS/succinctx.git", package = "plonky2x-derive", branch = "zkm" }
+#keccak-hash = "0.10.0"
+#plonky2x = { git = "https://github.com/zkMIPS/succinctx.git", package = "plonky2x", branch = "zkm" }
+#plonky2x-derive = { git = "https://github.com/zkMIPS/succinctx.git", package = "plonky2x-derive", branch = "zkm" }
 
 [build-dependencies]
 tonic-build = "0.8.0"

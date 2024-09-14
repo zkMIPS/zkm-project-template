@@ -7,7 +7,7 @@ There are two ways to prove the guest program:
 * Use ZKM proof network 
 
 ## Local Proving Requirements
-* Hardware: X86 CPU, 32 cores, 40G memory
+* Hardware: X86 CPU, 32 cores, 64G memory
 
 * OS: Ubuntu22
 
