@@ -1,12 +1,12 @@
+use crate::prover::{Prover, ProverInput, ProverResult};
+use async_trait::async_trait;
 use std::collections::HashMap;
+use std::fs;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
-use tokio::time::sleep;
-use crate::prover::{Prover, ProverInput, ProverResult};
-use async_trait::async_trait;
-use std::fs;
 use std::time::Instant;
+use tokio::time::sleep;
 
 pub struct ProverTask {
     proof_id: String,

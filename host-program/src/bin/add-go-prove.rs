@@ -1,10 +1,10 @@
 use common::file;
+use serde::{Deserialize, Serialize};
 use std::env;
+use std::fs::read;
 use std::path::Path;
 use std::time::Instant;
 use zkm_sdk::{prover::ProverInput, ProverClient};
-use std::fs::read;
-use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum DataId {
