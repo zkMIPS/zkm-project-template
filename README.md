@@ -122,10 +122,6 @@ The proof and contract file will be in the OUTPUT_DIR.(snark_proof_with_public_i
 
 * network proving
 
-> [!NOTE]
-> The proving network may sometimes experience high traffic, causing proof tasks to be queued for hours; therefore, it is advisable to run the client in the background (or utilize a screen session).
-> The proving task requires several stages: queuing, splitting, proving, aggregating and finalizing. Each stage involves a varying duration.
-
 ```
 $cd zkm-project-template
 $cat run-add-go-network-proving.sh
@@ -150,7 +146,7 @@ cd zkm-project-template
 mkdir /tmp/zkm    ##Ensure that OUTPUT_DIR exists
 ./run-add-go-network-proving.sh
 ```
-If successful, it will output a similar message
+If successful, it will output a similar message.
 
 ```
 $cat add-go-network-proving.log
@@ -210,7 +206,7 @@ cd zkm-project-template
 mkdir /tmp/zkm    ##Ensure that OUTPUT_DIR exists
 ./run-revme-local-proving.sh
 ```
-If successful, it will output a similar message
+If successful, it will output a similar message.
 
 ```
 $cat local-revme-proving.log
@@ -237,6 +233,12 @@ $cat local-revme-proving.log
 The proof and contract file will be in the OUTPUT_DIR.(snark_proof_with_public_inputs.json and verifier.sol)
 
 * network proing
+  
+> [!NOTE]
+> The proving network may sometimes experience high traffic, causing proof tasks to be queued for hours.
+
+> The proving task requires several stages: queuing, splitting, proving, aggregating and finalizing. Each stage involves a varying duration.
+
 ```
 $cd zkm-project-template
 $ cat run-revme-network-provin.sh
@@ -261,7 +263,7 @@ cd zkm-project-template
 mkdir /tmp/zkm    ##Ensure that OUTPUT_DIR exists
 ./run-revme-network-provin.sh
 ```
-If successful, it will output a similar message
+If successful, it will output a similar message.
 
 ```
 $cat revme-network_proving.log
