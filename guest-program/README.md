@@ -2,6 +2,14 @@
 
 ZKM can generate proof for  Go and Rust (guest) Programs.
 
+* add-go
+  
+A simple program that takes struct Data   as input, and operate the elements  as an output.
+
+* revme
+  
+This program is more complex, taking a block of data as input and simulating the Ethereum Virtual Machine's computation for that block.
+
 > [!NOTE]
 > In the mips-elf directory, we have prepared the relative mips ELF which are ready for proof use.  
 > If you want to compile the guest programs, you should use a x86 Ubuntu22 machine with Rust: 1.81.0-nightly and Go : 1.22.1
