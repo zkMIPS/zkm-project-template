@@ -1,10 +1,10 @@
-use serde::{Deserialize, Serialize};
 use common::file;
 use std::env;
 use std::path::Path;
 use std::time::Instant;
 use zkm_sdk::{prover::ProverInput, ProverClient};
 use std::fs::read;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum DataId {
@@ -61,7 +61,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     log::info!("new prover client.");
     let prover_client = ProverClient::new().await; //ENV: ZKM_PROVER=local
     log::info!("new prover client,ok.");
- 
     let seg_size = env::var("SEG_SIZE").unwrap_or("131072".to_string());
     let seg_size2 = seg_size.parse::<_>().unwrap_or(131072);
     let execute_only = env::var("EXECUTE_ONLY").unwrap_or("false".to_string());
@@ -82,7 +81,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         seg_size: seg_size2,
         execute_only: execute_only2,
     };
-    
     let start = Instant::now();
     let proving_result = prover_client.prover.prove(&input, None).await;
     match proving_result {

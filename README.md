@@ -97,19 +97,7 @@ $cat add-go-local-proving.log
 [2024-09-14T14:09:57Z INFO  zkm_sdk::local::prover] calling request_proof.
 [2024-09-14T14:09:57Z INFO  zkm_sdk::local::prover] calling wait_proof, proof_id=46871d50-e00d-4aa0-a346-2bb172ca9dcb
 [2024-09-14T14:09:57Z INFO  zkm_sdk::local::prover] waiting the proof result.
-panic: runtime error: slice bounds out of range [48:47]
 
-goroutine 1 [running]:
-github.com/zkMIPS/zkm/go-runtime/zkm_runtime.deserializeData({0x42e000, 0x4b, 0x4c}, {0xd6400, 0x422710, 0x197}, 0x28)
-        /mnt/data/gavin/zkm/go-runtime/zkm_runtime/deserialize.go:88 +0x116c
-github.com/zkMIPS/zkm/go-runtime/zkm_runtime.deserializeData({0x42e000, 0x4b, 0x4c}, {0xe0da0, 0x434ee8, 0x199}, 0x0)
-        /mnt/data/gavin/zkm/go-runtime/zkm_runtime/deserialize.go:122 +0x10a0
-github.com/zkMIPS/zkm/go-runtime/zkm_runtime.DeserializeData({0x42e000, 0x4b, 0x4c}, {0xd4600, 0x4226e8})
-        /mnt/data/gavin/zkm/go-runtime/zkm_runtime/deserialize.go:28 +0x1d4
-github.com/zkMIPS/zkm/go-runtime/zkm_runtime.Read[...]()
-        /mnt/data/gavin/zkm/go-runtime/zkm_runtime/runtime.go:17 +0x11c
-main.main()
-        /mnt/data/gavin/zkm/prover/examples/add-go/add.go:30 +0x48
 [2024-09-14T14:09:57Z INFO  zkm_emulator::utils] Split done 530872
 [2024-09-14T14:10:48Z INFO  zkm_sdk::local::util] Process segment /tmp/46871d50-e00d-4aa0-a346-2bb172ca9dcb/input/segments/0
 [2024-09-14T14:10:52Z INFO  zkm_prover::cpu::bootstrap_kernel] Bootstrapping took 21159 cycles
