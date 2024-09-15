@@ -73,7 +73,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let execute_only2 = execute_only.parse::<bool>().unwrap_or(false);
     let elf_path = env::var("ELF_PATH")
         .unwrap_or("guest-program/mips-elf/zkm-mips-elf-add-go".to_string());
-    let public_input_path = env::var("PUBLIC_INPUT_PATH").unwrap_or("".to_string());
+    //let public_input_path = env::var("PUBLIC_INPUT_PATH").unwrap_or("".to_string());
     let private_input_path = env::var("PRIVATE_INPUT_PATH").unwrap_or("".to_string());
     let output_dir = env::var("OUTPUT_DIR").unwrap_or("/tmp/zkm".to_string());
     let data = Data::new();

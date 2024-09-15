@@ -23,6 +23,8 @@ $ forge build
 
 ### Test
 
+The following command will locally verify the validity of the snark proof.
+
 ```shell
 $ forge test 
 ```
