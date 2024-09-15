@@ -40,11 +40,11 @@ func (obj *SnarkProver) init_circuit_keys(inputdir string) error {
 	_, err := os.Stat(circuitPath)
 
 	if os.IsNotExist(err) {
-		commonCircuitData := types.ReadCommonCircuitData(inputdir + "/common_circuit_data.json")
-		proofWithPisData := types.ReadProofWithPublicInputs(inputdir + "/proof_with_public_inputs.json")
+		commonCircuitData, _ := types.ReadCommonCircuitData(inputdir + "/common_circuit_data.json")
+		proofWithPisData, _ := types.ReadProofWithPublicInputs(inputdir + "/proof_with_public_inputs.json")
 		proofWithPis := variables.DeserializeProofWithPublicInputs(proofWithPisData)
 
-		verifierOnlyCircuitRawData := types.ReadVerifierOnlyCircuitData(inputdir + "/verifier_only_circuit_data.json")
+		verifierOnlyCircuitRawData, _ := types.ReadVerifierOnlyCircuitData(inputdir + "/verifier_only_circuit_data.json")
 		verifierOnlyCircuitData := variables.DeserializeVerifierOnlyCircuitData(verifierOnlyCircuitRawData)
 
 		circuit := verifier.ExampleVerifierCircuit{
@@ -110,10 +110,10 @@ func (obj *SnarkProver) init_circuit_keys(inputdir string) error {
 }
 
 func (obj *SnarkProver) groth16ProofWithCache(r1cs constraint.ConstraintSystem, inputdir, outputdir string) error {
-	proofWithPisData := types.ReadProofWithPublicInputs(inputdir + "/proof_with_public_inputs.json")
+	proofWithPisData, _ := types.ReadProofWithPublicInputs(inputdir + "/proof_with_public_inputs.json")
 	proofWithPis := variables.DeserializeProofWithPublicInputs(proofWithPisData)
 
-	verifierOnlyCircuitRawData := types.ReadVerifierOnlyCircuitData(inputdir + "/verifier_only_circuit_data.json")
+	verifierOnlyCircuitRawData, _ := types.ReadVerifierOnlyCircuitData(inputdir + "/verifier_only_circuit_data.json")
 	verifierOnlyCircuitData := variables.DeserializeVerifierOnlyCircuitData(verifierOnlyCircuitRawData)
 
 	assignment := verifier.ExampleVerifierCircuit{
