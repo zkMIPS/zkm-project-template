@@ -69,21 +69,21 @@ This program takes struct Data  as public input .
 * local proving
   
 ```
-$cd zkm-project-template
+$cd zkm-project-template/host-program
 $cat run-add-go-local-proving.sh
 
 export LD_LIBRARY_PATH=/mnt/data/zkm-project-template/sdk/src/local/libsnark:$LD_LIBRARY_PATH  ##Modify it according your template 
 export ZKM_PROVER=local
 export RUST_LOG=info
 export SEG_SIZE=262144
-export ELF_PATH=guest-program/mips-elf/zkm-mips-elf-add-go ##If you using your own mips ELF, please modify the path
+export ELF_PATH=../guest-program/mips-elf/zkm-mips-elf-add-go ##If you using your own mips ELF, please modify the path
 export OUTPUT_DIR=/tmp/zkm 
 
-nohup ./target/release/add-go-prove  >./add-go-local-proving.log 2>&1 &
+nohup ../target/release/add-go-prove  >./add-go-local-proving.log 2>&1 &
 ```
 Excute the host program.
 ```
-cd zkm-project-template
+cd zkm-project-template/host-program
 mkdir /tmp/zkm    ##Ensure that OUTPUT_DIR exists
 ./run-add-go-local-proving.sh
 ```
@@ -111,7 +111,7 @@ The proof and contract file will be in the OUTPUT_DIR.(snark_proof_with_public_i
 * network proving
 
 ```
-$cd zkm-project-template
+$cd zkm-project-template/host-program
 $cat run-add-go-network-proving.sh
 
 export CA_CERT_PATH=host-program/tool/ca.pem  #If you use your own CA, you should modify the path.
@@ -121,16 +121,16 @@ export ZKM_PROVER=network
 export RUST_LOG=info
 export SEG_SIZE=262144
 export ENDPOINT=https://152.32.186.45:20002    ##the test entry of zkm proof network
-export ELF_PATH=guest-program/mips-elf/zkm-mips-elf-add-go
+export ELF_PATH=../guest-program/mips-elf/zkm-mips-elf-add-go
 export OUTPUT_DIR=/tmp/zkm 
 
-nohup ./target/release/add-go-prove  >./add-go-network-proving.log 2>&1 &
+nohup ../target/release/add-go-prove  >./add-go-network-proving.log 2>&1 &
 ```
 
 Excute the host program.
 
 ```
-cd zkm-project-template
+cd zkm-project-template/host-program
 mkdir /tmp/zkm    ##Ensure that OUTPUT_DIR exists
 ./run-add-go-network-proving.sh
 ```
@@ -162,6 +162,7 @@ This program  takes a block of data as public input.
 > The local node is the GOAT test chain in the following example.
 
 ```
+cd ~
 git clone https://github.com/zkMIPS/revme
 cd  revme
 RPC_URL=http://localhost:8545 CHAIN_ID=1337 BLOCK_NO=244 RUST_LOG=debug SUITE_JSON_PATH=./test-vectors/244.json cargo run --example process
@@ -175,22 +176,22 @@ cp test-vectors/244.json   zkm-project-template/host-program/test-vectors/
 * local proving
   
 ```
-$cd zkm-project-template
+$cd zkm-project-template/host-program
 $cat run-revme-local-proving.sh
 
 export LD_LIBRARY_PATH=/mnt/data/zkm-project-template/sdk/src/local/libsnark:$LD_LIBRARY_PATH  ##Modify it according your template 
 export ZKM_PROVER=local
 export RUST_LOG=info
 export SEG_SIZE=262144
-export ELF_PATH=guest-program/mips-elf/zkm-mips-elf-revme-rust  ##If you using your own mips ELF, please modify the path
+export ELF_PATH=../guest-program/mips-elf/zkm-mips-elf-revme-rust  ##If you using your own mips ELF, please modify the path
 export PUBLIC_INPUT_PATH=host-program/test-vectors/244.json    
 export OUTPUT_DIR=/tmp/zkm
 
-nohup ./target/release/revme-prove  >./revme-local-proving.log 2>&1 &
+nohup ../target/release/revme-prove  >./revme-local-proving.log 2>&1 &
 ```
 Excute the host program.
 ```
-cd zkm-project-template
+cd zkm-project-template/host-program
 mkdir /tmp/zkm    ##Ensure that OUTPUT_DIR exists
 ./run-revme-local-proving.sh
 ```
@@ -228,7 +229,7 @@ The proof and contract file will be in the OUTPUT_DIR.(snark_proof_with_public_i
 > The proving task requires several stages: queuing, splitting, proving, aggregating and finalizing. Each stage involves a varying duration.
 
 ```
-$cd zkm-project-template
+$cd zkm-project-template/host-program
 $ cat run-revme-network-provin.sh
 
 export CA_CERT_PATH=host-program/tool/ca.pem
@@ -238,16 +239,16 @@ export ZKM_PROVER=network
 export RUST_LOG=info
 export ENDPOINT=https://152.32.186.45:20002    ##the test entry of zkm proving network
 export SEG_SIZE=262144
-export ELF_PATH=guest-program/mips-elf/zkm-mips-elf-revme-rust
+export ELF_PATH=../guest-program/mips-elf/zkm-mips-elf-revme-rust
 export PUBLIC_INPUT_PATH=host-program/test-vectors/244.json
 export OUTPUT_DIR=/tmp/zkm
 
-nohup ./target/release/revme-network-prove  >./revme-network_proving.log 2>&1 &
+nohup ../target/release/revme-network-prove  >./revme-network_proving.log 2>&1 &
 ```
 
 Excute the host program.
 ```
-cd zkm-project-template
+cd zkm-project-template/host-program
 mkdir /tmp/zkm    ##Ensure that OUTPUT_DIR exists
 ./run-revme-network-provin.sh
 ```

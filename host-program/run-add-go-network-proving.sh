@@ -5,7 +5,7 @@ export ZKM_PROVER=network
 export RUST_LOG=info
 export SEG_SIZE=262144
 export ENDPOINT=https://152.32.186.45:20002    ##the test entry of zkm proof network
-export ELF_PATH=guest-program/mips-elf/zkm-mips-elf-add-go
+export ELF_PATH=../guest-program/mips-elf/zkm-mips-elf-add-go
 export OUTPUT_DIR=/tmp/zkm 
 
-nohup ./target/release/add-go-prove  >./add-go-network-proving.log 2>&1 &
+nohup ../target/release/add-go-prove  >./add-go-network-proving.log 2>&1 &
