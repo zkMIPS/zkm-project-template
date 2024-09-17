@@ -1,12 +1,12 @@
+use crate::prover::{Prover, ProverInput, ProverResult};
+use async_trait::async_trait;
 use std::collections::HashMap;
+use std::fs;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
-
-use crate::prover::{Prover, ProverInput, ProverResult};
-use async_trait::async_trait;
-use std::fs;
 use std::time::Instant;
+use tokio::time::sleep;
 
 pub struct ProverTask {
     proof_id: String,
@@ -106,6 +106,8 @@ impl Prover for LocalProver {
                 self.tasks.lock().unwrap().remove(proof_id);
                 return Ok(task.lock().unwrap().result.clone());
             }
+            log::info!("waiting the proof result.");
+            sleep(Duration::from_secs(30)).await;
         }
     }
 
@@ -114,7 +116,9 @@ impl Prover for LocalProver {
         input: &'a ProverInput,
         timeout: Option<Duration>,
     ) -> anyhow::Result<Option<ProverResult>> {
+        log::info!("calling request_proof.");
         let proof_id = self.request_proof(input).await?;
+        log::info!("calling wait_proof, proof_id={}", proof_id);
         self.wait_proof(&proof_id, timeout).await
     }
 }
