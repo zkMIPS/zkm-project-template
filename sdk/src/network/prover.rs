@@ -141,17 +141,23 @@ impl Prover for NetworkProver {
                     sleep(Duration::from_secs(30)).await;
                 }
                 Some(Status::Success) => {
-                    let stark_proof =
-                        NetworkProver::download_file(&get_status_response.stark_proof_url).await?;
-                    let solidity_verifier =
-                        NetworkProver::download_file(&get_status_response.solidity_verifier_url)
-                            .await?;
-                    let proof_result = ProverResult {
+                    let mut proof_result = ProverResult {
                         output_stream: get_status_response.output_stream,
                         proof_with_public_inputs: get_status_response.proof_with_public_inputs,
-                        stark_proof,
-                        solidity_verifier,
+                        stark_proof: vec![],
+                        solidity_verifier: vec![],
                     };
+                    if !get_status_response.stark_proof_url.is_empty() {
+                        proof_result.stark_proof =
+                            NetworkProver::download_file(&get_status_response.stark_proof_url)
+                                .await?;
+                    }
+                    if !get_status_response.solidity_verifier_url.is_empty() {
+                        proof_result.solidity_verifier = NetworkProver::download_file(
+                            &get_status_response.solidity_verifier_url,
+                        )
+                        .await?;
+                    }
                     return Ok(Some(proof_result));
                 }
                 _ => {
