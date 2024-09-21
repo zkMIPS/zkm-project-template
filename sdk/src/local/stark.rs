@@ -17,9 +17,7 @@ pub fn prove_stark(input: &ProverInput, storedir: &str, result: &mut ProverResul
     state.add_input_stream(&input.private_inputstream);
 
     let (total_steps, state) = split_prog_into_segs(state, &seg_path, "", seg_size);
-    result
-        .output_stream
-        .copy_from_slice(&state.public_values_stream);
+    result.output_stream = state.public_values_stream.clone();
     if input.execute_only {
         return;
     }
