@@ -5,6 +5,46 @@ This is a template for creating an end-to-end ZKM project which can generate the
 There are two ways to prove the guest program: 
 * Use your local machine
 * Use ZKM proof network 
+  
+## Running diagram
+
+
+## Template code structure
+
+```
+├── Cargo.toml
+├── LICENSE
+├── Makefile
+├── README.md
+├── clippy.toml
+├── contracts      //Use Foundry to manage the verifier contract
+│   ├── README.md
+│   ├── ...
+├── guest-program  //Include two examples: one in Go  and the other in Rust
+│   ├── README.md
+│   ├── add-go
+│   ├── mips-elf
+│   └── revme
+├── host-program   //Generate the proof and verifier contracts  to the  guest programs
+│   ├── src
+│   │   └── bin
+│   │       ├── add-go-prove.rs
+│   │       └── revme-prove.rs
+│   ├── test-vectors
+│   │   └── 244.json
+├── install_mips_rust_tool
+├── rust-toolchain.toml
+├── sdk          //Support proof network and local proof
+    ├── Cargo.toml
+    ├── build.rs
+    └── src
+       ├── lib.rs
+       ├── local    //Generate the proof locally using the libsnark library
+       ├── network  //Generate the proof using ZKM Proof Network.
+       ├── proto
+       │   └── stage.proto
+       └── prover.rs //interface
+```
 
 ## Local Proving Requirements
 * Hardware: X86_64 CPU, 32 cores, 40G memory
@@ -303,7 +343,3 @@ curl -L https://foundry.paradigm.xyz | bash
 ```
 
 Next, deploy the contract as detailed in the contracts/README.md.
-
-
-
-

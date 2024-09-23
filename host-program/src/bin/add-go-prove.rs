@@ -85,16 +85,47 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let proving_result = prover_client.prover.prove(&input, None).await;
     match proving_result {
         Ok(Some(prover_result)) => {
-            log::info!("Generating proof successfully .The proof file and verifier contract are in the path {}.",&output_dir);
-            let output_path = Path::new(&output_dir);
-            let proof_result_path = output_path.join("snark_proof_with_public_inputs.json");
-            let _ = file::new(&proof_result_path.to_string_lossy())
-                .write(prover_result.proof_with_public_inputs.as_slice());
-            //contract
-            let output_path = Path::new(&output_dir);
-            let contract_path = output_path.join("verifier.sol");
-            let _ = file::new(&contract_path.to_string_lossy())
-                .write(prover_result.solidity_verifier.as_slice());
+            if execute_only2 == false {
+                log::info!("Generating proof successfully .The proof file and verifier contract are in the path {}.",&output_dir);
+                let output_path = Path::new(&output_dir);
+                let proof_result_path = output_path.join("snark_proof_with_public_inputs.json");
+                let _ = file::new(&proof_result_path.to_string_lossy())
+                    .write(prover_result.proof_with_public_inputs.as_slice());
+                //contract
+                let output_path = Path::new(&output_dir);
+                let contract_path = output_path.join("verifier.sol");
+                let _ = file::new(&contract_path.to_string_lossy())
+                    .write(prover_result.solidity_verifier.as_slice());
+            } else {
+                if prover_result.output_stream.len() < 256 {
+                    log::info!("output_stream.len() is too short: {}",prover_result.output_stream.len());
+                    return Ok(());
+                }
+                log::info!("Executing the guest program  successfully, result:");
+                //let mut input1 = [0u8; 10];
+                //input1.copy_from_slice(prover_result.output_stream[..10]);
+                let input1: [u8; 10] = prover_result.output_stream[..10].try_into().expect("Slice has incorrect length");
+                log::info!("input1: {:?}", input1);
+                let input2 = prover_result.output_stream[10];
+                log::info!("input2: {}", input2);
+                let input3 = prover_result.output_stream[11] as i8;
+                log::info!("input3: {}", input3);
+                let input4 = u16::from_be_bytes(prover_result.output_stream[12..14].try_into().map_err(|_| "Invalid data")?);
+                log::info!("input4: {}", input4);
+                let input5 = i16::from_be_bytes(prover_result.output_stream[14..16].try_into().map_err(|_| "Invalid data")?);
+                log::info!("input5: {}", input5);
+                let input6 = u32::from_be_bytes(prover_result.output_stream[16..20].try_into().map_err(|_| "Invalid data")?);
+                log::info!("input6: {}", input6);
+                let input7 = i32::from_be_bytes(prover_result.output_stream[20..24].try_into().map_err(|_| "Invalid data")?);
+                log::info!("input7: {}", input7);
+                let input8 = u64::from_be_bytes(prover_result.output_stream[24..32].try_into().map_err(|_| "Invalid data")?);
+                log::info!("input8: {}", input8);
+                let input9 = i64::from_be_bytes(prover_result.output_stream[32..40].try_into().map_err(|_| "Invalid data")?);
+                log::info!("input9: {:?}", input9);
+                let input10 = prover_result.output_stream[40..].to_vec();
+                log::info!("input10: {}", input10);
+            }
+            
         }
         Ok(None) => {
             log::info!("Failed to generate proof.The result is None.");

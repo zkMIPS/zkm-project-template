@@ -1,6 +1,6 @@
-export CA_CERT_PATH=host-program/tool/ca.pem
+export CA_CERT_PATH=../host-program/tool/ca.pem
 export PRIVATE_KEY=xxxxxx   ##The private key corresponding to the public key when registering in the https://www.zkm.io/apply
-export LD_LIBRARY_PATH=/mnt/data/gavin/zkm-project-template/sdk/src/local/libsnark:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/mnt/data/zkm-project-template/sdk/src/local/libsnark:$LD_LIBRARY_PATH
 export ZKM_PROVER=network
 export RUST_LOG=info
 export SEG_SIZE=262144
