@@ -54,7 +54,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     return Ok(());
                 }
                 log::info!("Executing the guest program  successfully.");
-                let ret_data: Data = bincode::deserialize_from(prover_result.output_stream.as_slice())
+                let ret_data = bincode::deserialize_from(prover_result.output_stream.as_slice())
                 .expect("deserialization failed");
                 log::info!("ret_data: {:?}", ret_data);
             }
