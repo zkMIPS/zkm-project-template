@@ -97,14 +97,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let _ = file::new(&contract_path.to_string_lossy())
                     .write(prover_result.solidity_verifier.as_slice());
             } else {
-                if prover_result.output_stream.len() < 256 {
+                if prover_result.output_stream.len() == 0 {
                     log::info!("output_stream.len() is too short: {}",prover_result.output_stream.len());
                     return Ok(());
                 }
                 log::info!("Executing the guest program  successfully, result:");
+                let ret_data: Data = bincode::deserialize_from(prover_result.output_stream.as_slice())
+                .expect("deserialization failed");
+                log::info!("ret_data: {:?}", ret_data);
                 //let mut input1 = [0u8; 10];
                 //input1.copy_from_slice(prover_result.output_stream[..10]);
-                let input1: [u8; 10] = prover_result.output_stream[..10].try_into().expect("Slice has incorrect length");
+               /* let input1: [u8; 10] = prover_result.output_stream[..10].try_into().expect("Slice has incorrect length");
                 log::info!("input1: {:?}", input1);
                 let input2 = prover_result.output_stream[10];
                 log::info!("input2: {}", input2);
@@ -123,7 +126,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let input9 = i64::from_be_bytes(prover_result.output_stream[32..40].try_into().map_err(|_| "Invalid data")?);
                 log::info!("input9: {:?}", input9);
                 let input10 = prover_result.output_stream[40..].to_vec();
-                log::info!("input10: {:?}", input10);
+                log::info!("input10: {:?}", input10);*/
             }
             
         }
