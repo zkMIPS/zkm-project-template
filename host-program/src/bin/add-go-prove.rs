@@ -123,7 +123,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let input9 = i64::from_be_bytes(prover_result.output_stream[32..40].try_into().map_err(|_| "Invalid data")?);
                 log::info!("input9: {:?}", input9);
                 let input10 = prover_result.output_stream[40..].to_vec();
-                log::info!("input10: {}", input10);
+                log::info!("input10: {:?}", input10);
             }
             
         }
