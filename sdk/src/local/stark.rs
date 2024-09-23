@@ -13,8 +13,8 @@ pub fn prove_stark(input: &ProverInput, storedir: &str, result: &mut ProverResul
     state.patch_elf(&file);
     state.patch_stack(vec![]);
 
-    state.add_input_stream(&input.public_inputstream);
-    state.add_input_stream(&input.private_inputstream);
+    state.input_stream.push(input.public_inputstream.clone());
+    state.input_stream.push(input.private_inputstream.clone());
 
     let (total_steps, state) = split_prog_into_segs(state, &seg_path, "", seg_size);
     result.output_stream = state.public_values_stream.clone();
