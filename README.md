@@ -101,6 +101,8 @@ If it executes successfully,  it will generate two binary files in target/releas
 > The host program executes local proving when the environmental variable ZKM_PROVER is set to "local" and performs network proving when ZKM_PROVER is set to "network".
 
 ### 3. Generate groth16 proof and verifier contract 
+> [!NOTE]
+> You can run the guest program without generating a proof by setting the environmental variable EXECUTE_ONLY to true.https://github.com/zkMIPS/zkm/issues/152
 
 ### (1) add-go
 

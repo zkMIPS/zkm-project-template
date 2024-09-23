@@ -101,32 +101,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     log::info!("output_stream.len() is too short: {}",prover_result.output_stream.len());
                     return Ok(());
                 }
-                log::info!("Executing the guest program  successfully, result:");
+                log::info!("Executing the guest program  successfully.");
                 let ret_data: Data = bincode::deserialize_from(prover_result.output_stream.as_slice())
                 .expect("deserialization failed");
                 log::info!("ret_data: {:?}", ret_data);
-                //let mut input1 = [0u8; 10];
-                //input1.copy_from_slice(prover_result.output_stream[..10]);
-               /* let input1: [u8; 10] = prover_result.output_stream[..10].try_into().expect("Slice has incorrect length");
-                log::info!("input1: {:?}", input1);
-                let input2 = prover_result.output_stream[10];
-                log::info!("input2: {}", input2);
-                let input3 = prover_result.output_stream[11] as i8;
-                log::info!("input3: {}", input3);
-                let input4 = u16::from_be_bytes(prover_result.output_stream[12..14].try_into().map_err(|_| "Invalid data")?);
-                log::info!("input4: {}", input4);
-                let input5 = i16::from_be_bytes(prover_result.output_stream[14..16].try_into().map_err(|_| "Invalid data")?);
-                log::info!("input5: {}", input5);
-                let input6 = u32::from_be_bytes(prover_result.output_stream[16..20].try_into().map_err(|_| "Invalid data")?);
-                log::info!("input6: {}", input6);
-                let input7 = i32::from_be_bytes(prover_result.output_stream[20..24].try_into().map_err(|_| "Invalid data")?);
-                log::info!("input7: {}", input7);
-                let input8 = u64::from_be_bytes(prover_result.output_stream[24..32].try_into().map_err(|_| "Invalid data")?);
-                log::info!("input8: {}", input8);
-                let input9 = i64::from_be_bytes(prover_result.output_stream[32..40].try_into().map_err(|_| "Invalid data")?);
-                log::info!("input9: {:?}", input9);
-                let input10 = prover_result.output_stream[40..].to_vec();
-                log::info!("input10: {:?}", input10);*/
             }
             
         }

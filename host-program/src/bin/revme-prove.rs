@@ -36,7 +36,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let proving_result = prover_client.prover.prove(&input, None).await;
     //match proverClient.await.prover.prover(&input,None).await {
     match proving_result {
-        Ok(Some(prover_result)) => {
+        if execute_only2 == false {
             log::info!("Generating proof successfully .The proof file and verifier contract are in the path {}.",&output_dir);
             let output_path = Path::new(&output_dir);
             let proof_result_path = output_path.join("snark_proof_with_public_inputs.json");
@@ -47,13 +47,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let contract_path = output_path.join("verifier.sol");
             let _ = file::new(&contract_path.to_string_lossy())
                 .write(prover_result.solidity_verifier.as_slice());
-        }
-        Ok(None) => {
-            log::info!("Failed to generate proof.The result is None.");
-        }
-        Err(e) => {
-            log::info!("Failed to generate proof. error: {}", e);
-            return Ok(());
+        } else {
+            if prover_result.output_stream.len() == 0 {
+                log::info!("output_stream.len() is too short: {}",prover_result.output_stream.len());
+                return Ok(());
+            }
+            log::info!("Executing the guest program  successfully.");
+            let ret_data: Data = bincode::deserialize_from(prover_result.output_stream.as_slice())
+            .expect("deserialization failed");
+            log::info!("ret_data: {:?}", ret_data);
         }
     }
 
