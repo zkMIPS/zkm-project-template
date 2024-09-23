@@ -37,28 +37,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //match proverClient.await.prover.prover(&input,None).await {
     match proving_result {
         Ok(Some(prover_result)) => {
-            if execute_only2 == false {
-                log::info!("Generating proof successfully .The proof file and verifier contract are in the path {}.",&output_dir);
-                let output_path = Path::new(&output_dir);
-                let proof_result_path = output_path.join("snark_proof_with_public_inputs.json");
-                let _ = file::new(&proof_result_path.to_string_lossy())
-                    .write(prover_result.proof_with_public_inputs.as_slice());
-                //contract
-                let output_path = Path::new(&output_dir);
-                let contract_path = output_path.join("verifier.sol");
-                let _ = file::new(&contract_path.to_string_lossy())
-                    .write(prover_result.solidity_verifier.as_slice());
-            } else {
-                if prover_result.output_stream.len() == 0 {
-                    log::info!("output_stream.len() is too short: {}",prover_result.output_stream.len());
-                    return Ok(());
-                }
-                log::info!("Executing the guest program  successfully.");
-                let ret_data = bincode::deserialize_from(prover_result.output_stream.as_slice())
-                .expect("deserialization failed");
-                log::info!("ret_data: {:?}", ret_data);
-            }
-            
+            log::info!("Generating proof successfully .The proof file and verifier contract are in the path {}.",&output_dir);
+            let output_path = Path::new(&output_dir);
+            let proof_result_path = output_path.join("snark_proof_with_public_inputs.json");
+            let _ = file::new(&proof_result_path.to_string_lossy())
+                .write(prover_result.proof_with_public_inputs.as_slice());
+            //contract
+            let output_path = Path::new(&output_dir);
+            let contract_path = output_path.join("verifier.sol");
+            let _ = file::new(&contract_path.to_string_lossy())
+                .write(prover_result.solidity_verifier.as_slice());
         }
         Ok(None) => {
             log::info!("Failed to generate proof.The result is None.");
