@@ -98,20 +98,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     .write(prover_result.solidity_verifier.as_slice());
             } else {
                 if prover_result.output_stream.is_empty() {
-                    log::info!("output_stream.len() is too short: {}", prover_result.output_stream.len());
+                    log::info!(
+                        "output_stream.len() is too short: {}",
+                        prover_result.output_stream.len()
+                    );
                     return Ok(());
                 }
                 log::info!("Executing the guest program  successfully.");
                 let ret_data: Data =
                     bincode::deserialize_from(prover_result.output_stream.as_slice())
-                    .expect("deserialization failed");
+                        .expect("deserialization failed");
                 log::info!("ret_data: {:?}", ret_data);
             }
-            
         }
         Ok(None) => {
             log::info!("Failed to generate proof.The result is None.");
-            return Ok(None);
         }
         Err(e) => {
             log::info!("Failed to generate proof. error: {}", e);
