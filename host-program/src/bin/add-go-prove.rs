@@ -85,7 +85,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let proving_result = prover_client.prover.prove(&input, None).await;
     match proving_result {
         Ok(Some(prover_result)) => {
-            if execute_only2 == false {
+            if !execute_only2 {
                 log::info!("Generating proof successfully .The proof file and verifier contract are in the path {}.", &output_dir);
                 let output_path = Path::new(&output_dir);
                 let proof_result_path = output_path.join("snark_proof_with_public_inputs.json");
@@ -97,7 +97,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let _ = file::new(&contract_path.to_string_lossy())
                     .write(prover_result.solidity_verifier.as_slice());
             } else {
-                if prover_result.output_stream.len() == 0 {
+                if prover_result.output_stream.is_empty() {
                     log::info!("output_stream.len() is too short: {}", prover_result.output_stream.len());
                     return Ok(());
                 }
