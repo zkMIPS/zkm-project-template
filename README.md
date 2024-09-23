@@ -7,6 +7,7 @@ There are two ways to prove the guest program:
 * Use ZKM proof network 
   
 ## Running diagram
+![image](https://github.com/user-attachments/assets/6579b120-7d0d-46ef-9433-23ed53b3d6a3)
 
 
 ## Template code structure
