@@ -105,6 +105,8 @@ If it executes successfully,  it will generate two binary files in target/releas
 > [!NOTE]
 > You can run the guest program without generating a proof by setting the environmental variable EXECUTE_ONLY to true.https://github.com/zkMIPS/zkm/issues/152
 
+> The EXECUTE_ONLY example , please  refer to the add-go-prove.rs.
+
 ### (1) add-go
 
 This program takes struct Data  as public input .
