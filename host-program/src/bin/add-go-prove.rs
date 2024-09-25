@@ -111,7 +111,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                     Err(e) => {
                         log::info!("Contract: failed to write to file: {}", e);
-                        return Ok(());
+                        return Err("Contract: failed to write to file".into());
                     }
                 }
                 log::info!("Generating proof successfully .The proof file and verifier contract are in the path {}.", &output_dir);
@@ -121,7 +121,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         "output_stream.len() is too short: {}",
                         prover_result.output_stream.len()
                     );
-                    return Ok(());
+                    return Err("output_stream.len() is too short".into());
                 }
                 log::info!("Executing the guest program  successfully.");
                 let ret_data: Data =
@@ -132,10 +132,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         Ok(None) => {
             log::info!("Failed to generate proof.The result is None.");
+            return Err("Failed to generate proof.".into());
         }
         Err(e) => {
             log::info!("Failed to generate proof. error: {}", e);
-            return Ok(());
+            return Err("Failed to generate proof.".into());
         }
     }
 
