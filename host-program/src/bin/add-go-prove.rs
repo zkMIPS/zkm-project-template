@@ -86,16 +86,32 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     match proving_result {
         Ok(Some(prover_result)) => {
             if !execute_only2 {
-                log::info!("Generating proof successfully .The proof file and verifier contract are in the path {}.", &output_dir);
                 let output_path = Path::new(&output_dir);
                 let proof_result_path = output_path.join("snark_proof_with_public_inputs.json");
-                let _ = file::new(&proof_result_path.to_string_lossy())
-                    .write(prover_result.proof_with_public_inputs.as_slice());
+                let mut f = file::new(&proof_result_path.to_string_lossy());
+                match  f.write(prover_result.proof_with_public_inputs.as_slice()) {
+                    Ok(bytes_written) => {
+                        log::info!("Proof: successfully written {} bytes.", bytes_written);
+                    },
+                    Err(e) => {
+                        log::info!("Proof: failed to write to file: {}", e);
+                        return Err(e);
+                    }
+                }
                 //contract
                 let output_path = Path::new(&output_dir);
                 let contract_path = output_path.join("verifier.sol");
-                let _ = file::new(&contract_path.to_string_lossy())
-                    .write(prover_result.solidity_verifier.as_slice());
+                let mut f = file::new(&contract_path.to_string_lossy());
+                match  f.write(prover_result.solidity_verifier.as_slice()){
+                    Ok(bytes_written) => {
+                        log::info!("Contract: successfully written {} bytes.", bytes_written);
+                    },
+                    Err(e) => {
+                        log::info!("Contract: failed to write to file: {}", e);
+                        return Err(e);
+                    }
+                }
+                log::info!("Generating proof successfully .The proof file and verifier contract are in the path {}.", &output_dir);
             } else {
                 if prover_result.output_stream.is_empty() {
                     log::info!(
