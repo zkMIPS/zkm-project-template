@@ -55,5 +55,6 @@ plonky2x-derive = { git = "https://github.com/zkMIPS/succinctx.git", package = "
 tonic-build = "0.8.0"
 
 [features]
+snark = []
 test = []
 
