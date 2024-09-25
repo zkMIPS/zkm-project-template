@@ -33,13 +33,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //
     let start = Instant::now();
     let output_dir = env::var("OUTPUT_DIR").unwrap_or("/tmp/zkm".to_string());
-    match fs::create_dir_all(&output_dir) {
-        Ok(_) => log::info!("{} created successfully.", &output_dir),
-        Err(e) => {
-            log::info!("Failed to create directory {}, err: {}", &output_dir, e);
-            return Ok(());
-        }
-    }
+    tokio::fs::create_dir_all(&output_dir).await?;
     let proving_result = prover_client.prover.prove(&input, None).await;
     //match proverClient.await.prover.prover(&input,None).await {
     match proving_result {

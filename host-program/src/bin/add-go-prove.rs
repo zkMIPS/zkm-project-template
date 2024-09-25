@@ -83,13 +83,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         execute_only: execute_only2,
     };
 
-    match fs::create_dir_all(&output_dir) {
-        Ok(_) => log::info!("{} created successfully.", &output_dir),
-        Err(e) => {
-            log::info!("Failed to create directory {}, err: {}", &output_dir, e);
-            return Ok(());
-        }
-    }
+    tokio::fs::create_dir_all(&output_dir).await?;
     let start = Instant::now();
     let proving_result = prover_client.prover.prove(&input, None).await;
     match proving_result {
