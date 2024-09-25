@@ -1,6 +1,6 @@
 use common::file;
-use std::fs;
 use std::env;
+use std::fs;
 use std::path::Path;
 use std::time::Instant;
 
@@ -47,10 +47,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let output_path = Path::new(&output_dir);
             let proof_result_path = output_path.join("snark_proof_with_public_inputs.json");
             let mut f = file::new(&proof_result_path.to_string_lossy());
-            match  f.write(prover_result.proof_with_public_inputs.as_slice()) {
+            match f.write(prover_result.proof_with_public_inputs.as_slice()) {
                 Ok(bytes_written) => {
                     log::info!("Proof: successfully written {} bytes.", bytes_written);
-                },
+                }
                 Err(e) => {
                     log::info!("Proof: failed to write to file: {}", e);
                     return Ok(());
@@ -60,10 +60,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let output_path = Path::new(&output_dir);
             let contract_path = output_path.join("verifier.sol");
             let mut f = file::new(&contract_path.to_string_lossy());
-            match  f.write(prover_result.solidity_verifier.as_slice()){
+            match f.write(prover_result.solidity_verifier.as_slice()){
                 Ok(bytes_written) => {
                     log::info!("Contract: successfully written {} bytes.", bytes_written);
-                },
+                }
                 Err(e) => {
                     log::info!("Contract: failed to write to file: {}", e);
                     return Ok(());
