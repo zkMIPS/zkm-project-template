@@ -1,7 +1,7 @@
 use common::file;
 use serde::{Deserialize, Serialize};
 use std::env;
-use std::fs;
+
 use std::fs::read;
 use std::path::Path;
 use std::time::Instant;
@@ -98,7 +98,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                     Err(e) => {
                         log::info!("Proof: failed to write to file: {}", e);
-                        return Ok(());
+                        return Err("Proof: failed to write to file".into());
                     }
                 }
                 //contract
