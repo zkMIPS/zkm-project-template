@@ -1,4 +1,5 @@
 use common::file;
+use common::file::LocalFile;
 use serde::{Deserialize, Serialize};
 use std::env;
 use std::fs;
@@ -83,7 +84,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         execute_only: execute_only2,
     };
 
-    match file::create_dir_all(&output_dir) {
+    match LocalFile::create_dir_all(&output_dir) {
         Ok(_) => log::info!("{} created successfully.", &output_dir),
         Err(e) => {
             log::info!("Failed to create directory {}, err: {}", &output_dir, e);
