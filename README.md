@@ -12,6 +12,9 @@ There are two ways to prove the guest program:
 
 ## Template code structure
 
+> [!NOTE]
+> The SDK has a  libary(libsnark) which supports local proving.If the libsnark  is required, please specify the  features = ["snark"] in your  Cargo.toml. To disable libsnark, set the environment variable NO_USE_SNARK to true when compiling the SDK. 
+
 ```
 ├── Cargo.toml
 ├── LICENSE
@@ -40,7 +43,7 @@ There are two ways to prove the guest program:
     ├── build.rs
     └── src
        ├── lib.rs
-       ├── local    //Generate the proof locally using the libsnark library
+       ├── local    //Generate the proof locally using the libsnark library.
        ├── network  //Generate the proof using ZKM Proof Network.
        ├── proto
        │   └── stage.proto
@@ -129,7 +132,6 @@ nohup ../target/release/add-go-prove  >./add-go-local-proving.log 2>&1 &
 Excute the host program.
 ```
 cd zkm-project-template/host-program
-mkdir /tmp/zkm    ##Ensure that OUTPUT_DIR exists
 ./run-add-go-local-proving.sh
 ```
 If successful, it will output a similar message
@@ -176,7 +178,6 @@ Excute the host program.
 
 ```
 cd zkm-project-template/host-program
-mkdir /tmp/zkm    ##Ensure that OUTPUT_DIR exists
 ./run-add-go-network-proving.sh
 ```
 If successful, it will output a similar message.
@@ -237,7 +238,6 @@ nohup ../target/release/revme-prove  >./revme-local-proving.log 2>&1 &
 Excute the host program.
 ```
 cd zkm-project-template/host-program
-mkdir /tmp/zkm    ##Ensure that OUTPUT_DIR exists
 ./run-revme-local-proving.sh
 ```
 If successful, it will output a similar message.
@@ -294,7 +294,6 @@ nohup ../target/release/revme-network-prove  >./revme-network_proving.log 2>&1 &
 Excute the host program.
 ```
 cd zkm-project-template/host-program
-mkdir /tmp/zkm    ##Ensure that OUTPUT_DIR exists
 ./run-revme-network-provin.sh
 ```
 If successful, it will output a similar message.
