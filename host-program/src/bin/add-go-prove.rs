@@ -82,14 +82,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         seg_size: seg_size2,
         execute_only: execute_only2,
     };
+
+    match file::create_dir_all(&output_dir) {
+        Ok(_) => log::info!("{} created successfully.", &output_dir),
+        Err(e) => {
+            log::info!("Failed to create directory {}, err: {}", &output_dir, e);
+            return Ok(());
+        }
+    }
     let start = Instant::now();
     let proving_result = prover_client.prover.prove(&input, None).await;
     match proving_result {
         Ok(Some(prover_result)) => {
             if !execute_only2 {
-                //let output_path = Path::new(&output_dir);
-                let output_path = fs::create_dir_all(&output_dir);
-                
+                let output_path = Path::new(&output_dir);
                 let proof_result_path = output_path.join("snark_proof_with_public_inputs.json");
                 let mut f = file::new(&proof_result_path.to_string_lossy());
                 match  f.write(prover_result.proof_with_public_inputs.as_slice()) {
@@ -102,7 +108,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }
                 //contract
-                //let output_path = Path::new(&output_dir);
+                let output_path = Path::new(&output_dir);
                 let contract_path = output_path.join("verifier.sol");
                 let mut f = file::new(&contract_path.to_string_lossy());
                 match  f.write(prover_result.solidity_verifier.as_slice()){
