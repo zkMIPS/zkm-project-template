@@ -45,6 +45,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     match proving_result {
         Ok(Some(prover_result)) => {
             let output_path = Path::new(&output_dir);
+            let proof_result_path = output_path.join("snark_proof_with_public_inputs.json");
             let mut f = file::new(&proof_result_path.to_string_lossy());
             match  f.write(prover_result.proof_with_public_inputs.as_slice()) {
                 Ok(bytes_written) => {
