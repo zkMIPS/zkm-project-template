@@ -95,7 +95,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     },
                     Err(e) => {
                         log::info!("Proof: failed to write to file: {}", e);
-                        return Err(e);
+                        return Ok(());
                     }
                 }
                 //contract
@@ -108,7 +108,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     },
                     Err(e) => {
                         log::info!("Contract: failed to write to file: {}", e);
-                        return Err(e);
+                        return Ok(());
                     }
                 }
                 log::info!("Generating proof successfully .The proof file and verifier contract are in the path {}.", &output_dir);
