@@ -7,10 +7,12 @@ There are two ways to prove the guest program:
 * Use ZKM proof network 
   
 ## Running diagram
-![image](https://github.com/user-attachments/assets/6579b120-7d0d-46ef-9433-23ed53b3d6a3)
-
+![image](https://github.com/user-attachments/assets/a420c018-7292-4a67-bba6-048c1bd17c77)
 
 ## Template code structure
+
+> [!NOTE]
+> The SDK has a  libary(libsnark) which supports local proving.If the libsnark  is required, please specify the  features = ["snark"] in your  Cargo.toml. To disable libsnark, set the environment variable NO_USE_SNARK to true when compiling the SDK. 
 
 ```
 ├── Cargo.toml
@@ -40,7 +42,7 @@ There are two ways to prove the guest program:
     ├── build.rs
     └── src
        ├── lib.rs
-       ├── local    //Generate the proof locally using the libsnark library
+       ├── local    //Generate the proof locally using the libsnark library.
        ├── network  //Generate the proof using ZKM Proof Network.
        ├── proto
        │   └── stage.proto
@@ -129,7 +131,6 @@ nohup ../target/release/add-go-prove  >./add-go-local-proving.log 2>&1 &
 Excute the host program.
 ```
 cd zkm-project-template/host-program
-mkdir /tmp/zkm    ##Ensure that OUTPUT_DIR exists
 ./run-add-go-local-proving.sh
 ```
 If successful, it will output a similar message
@@ -176,7 +177,6 @@ Excute the host program.
 
 ```
 cd zkm-project-template/host-program
-mkdir /tmp/zkm    ##Ensure that OUTPUT_DIR exists
 ./run-add-go-network-proving.sh
 ```
 If successful, it will output a similar message.
@@ -237,7 +237,6 @@ nohup ../target/release/revme-prove  >./revme-local-proving.log 2>&1 &
 Excute the host program.
 ```
 cd zkm-project-template/host-program
-mkdir /tmp/zkm    ##Ensure that OUTPUT_DIR exists
 ./run-revme-local-proving.sh
 ```
 If successful, it will output a similar message.
@@ -294,7 +293,6 @@ nohup ../target/release/revme-network-prove  >./revme-network_proving.log 2>&1 &
 Excute the host program.
 ```
 cd zkm-project-template/host-program
-mkdir /tmp/zkm    ##Ensure that OUTPUT_DIR exists
 ./run-revme-network-provin.sh
 ```
 If successful, it will output a similar message.

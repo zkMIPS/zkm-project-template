@@ -1,6 +1,7 @@
 use common::file;
 use serde::{Deserialize, Serialize};
 use std::env;
+
 use std::fs::read;
 use std::path::Path;
 use std::time::Instant;
@@ -81,28 +82,46 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         seg_size: seg_size2,
         execute_only: execute_only2,
     };
+
+    tokio::fs::create_dir_all(&output_dir).await?;
     let start = Instant::now();
     let proving_result = prover_client.prover.prove(&input, None).await;
     match proving_result {
         Ok(Some(prover_result)) => {
             if !execute_only2 {
-                log::info!("Generating proof successfully .The proof file and verifier contract are in the path {}.", &output_dir);
                 let output_path = Path::new(&output_dir);
                 let proof_result_path = output_path.join("snark_proof_with_public_inputs.json");
-                let _ = file::new(&proof_result_path.to_string_lossy())
-                    .write(prover_result.proof_with_public_inputs.as_slice());
+                let mut f = file::new(&proof_result_path.to_string_lossy());
+                match f.write(prover_result.proof_with_public_inputs.as_slice()) {
+                    Ok(bytes_written) => {
+                        log::info!("Proof: successfully written {} bytes.", bytes_written);
+                    }
+                    Err(e) => {
+                        log::info!("Proof: failed to write to file: {}", e);
+                        return Err("Proof: failed to write to file".into());
+                    }
+                }
                 //contract
                 let output_path = Path::new(&output_dir);
                 let contract_path = output_path.join("verifier.sol");
-                let _ = file::new(&contract_path.to_string_lossy())
-                    .write(prover_result.solidity_verifier.as_slice());
+                let mut f = file::new(&contract_path.to_string_lossy());
+                match f.write(prover_result.solidity_verifier.as_slice()) {
+                    Ok(bytes_written) => {
+                        log::info!("Contract: successfully written {} bytes.", bytes_written);
+                    }
+                    Err(e) => {
+                        log::info!("Contract: failed to write to file: {}", e);
+                        return Err("Contract: failed to write to file".into());
+                    }
+                }
+                log::info!("Generating proof successfully .The proof file and verifier contract are in the path {}.", &output_dir);
             } else {
                 if prover_result.output_stream.is_empty() {
                     log::info!(
                         "output_stream.len() is too short: {}",
                         prover_result.output_stream.len()
                     );
-                    return Ok(());
+                    return Err("output_stream.len() is too short".into());
                 }
                 log::info!("Executing the guest program  successfully.");
                 let ret_data: Data =
@@ -113,10 +132,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         Ok(None) => {
             log::info!("Failed to generate proof.The result is None.");
+            return Err("Failed to generate proof.".into());
         }
         Err(e) => {
             log::info!("Failed to generate proof. error: {}", e);
-            return Ok(());
+            return Err("Failed to generate proof.".into());
         }
     }
 
