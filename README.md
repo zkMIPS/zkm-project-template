@@ -2,17 +2,19 @@
 
 This is a template for creating an end-to-end ZKM project which can generate the EVM-Compatible proof and the on chain verification contract.
 
-There are two ways to prove the guest program: 
-* Use your local machine
-* Use ZKM proof network 
-  
+There are two ways to prove the guest program:
+
+- Use your local machine
+- Use ZKM proof network
+
 ## Running diagram
+
 ![image](https://github.com/user-attachments/assets/a420c018-7292-4a67-bba6-048c1bd17c77)
 
 ## Template code structure
 
 > [!NOTE]
-> The SDK has a  libary(libsnark) which supports local proving.If the libsnark  is required, please specify the  features = ["snark"] in your  Cargo.toml. To disable libsnark, set the environment variable NO_USE_SNARK to true when compiling the SDK. 
+> The SDK has a libary(libsnark) which supports local proving. If the libsnark is required, please specify the features = ["snark"] in your Cargo.toml. To disable libsnark, set the environment variable NO_USE_SNARK to true when compiling the SDK.
 
 ```
 ├── Cargo.toml
@@ -50,94 +52,78 @@ There are two ways to prove the guest program:
 ```
 
 ## Local Proving Requirements
-* Hardware: X86_64 CPU, 32 cores, 40G memory
 
-* OS: Ubuntu22
+- Hardware: X86_64 CPU, 32 cores, 13GB memory (minimum)
+- OS: Linux
+- Rust: 1.81.0-nightly
+- Go : 1.22.1
+- Set up a local node for some blockchain(eg, sepolia)
 
-* Rust: 1.81.0-nightly
-  
-* Go : 1.22.1
-  
-* Set up a local node for some blockchain(eg, sepolia)
-  
-  
 ## Network Proving Requirements
-* Hardware: X86_64 CPU, 8 cores, 8G memory
 
-* OS: Ubuntu22
+- Hardware: X86_64 CPU, 8 cores, 8G memory
+- OS: Linux
+- Rust: 1.81.0-nightly
+- Go : 1.22.1
+- CA certificate: ca.pem, ca.key
+- [Register](https://www.zkm.io/apply) your address to use
+- RPC for a blockchain (eg, sepolia)
 
-* Rust: 1.81.0-nightly
-  
-* Go : 1.22.1
-  
-* CA certificate:  ca.pem, ca.key
-  
-* Register in the https://www.zkm.io/apply (Let your public key be in the whitelist)
-  
-* Set up a local node for some blockchain(eg, sepolia)
-
+> [!NOTE]
+> All actions are assumed to be from the base directory `zkm-project-template`
 
 ## Running the project
 
 ### 0. Download the repo
 
-```
+```sh
 git clone https://github.com/zkMIPS/zkm-project-template.git
 ```
 
 ### 1. Build the guest program ELF
 
-Please refer to : guest-program/README.md
+Please refer to [this](guest-program/README.md) guide
 
 ### 2. Build the host program
 
+```sh
+sdk/src/local/libsnark/compile.sh  # compile snark library
+cargo build --release              # build host programs
 ```
-cd zkm-project-template/sdk/src/local/libsnark/
-./compile.sh      ##compile snark libary
 
-cd zkm-project-template
-cargo build --release
-```
-If it executes successfully,  it will generate two binary files in target/release : add-go-prove ,revme-prove
+If the program executes successfully, it will generate two binary files in `target/release`: `add-go-prove`,`revme-prove`
 
 > [!NOTE]
-> The host program executes local proving when the environmental variable ZKM_PROVER is set to "local" and performs network proving when ZKM_PROVER is set to "network".
+> The host program executes local proving when the environmental variable `ZKM_PROVER` is set to "local" and performs network proving when `ZKM_PROVER` is set to "network"
 
-### 3. Generate groth16 proof and verifier contract 
+### 3. Generate groth16 proof and verifier contract
+
+```sh
+cd host-program
+```
+
 > [!NOTE]
-> You can run the guest program without generating a proof by setting the environmental variable EXECUTE_ONLY to true.https://github.com/zkMIPS/zkm/issues/152
+> You can run the guest program without generating a proof by setting the environmental variable `EXECUTE_ONLY` to "true".https://github.com/zkMIPS/zkm/issues/152
 
-> The EXECUTE_ONLY example , please  refer to the add-go-prove.rs.
+> For an `EXECUTE_ONLY` example, please refer to [add-go-prove.rs](host-program/src/bin/add-go-prove.rs)
 
-### (1) add-go
+### Example 1: `add-go`
 
-This program takes struct Data  as public input .
+This program takes struct Data as public input
 
-* local proving
-  
-```
-$cd zkm-project-template/host-program
-$cat run-add-go-local-proving.sh
+#### Local Proving
 
-export LD_LIBRARY_PATH=/mnt/data/zkm-project-template/sdk/src/local/libsnark:$LD_LIBRARY_PATH  ##Modify it according your template 
-export ZKM_PROVER=local
-export RUST_LOG=info
-export SEG_SIZE=262144
-export ELF_PATH=../guest-program/mips-elf/zkm-mips-elf-add-go ##If you using your own mips ELF, please modify the path
-export OUTPUT_DIR=/tmp/zkm 
+Make any edits to [`run-add-go-local-proving.sh`](host-program/run-add-go-local-proving.sh) and run the program:
 
-nohup ../target/release/add-go-prove  >./add-go-local-proving.log 2>&1 &
-```
-Excute the host program.
-```
-cd zkm-project-template/host-program
+```sh
 ./run-add-go-local-proving.sh
 ```
-If successful, it will output a similar message
+
+If successful, it will output a similar log:
+
+##### **`run-add-go-local-proving.log`**
 
 ```
-$cat add-go-local-proving.log
-
 [2024-09-14T14:09:57Z INFO  add_go_prove] new prover client.
 [2024-09-14T14:09:57Z INFO  add_go_prove] new prover client,ok.
 [2024-09-14T14:09:57Z INFO  zkm_sdk::local::prover] calling request_proof.
@@ -152,37 +138,22 @@ $cat add-go-local-proving.log
 [2024-09-14T14:20:58Z INFO  add_go_prove] Generating proof successfully .The proof file and verifier contract are in the path /tmp/zkm.
 [2024-09-14T14:20:58Z INFO  add_go_prove] Elapsed time: 660 secs
 ```
-The proof and contract file will be in the OUTPUT_DIR.(snark_proof_with_public_inputs.json and verifier.sol)
 
-* network proving
+The proof and contract file will be in the `OUTPUT_DIR`
 
-```
-$cd zkm-project-template/host-program
-$cat run-add-go-network-proving.sh
+#### Network Proving
 
-export CA_CERT_PATH=host-program/tool/ca.pem  #If you use your own CA, you should modify the path.
-export PRIVATE_KEY=xxxxxx   ##The private key corresponding to the public key when registering in the https://www.zkm.io/apply
-export LD_LIBRARY_PATH=/mnt/data/zkm-project-template/sdk/src/local/libsnark:$LD_LIBRARY_PATH  ##Modify it according your template
-export ZKM_PROVER=network
-export RUST_LOG=info
-export SEG_SIZE=262144
-export ENDPOINT=https://152.32.186.45:20002    ##the test entry of zkm proof network
-export ELF_PATH=../guest-program/mips-elf/zkm-mips-elf-add-go
-export OUTPUT_DIR=/tmp/zkm 
+Make any edits to [`run-add-go-network-proving.sh`](host-program/run-add-go-network-proving.sh) and run the program:
 
-nohup ../target/release/add-go-prove  >./add-go-network-proving.log 2>&1 &
-```
-
-Excute the host program.
-
-```
-cd zkm-project-template/host-program
+```sh
 ./run-add-go-network-proving.sh
 ```
-If successful, it will output a similar message.
+
+If successful, it will output a similar log:
+
+##### **`add-go-network-proving.log`**
 
 ```
-$cat add-go-network-proving.log
 [2024-09-14T14:40:02Z INFO  add_go_prove] new prover client.
 [2024-09-14T14:40:03Z INFO  add_go_prove] new prover client,ok.
 [2024-09-14T14:40:03Z INFO  zkm_sdk::network::prover] calling request_proof.
@@ -194,56 +165,43 @@ $cat add-go-network-proving.log
 [2024-09-14T14:41:38Z INFO  add_go_prove] Elapsed time: 95 secs
 ```
 
-The proof and contract file will be in the OUTPUT_DIR.(snark_proof_with_public_inputs.json and verifier.sol)
+The proof and contract file will be in the `OUTPUT_DIR`
 
+### Example 2: `revme`
 
-### (2) revme
+This program takes a block of data as public input
 
-This program  takes a block of data as public input.
+#### Generating the public input about a specific block
 
-* Generate the public input about a specific block
-  
 > [!NOTE]
-> The local node is the GOAT test chain in the following example.
+> The local node is the [GOAT](https://goat.network) test chain in the following example.
 
-```
+```sh
 cd ~
 git clone https://github.com/zkMIPS/revme
-cd  revme
+cd revme
 RPC_URL=http://localhost:8545 CHAIN_ID=1337 BLOCK_NO=244 RUST_LOG=debug SUITE_JSON_PATH=./test-vectors/244.json cargo run --example process
 ```
-If successfully,  it will generate the 244.json in the path test-vectors.
 
-```
-cp test-vectors/244.json   zkm-project-template/host-program/test-vectors/
+If successfully, it will generate `244.json` in the path test-vectors
+
+```sh
+cp test-vectors/244.json zkm-project-template/host-program/test-vectors/
 ```
 
-* local proving
-  
-```
-$cd zkm-project-template/host-program
-$cat run-revme-local-proving.sh
+#### Local Proving
 
-export LD_LIBRARY_PATH=/mnt/data/zkm-project-template/sdk/src/local/libsnark:$LD_LIBRARY_PATH  ##Modify it according your template 
-export ZKM_PROVER=local
-export RUST_LOG=info
-export SEG_SIZE=262144
-export ELF_PATH=../guest-program/mips-elf/zkm-mips-elf-revme-rust  ##If you using your own mips ELF, please modify the path
-export PUBLIC_INPUT_PATH=host-program/test-vectors/244.json    
-export OUTPUT_DIR=/tmp/zkm
+Make any edits to [`run-revme-local-proving.sh`](host-program/run-revme-local-proving.sh) and run the program:
 
-nohup ../target/release/revme-prove  >./revme-local-proving.log 2>&1 &
-```
-Excute the host program.
-```
-cd zkm-project-template/host-program
+```sh
 ./run-revme-local-proving.sh
 ```
-If successful, it will output a similar message.
+
+If successful, it will output a similar log:
+
+##### **`revme-local-proving.log`**
 
 ```
-$cat local-revme-proving.log
-
 [2024-09-15T02:37:53Z INFO  revme_prove] new prover client.
 [2024-09-15T02:37:53Z INFO  revme_prove] new prover client,ok.
 [2024-09-15T02:37:53Z INFO  zkm_sdk::local::prover] calling request_proof.
@@ -263,43 +221,27 @@ $cat local-revme-proving.log
 [2024-09-15T03:48:11Z INFO  revme_prove] Generating proof successfully .The proof file and verifier contract are in the path /tmp/zkm.
 [2024-09-15T03:48:11Z INFO  revme_prove] Elapsed time: 4217 secs
 ```
-The proof and contract file will be in the OUTPUT_DIR.(snark_proof_with_public_inputs.json and verifier.sol)
 
-* network proing
-  
+The proof and contract file will be in the `OUTPUT_DIR`
+
+#### Network Proving
+
 > [!NOTE]
 > The proving network may sometimes experience high traffic, causing proof tasks to be queued for hours.
 
 > The proving task requires several stages: queuing, splitting, proving, aggregating and finalizing. Each stage involves a varying duration.
 
-```
-$cd zkm-project-template/host-program
-$ cat run-revme-network-provin.sh
-
-export CA_CERT_PATH=host-program/tool/ca.pem
-export PRIVATE_KEY=xxxxxx   ##The private key corresponding to the public key when registering in the https://www.zkm.io/apply
-export LD_LIBRARY_PATH=/mnt/data/zkm-project-template/sdk/src/local/libsnark:$LD_LIBRARY_PATH  ##Modify it according your template
-export ZKM_PROVER=network
-export RUST_LOG=info
-export ENDPOINT=https://152.32.186.45:20002    ##the test entry of zkm proving network
-export SEG_SIZE=262144
-export ELF_PATH=../guest-program/mips-elf/zkm-mips-elf-revme-rust
-export PUBLIC_INPUT_PATH=host-program/test-vectors/244.json
-export OUTPUT_DIR=/tmp/zkm
-
-nohup ../target/release/revme-network-prove  >./revme-network_proving.log 2>&1 &
-```
-
-Excute the host program.
-```
-cd zkm-project-template/host-program
-./run-revme-network-provin.sh
-```
-If successful, it will output a similar message.
+Make any edits to [`run-revme-remote-proving.sh`](host-program/run-revme-remote-proving.sh) and run the program:
 
 ```
-$cat revme-network_proving.log
+./run-revme-network-proving.sh
+```
 
+If successful, it will output a similar log:
+
+##### **`revme-remote-proving.log`**
+
+```
 [2024-09-14T15:02:42Z INFO  revme_network_prove] new prover client.
 [2024-09-14T15:02:42Z INFO  revme_network_prove] new prover client,ok.
 [2024-09-14T15:02:42Z INFO  zkm_sdk::network::prover] calling request_proof.
@@ -326,23 +268,24 @@ $cat revme-network_proving.log
 [2024-09-14T15:12:24Z INFO  revme_network_prove] Generating proof successfully .The proof file and verifier contract are in the path /tmp/zkm.
 [2024-09-14T15:12:24Z INFO  revme_network_prove] Elapsed time: 581 secs
 ```
-The proof and contract file will be in the OUTPUT_DIR.(snark_proof_with_public_inputs.json and verifier.sol)
 
-#### 4. Deploy Verifier Contract.
+The proof and contract file will be in the `OUTPUT_DIR`
 
-Copy the snark_proof_with_public_inputs.json and verifier.sol generated in the previous step to the contracts directory.
+#### 4. Deploy the Verifier Contract
 
-```
+Copy the `snark_proof_with_public_inputs.json` and `verifier.sol` generated in the previous step to the contracts directory
+
+```sh
 cd zkm-project-template
-export OUTPUT_DIR=/tmp/zkm  ##according your setting in the run shell.
-cp $OUTPUT_DIR/snark_proof_with_public_inputs.json  contracts/verifier/
+export OUTPUT_DIR=/tmp/zkm  #according your setting in the run shell.
+cp $OUTPUT_DIR/snark_proof_with_public_inputs.json contracts/verifier/
 cp $OUTPUT_DIR/verifier.sol contracts/src/
 ```
 
-If your system does not has  Foundry,please install it.
+If your system does not has Foundry, please install it:
 
-```
+```sh
 curl -L https://foundry.paradigm.xyz | bash
 ```
 
-Next, deploy the contract as detailed in the contracts/README.md.
+Next, deploy the contract as detailed in [this](contracts/README.md) guide
