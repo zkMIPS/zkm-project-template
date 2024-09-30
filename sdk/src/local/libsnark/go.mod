@@ -10,7 +10,7 @@ require (
 
 replace github.com/consensys/gnark v0.9.1 => github.com/zkMIPS/gnark v0.9.2-0.20240114074717-11112539ed1e
 
-replace github.com/succinctlabs/gnark-plonky2-verifier v0.1.0 => github.com/zkMIPS/gnark-plonky2-verifier v0.0.0-20240909021746-f3bca35a645f
+replace github.com/succinctlabs/gnark-plonky2-verifier v0.1.0 => github.com/zkMIPS/gnark-plonky2-verifier v0.0.0-20240929021913-ecd070f3d885
 
 require (
 	github.com/Microsoft/go-winio v0.6.1 // indirect
