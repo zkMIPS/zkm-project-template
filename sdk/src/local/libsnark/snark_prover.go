@@ -48,6 +48,7 @@ func (obj *SnarkProver) init_circuit_keys(inputdir string) error {
 		verifierOnlyCircuitData := variables.DeserializeVerifierOnlyCircuitData(verifierOnlyCircuitRawData)
 
 		circuit := verifier.ExampleVerifierCircuit{
+			PublicInputsHash:        proofWithPis.PublicInputsHash,
 			Proof:                   proofWithPis.Proof,
 			PublicInputs:            proofWithPis.PublicInputs,
 			VerifierOnlyCircuitData: verifierOnlyCircuitData,
@@ -117,6 +118,7 @@ func (obj *SnarkProver) groth16ProofWithCache(r1cs constraint.ConstraintSystem, 
 	verifierOnlyCircuitData := variables.DeserializeVerifierOnlyCircuitData(verifierOnlyCircuitRawData)
 
 	assignment := verifier.ExampleVerifierCircuit{
+		PublicInputsHash:        proofWithPis.PublicInputsHash,
 		Proof:                   proofWithPis.Proof,
 		PublicInputs:            proofWithPis.PublicInputs,
 		VerifierOnlyCircuitData: verifierOnlyCircuitData,
