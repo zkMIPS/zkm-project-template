@@ -173,7 +173,7 @@ contract Verifier {
         vk.delta = {{.Delta}};
         {{.Gamma_abc}}
     }
-    function verify(uint[65] memory input, Proof memory proof, uint[2] memory proof_commitment) public view returns (uint) {
+    function verify(uint[2] memory input, Proof memory proof, uint[2] memory proof_commitment) public view returns (uint) {
         uint256 snark_scalar_field = 21888242871839275222246405745257275088548364400416034343698204186575808495617;
         
         VerifyingKey memory vk = verifyingKey();
@@ -200,7 +200,7 @@ contract Verifier {
         return 0;
     }
     function verifyTx(
-            Proof memory proof, uint[65] memory input
+            Proof memory proof, uint[2] memory input
         ,uint[2] memory proof_commitment) public returns (bool r) {
 
         if (verify(input, proof , proof_commitment) == 0) {
