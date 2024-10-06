@@ -1,4 +1,5 @@
-export LD_LIBRARY_PATH=/mnt/data/zkm-project-template/sdk/src/local/libsnark:$LD_LIBRARY_PATH  ##Modify it according your template 
+BASEDIR=$(cd $(dirname $0); pwd)
+export LD_LIBRARY_PATH=$BASEDIR/../sdk/src/local/libsnark:$LD_LIBRARY_PATH  ##Modify it according your template
 export ZKM_PROVER=local
 export RUST_LOG=info
 export SEG_SIZE=262144
