@@ -4,12 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [[bin]]
-name = "add-go-prove"
-path = "src/bin/add-go-prove.rs"
-
-[[bin]]
-name = "revme-prove"
-path = "src/bin/revme-prove.rs"
+name = "local-prove"
+path = "src/bin/local-prove.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

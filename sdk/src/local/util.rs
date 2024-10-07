@@ -19,10 +19,10 @@ use zkm_prover::proof::PublicValues;
 use zkm_prover::prover::prove;
 use zkm_prover::verifier::verify_proof;
 
-const DEGREE_BITS_RANGE: [Range<usize>; 6] = [10..21, 12..22, 12..21, 8..21, 6..21, 13..23];
+const DEGREE_BITS_RANGE: [Range<usize>; 6] = [10..21, 12..22, 10..21, 10..21, 6..21, 13..23];
 
-pub fn prove_single_seg_common(seg_file: &str, basedir: &str, block: &str, file: &str) {
-    let seg_reader = BufReader::new(File::open(seg_file).unwrap());
+pub fn prove_single_seg_common(seg_file: &str, basedir: &str, block: &str, file: &str) -> anyhow::Result<()> {
+    let seg_reader = BufReader::new(File::open(seg_file)?);
     let kernel = segment_kernel(basedir, block, file, seg_reader);
 
     const D: usize = 2;
@@ -33,17 +33,18 @@ pub fn prove_single_seg_common(seg_file: &str, basedir: &str, block: &str, file:
     let config = StarkConfig::standard_fast_config();
     let mut timing = TimingTree::new("prove", log::Level::Info);
     let allproof: proof::AllProof<GoldilocksField, C, D> =
-        prove(&allstark, &kernel, &config, &mut timing).unwrap();
+        prove(&allstark, &kernel, &config, &mut timing)?;
     let mut count_bytes = 0;
     for (row, proof) in allproof.stark_proofs.clone().iter().enumerate() {
-        let proof_str = serde_json::to_string(&proof.proof).unwrap();
+        let proof_str = serde_json::to_string(&proof.proof)?;
         log::info!("row:{} proof bytes:{}", row, proof_str.len());
         count_bytes += proof_str.len();
     }
     timing.filter(Duration::from_millis(100)).print();
     log::info!("total proof bytes:{}KB", count_bytes / 1024);
-    verify_proof(&allstark, allproof, &config).unwrap();
+    verify_proof(&allstark, allproof, &config)?;
     log::info!("Prove done");
+    Ok(())
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -208,8 +209,8 @@ pub fn prove_multi_seg_common(
     );
     log::info!("build finish");
 
-    let wrapped_proof = wrapped_circuit.prove(&block_proof).unwrap();
-    wrapped_proof.save(outdir).unwrap();
+    let wrapped_proof = wrapped_circuit.prove(&block_proof)?;
+    wrapped_proof.save(outdir)?;
 
     total_timing.filter(Duration::from_millis(100)).print();
     result

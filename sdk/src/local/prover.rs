@@ -31,11 +31,13 @@ impl ProverTask {
         let outputdir = format!("/tmp/{}/output", self.proof_id);
         fs::create_dir_all(&inputdir).unwrap();
         fs::create_dir_all(&outputdir).unwrap();
-        crate::local::stark::prove_stark(&self.input, &inputdir, &mut result);
+        let should_agg = crate::local::stark::prove_stark(&self.input, &inputdir, &mut result).unwrap();
         if self.input.execute_only {
             result.proof_with_public_inputs = vec![];
             result.stark_proof = vec![];
             result.solidity_verifier = vec![];
+        } else if !should_agg {
+            log::info!("There is only one segment with segment size {}, will skip the aggregation!", self.input.seg_size);
         } else if crate::local::snark::prove_snark(&inputdir, &outputdir) {
             result.stark_proof =
                 std::fs::read(format!("{}/proof_with_public_inputs.json", inputdir)).unwrap();

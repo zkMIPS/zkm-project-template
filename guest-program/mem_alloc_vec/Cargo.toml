@@ -1,0 +1,8 @@
+[workspace]
+[package]
+name = "mem_alloc_vec"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+zkm-runtime = { git = "https://github.com/zkMIPS/zkm.git" }
