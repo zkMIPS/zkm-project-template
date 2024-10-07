@@ -13,5 +13,5 @@ export ELF_PATH=${BASEDIR}/../guest-program/$program/target/mips-unknown-linux-m
   cargo build --target=mips-unknown-linux-musl --release
 )
 
-#nohup ../target/release/local-prove  >./local-proving.log 2>&1 &
-../target/release/local-prove
+nohup ../target/release/local-prove  >./local-proving.log 2>&1 &
+echo 'check out the log by "tail -f local-proving.log"'
