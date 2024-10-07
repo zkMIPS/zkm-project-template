@@ -13,7 +13,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::try_init().unwrap_or_default();
     let args: Vec<String> = env::args().collect();
     let helper = || {
-        log::info!("Help: {} sha2-rust | sha2-go | mem-alloc-vec",args[0]);
+        log::info!("Help: {} sha2-rust | sha2-go | mem-alloc-vec", args[0]);
         std::process::exit(-1);
     };
     if args.len() < 2 {
@@ -32,13 +32,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let output_dir = env::var("OUTPUT_DIR").unwrap_or("/tmp/zkm".to_string());
     tokio::fs::create_dir_all(&output_dir).await?;
 
-    let  input: ProverInput = match args[1].as_str() {
+    let input: ProverInput = match args[1].as_str() {
         "sha2-rust" => set_sha2_rust_intput(seg_size2,execute_only2).expect("set sha2-rust input error"),
         "sha2-go" => set_sha2_go_intput(seg_size2,execute_only2).expect("set sha2-go input error"),
         "mem-alloc-vec" => set_mem_alloc_vec_intput(seg_size2,execute_only2).expect("set mem-alloc-vec input error"),
         _ => {
                 helper();
-                input = ProverInput {
+                ProverInput {
                     elf: "".into(),
                     public_inputstream: "".into(),
                     private_inputstream: "".into(),

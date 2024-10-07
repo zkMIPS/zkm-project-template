@@ -189,7 +189,16 @@ If successful, it will output a similar log:
 ##### **`sha2-go-network-proving.log`**
 
 ```
-
+[2024-10-07T08:42:02Z INFO  zkm_prove] new prover client.
+[2024-10-07T08:42:02Z INFO  zkm_prove] new prover client,ok.
+[2024-10-07T08:42:02Z INFO  zkm_sdk::network::prover] calling request_proof.
+[2024-10-07T08:42:04Z INFO  zkm_sdk::network::prover] calling wait_proof, proof_id=d9a9bf8f-aff5-4103-af9e-b14ac6556a45
+[2024-10-07T08:42:05Z INFO  zkm_sdk::network::prover] generate_proof : queuing the task.
+[2024-10-07T08:42:35Z INFO  zkm_sdk::network::prover] generate_proof : aggregating the proof.
+[2024-10-07T08:43:07Z INFO  zkm_prove] Proof: successfully written 1268 bytes.
+[2024-10-07T08:43:07Z INFO  zkm_prove] Contract: successfully written 10329 bytes.
+[2024-10-07T08:43:07Z INFO  zkm_prove] Generating proof successfully .The proof file and verifier contract are in the the path contracts/verifier and contracts/src .
+[2024-10-07T08:43:07Z INFO  zkm_prove] Elapsed time: 64 secs
 ```
 
 The proof and contract file will be in the contracts/verifier and contracts/src
