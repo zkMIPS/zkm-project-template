@@ -57,6 +57,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     match proving_result {
         Ok(Some(prover_result)) => {
             if !execute_only2 {
+                let output_dir = "../contracts/verifier".to_string();
                 let output_path = Path::new(&output_dir);
                 let proof_result_path = output_path.join("snark_proof_with_public_inputs.json");
                 let mut f = file::new(&proof_result_path.to_string_lossy());
@@ -70,6 +71,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }
                 //contract
+                let output_dir = "../contracts/src".to_string();
                 let output_path = Path::new(&output_dir);
                 let contract_path = output_path.join("verifier.sol");
                 let mut f = file::new(&contract_path.to_string_lossy());
@@ -82,7 +84,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         return Err("Contract: failed to write to file".into());
                     }
                 }
-                log::info!("Generating proof successfully .The proof file and verifier contract are in the path {}.", &output_dir);
+                log::info!("Generating proof successfully .The proof file and verifier contract are in the the path contracts/verifier and contracts/src .");
             } else {
                 if prover_result.output_stream.is_empty() {
                     log::info!(
@@ -116,7 +118,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 fn set_sha2_rust_intput( seg_size: u32, execute_only: bool) -> anyhow::Result<ProverInput>  {
     let elf_path =
-        env::var("ELF_PATH").unwrap_or("guest-program/sha2-rust/target/mips-unknown-linux-musl/release/zkm-mips-elf-sha2-rust".to_string());
+        env::var("ELF_PATH").unwrap_or("../guest-program/sha2-rust/target/mips-unknown-linux-musl/release/zkm-mips-elf-sha2-rust".to_string());
     let args = env::var("ARGS").unwrap_or("data-to-hash".to_string());
     // assume the  arg[0] is the hash(input)(which is a public input), and the arg[1] is the input.
     let args: Vec<&str> = args.split_whitespace().collect();
@@ -191,7 +193,7 @@ impl Data {
 
 fn set_sha2_go_intput( seg_size: u32, execute_only: bool) -> anyhow::Result<ProverInput>  {
     let elf_path =
-        env::var("ELF_PATH").unwrap_or("guest-program/sha2-go/target/mips-unknown-linux-musl/release/zkm-mips-elf-sha2-go".to_string());
+        env::var("ELF_PATH").unwrap_or("../guest-program/sha2-go/zkm-mips-elf-sha2-go".to_string());
     let args = env::var("ARGS").unwrap_or("data-to-hash".to_string());
     // assume the  arg[0] is the hash(input)(which is a public input), and the arg[1] is the input.
     let args: Vec<&str> = args.split_whitespace().collect();
@@ -216,7 +218,7 @@ fn set_sha2_go_intput( seg_size: u32, execute_only: bool) -> anyhow::Result<Prov
 
 fn set_mem_alloc_vec_intput( seg_size: u32, execute_only: bool) -> anyhow::Result<ProverInput>  {
     let elf_path =
-        env::var("ELF_PATH").unwrap_or("guest-program/mem-alloc-vec/target/mips-unknown-linux-musl/release/zkm-mips-elf-mem-alloc-vec".to_string());
+        env::var("ELF_PATH").unwrap_or("../guest-program/mem-alloc-vec/target/mips-unknown-linux-musl/release/zkm-mips-elf-mem-alloc-vec".to_string());
     
     let input = ProverInput {
         elf: read(elf_path).unwrap(),
