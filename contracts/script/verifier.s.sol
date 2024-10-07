@@ -2,17 +2,17 @@
 pragma solidity ^0.8.13;
 
 import {Script, console} from "forge-std/Script.sol";
-import {ERC20Token} from "../src/erc20.sol";
+import {Verifier} from "../src/verifier.sol";
 
-contract ERC20TokenScript is Script {
-    ERC20Token public erc20;
+contract VerifierScript is Script {
+    Verifier public verifier;
 
     function setUp() public {}
 
     function run() public {
         vm.startBroadcast();
 
-        erc20 = new ERC20Token();
+        verifier = new Verifier();
 
         vm.stopBroadcast();
     }

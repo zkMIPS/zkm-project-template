@@ -2,16 +2,16 @@
 
 ZKM can generate proof for  Go and Rust (guest) Programs.
 
-* add-go
+* sha2-go
   
 A simple program that takes struct Data   as input, and operate the elements  as an output.
 
-* revme
-  
-This program is more complex, taking a block of data as input and simulating the Ethereum Virtual Machine's computation for that block.
+* sha2-rust
+It takes a public input and a private input ,then check the hash(private input)= public input.
+
+* mem-allox-vec
 
 > [!NOTE]
-> In the mips-elf directory, we have prepared the relative mips ELF which are ready for proof use.  
 > If you want to compile the guest programs, you should use a x86 Ubuntu22 machine with Rust: 1.81.0-nightly and Go : 1.22.1
 
 * Install the mips-rust tool(the cargo should be ~/.cargo).
@@ -25,15 +25,22 @@ chmod +x install_mips_rust_tool
 * Compile the go guest program
  
 ```
-cd zkm-project-template/guest-program/add-go
-GOOS=linux GOARCH=mips GOMIPS=softfloat go build .
+cd zkm-project-template/guest-program/sha2-go
+GOOS=linux GOARCH=mips GOMIPS=softfloat go build  -o zkm-mips-elf-sha2-go
 ```
 
 * Compile the rust guest program
   
 ```
-cd zkm-project-template/guest-program/revme
+cd zkm-project-template/guest-program/sha2-rust
 cargo build --target=mips-unknown-linux-musl --release
 ```
-The compiled mips ELF is in the zkm-project-template/guest-program/revme/target/mips-unknown-linux-musl/release/zkm-mips-elf-revme-rust
+
+or
+```
+cd zkm-project-template/guest-program/mem-alloc-vec
+cargo build --target=mips-unknown-linux-musl --release
+```
+
+The compiled mips ELF is in the zkm-project-template/guest-program/revme/target/mips-unknown-linux-musl/release/zkm-mips-elf-xxx
 

@@ -37,7 +37,7 @@ struct PROOF {
 
 struct ProofPublicData{
     PROOF proof;
-    string[65] publicWitness;
+    string[2] publicWitness;
 }
 
 struct PairingG1Point {
@@ -90,7 +90,7 @@ contract VerifierTest is Test {
         bytes memory publicWitness = json.parseRaw(".PublicWitness");
         string[] memory pubwit = abi.decode(publicWitness, ( string[]));
         
-        uint256  [65] memory input;
+        uint  [2] memory input;
          for (uint256 i = 0; i < pubwit.length; i++ ){
             input[i]  =  vm.parseUint(pubwit[i]);
 	    }
