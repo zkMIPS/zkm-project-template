@@ -128,7 +128,50 @@ If successful, it will output a similar log:
 ##### **`sha2-go-local-proving.log`**
 
 ```
-
+[2024-10-07T08:11:59Z INFO  zkm_prove] new prover client.
+[2024-10-07T08:11:59Z INFO  zkm_prove] new prover client,ok.
+[2024-10-07T08:11:59Z INFO  zkm_sdk::local::prover] calling request_proof.
+[2024-10-07T08:11:59Z INFO  zkm_sdk::local::prover] calling wait_proof, proof_id=f8a8243f-8631-4f92-916c-754a438d8c57
+[2024-10-07T08:11:59Z INFO  zkm_sdk::local::prover] waiting the proof result.
+[2024-10-07T08:11:59Z INFO  zkm_emulator::utils] Split done 347823 : 446125
+[2024-10-07T08:12:51Z INFO  zkm_sdk::local::util] Process segment /tmp/f8a8243f-8631-4f92-916c-754a438d8c57/input/segments/0
+[2024-10-07T08:12:55Z INFO  zkm_prover::cpu::bootstrap_kernel] Bootstrapping took 21159 cycles
+[2024-10-07T08:12:55Z INFO  zkm_prover::generation] CPU halted after 261370 cycles
+[2024-10-07T08:12:55Z INFO  zkm_prover::generation] CPU trace padded to 262144 cycles
+[2024-10-07T08:12:55Z INFO  zkm_prover::generation] Trace lengths (before padding): TraceCheckpoint { arithmetic_len: 131963, cpu_len: 262144, poseidon_len: 21158, poseidon_sponge_len: 21158, logic_len: 16739, memory_len: 1949524 }
+[2024-10-07T08:13:42Z INFO  plonky2::util::timing] 50.7883s to prove root first
+[2024-10-07T08:13:42Z INFO  zkm_sdk::local::util] Process segment /tmp/f8a8243f-8631-4f92-916c-754a438d8c57/input/segments/1
+[2024-10-07T08:13:46Z INFO  zkm_prover::cpu::bootstrap_kernel] Bootstrapping took 21804 cycles
+[2024-10-07T08:13:46Z INFO  zkm_prover::generation] CPU halted after 129420 cycles
+[2024-10-07T08:13:46Z INFO  zkm_prover::generation] CPU trace padded to 131072 cycles
+[2024-10-07T08:13:46Z INFO  zkm_prover::generation] Trace lengths (before padding): TraceCheckpoint { arithmetic_len: 44577, cpu_len: 131072, poseidon_len: 21803, poseidon_sponge_len: 21803, logic_len: 5164, memory_len: 1362331 }
+[2024-10-07T08:14:20Z INFO  plonky2::util::timing] 37.3177s to prove root second
+[2024-10-07T08:14:21Z INFO  plonky2::util::timing] 1.3277s to prove aggression
+[2024-10-07T08:14:23Z INFO  zkm_sdk::local::util] proof size: 412755
+[2024-10-07T08:14:29Z INFO  zkm_sdk::local::util] build finish
+[2024-10-07T08:14:35Z INFO  plonky2x::backend::wrapper::wrap] Succesfully wrote common circuit data to common_circuit_data.json
+[2024-10-07T08:14:35Z INFO  plonky2x::backend::wrapper::wrap] Succesfully wrote verifier data to verifier_only_circuit_data.json
+[2024-10-07T08:14:35Z INFO  plonky2x::backend::wrapper::wrap] Succesfully wrote proof to proof_with_public_inputs.json
+[2024-10-07T08:14:35Z INFO  plonky2::util::timing] 156.1002s to prove total time
+08:14:39 INF compiling circuit
+08:14:39 INF parsed circuit inputs nbPublic=1 nbSecret=11182
+08:15:11 INF building constraint builder nbConstraints=5815132
+Generating witness 2024-10-07 08:21:33.36586361 +0000 UTC m=+573.868286665
+frontend.NewWitness cost time: 171 ms
+Creating proof 2024-10-07 08:21:33.536971193 +0000 UTC m=+574.039394228
+08:21:39 DBG constraint system solver done nbConstraints=5815132 took=5950.579212
+08:21:47 DBG prover done acceleration=none backend=groth16 curve=bn254 nbConstraints=5815132 took=7963.861692
+groth16.Prove cost time: 13914 ms
+Verifying proof 2024-10-07 08:21:47.451908504 +0000 UTC m=+587.954331579
+08:21:47 DBG verifier done backend=groth16 curve=bn254 took=1.707085
+groth16.Verify cost time: 1 ms
+before len of publicWitness:1
+after len of publicWitness:2
+08:21:47 DBG verifier done backend=groth16 curve=bn254 took=1.244218
+[2024-10-07T08:21:47Z INFO  zkm_prove] Proof: successfully written 1260 bytes.
+[2024-10-07T08:21:47Z INFO  zkm_prove] Contract: successfully written 10330 bytes.
+[2024-10-07T08:21:47Z INFO  zkm_prove] Generating proof successfully .The proof file and verifier contract are in the the path contracts/verifier and contracts/src .
+[2024-10-07T08:21:47Z INFO  zkm_prove] Elapsed time: 587 secs
 ```
 
 The proof and contract file will be in the contracts/verifier and contracts/src

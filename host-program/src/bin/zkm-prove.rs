@@ -13,10 +13,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::try_init().unwrap_or_default();
     let args: Vec<String> = env::args().collect();
     let helper = || {
-        log::info!(
-            "Help: {} sha2-rust | sha2-go | mem-alloc-vec",
-            args[0]
-        );
+        log::info!("Help: {} sha2-rust | sha2-go | mem-alloc-vec",args[0]);
         std::process::exit(-1);
     };
     if args.len() < 2 {
@@ -24,7 +21,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     log::info!("new prover client.");
-    let prover_client = ProverClient::new().await; 
+    let prover_client = ProverClient::new().await;
     log::info!("new prover client,ok.");
 
     let seg_size = env::var("SEG_SIZE").unwrap_or("65536".to_string());
@@ -35,11 +32,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let output_dir = env::var("OUTPUT_DIR").unwrap_or("/tmp/zkm".to_string());
     tokio::fs::create_dir_all(&output_dir).await?;
 
-    let  input: ProverInput ;
-    match args[1].as_str() {
-        "sha2-rust" => input = set_sha2_rust_intput(seg_size2,execute_only2).expect("set sha2-rust input error"),
-        "sha2-go" => input = set_sha2_go_intput(seg_size2,execute_only2).expect("set sha2-go input error"),
-        "mem-alloc-vec" => input = set_mem_alloc_vec_intput(seg_size2,execute_only2).expect("set mem-alloc-vec input error"),
+    let  input: ProverInput = match args[1].as_str() {
+        "sha2-rust" => set_sha2_rust_intput(seg_size2,execute_only2).expect("set sha2-rust input error"),
+        "sha2-go" => set_sha2_go_intput(seg_size2,execute_only2).expect("set sha2-go input error"),
+        "mem-alloc-vec" => set_mem_alloc_vec_intput(seg_size2,execute_only2).expect("set mem-alloc-vec input error"),
         _ => {
                 helper();
                 input = ProverInput {
@@ -48,7 +44,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     private_inputstream: "".into(),
                     seg_size: 0,
                     execute_only: false,
-                };
+                }
             },
     };
 
@@ -116,26 +112,27 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn set_sha2_rust_intput( seg_size: u32, execute_only: bool) -> anyhow::Result<ProverInput>  {
-    let elf_path =
-        env::var("ELF_PATH").unwrap_or("../guest-program/sha2-rust/target/mips-unknown-linux-musl/release/zkm-mips-elf-sha2-rust".to_string());
+fn set_sha2_rust_intput( seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
+    let elf_path = env::var("ELF_PATH").unwrap_or(
+        "../guest-program/sha2-rust/target/mips-unknown-linux-musl/release/zkm-mips-elf-sha2-rust".to_string());
     let args = env::var("ARGS").unwrap_or("data-to-hash".to_string());
     // assume the  arg[0] is the hash(input)(which is a public input), and the arg[1] is the input.
     let args: Vec<&str> = args.split_whitespace().collect();
     assert_eq!(args.len(), 2);
-    
     let public_input: Vec<u8> = hex::decode(args[0]).unwrap();
     let private_input = args[1].as_bytes().to_vec();
     let mut pub_buf = Vec::new();
-    bincode::serialize_into(&mut pub_buf, &public_input).expect("public_input serialization failed");
+    bincode::serialize_into(&mut pub_buf, &public_input)
+        .expect("public_input serialization failed");
     let mut pri_buf = Vec::new();
-    bincode::serialize_into(&mut pri_buf, &private_input).expect("private_input serialization failed");
+    bincode::serialize_into(&mut pri_buf, &private_input)
+        .expect("private_input serialization failed");
     let input = ProverInput {
         elf: read(elf_path).unwrap(),
         public_inputstream: pub_buf,
         private_inputstream: pri_buf,
-        seg_size: seg_size,
-        execute_only: execute_only,
+        seg_size: seg_size_u,
+        execute_only: execute_only_b,
     };
 
     Ok(input)
@@ -191,14 +188,13 @@ impl Data {
     }
 }
 
-fn set_sha2_go_intput( seg_size: u32, execute_only: bool) -> anyhow::Result<ProverInput>  {
+fn set_sha2_go_intput( seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
     let elf_path =
         env::var("ELF_PATH").unwrap_or("../guest-program/sha2-go/zkm-mips-elf-sha2-go".to_string());
     let args = env::var("ARGS").unwrap_or("data-to-hash".to_string());
     // assume the  arg[0] is the hash(input)(which is a public input), and the arg[1] is the input.
     let args: Vec<&str> = args.split_whitespace().collect();
     assert_eq!(args.len(), 2);
-    
     let mut data = Data::new();
     // Fill in the input data
     data.input10 = hex::decode(args[0]).unwrap();
@@ -209,23 +205,22 @@ fn set_sha2_go_intput( seg_size: u32, execute_only: bool) -> anyhow::Result<Prov
         elf: read(elf_path).unwrap(),
         public_inputstream: buf,
         private_inputstream: "".into(),
-        seg_size: seg_size,
-        execute_only: execute_only,
+        seg_size: seg_size_u,
+        execute_only: execute_only_b,
     };
 
     Ok(input)
 }
 
-fn set_mem_alloc_vec_intput( seg_size: u32, execute_only: bool) -> anyhow::Result<ProverInput>  {
+fn set_mem_alloc_vec_intput( seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
     let elf_path =
         env::var("ELF_PATH").unwrap_or("../guest-program/mem-alloc-vec/target/mips-unknown-linux-musl/release/zkm-mips-elf-mem-alloc-vec".to_string());
-    
     let input = ProverInput {
         elf: read(elf_path).unwrap(),
-        public_inputstream:  "".into(),
+        public_inputstream: "".into(),
         private_inputstream: "".into(),
-        seg_size: seg_size,
-        execute_only: execute_only,
+        seg_size: seg_size_u,
+        execute_only: execute_only_b,
     };
 
     Ok(input)
