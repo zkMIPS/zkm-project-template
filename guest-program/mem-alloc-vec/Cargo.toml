@@ -1,6 +1,6 @@
 [workspace]
 [package]
-name = "mem_alloc_vec"
+name = "zkm-mips-elf-mem-alloc-vec"
 version = "0.1.0"
 edition = "2021"
 
