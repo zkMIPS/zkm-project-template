@@ -40,7 +40,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "sha2-rust" => input = set_sha2_rust_intput(seg_size2,execute_only2).expect("set sha2-rust input error"),
         "sha2-go" => input = set_sha2_go_intput(seg_size2,execute_only2).expect("set sha2-go input error"),
         "mem-alloc-vec" => input = set_mem_alloc_vec_intput(seg_size2,execute_only2).expect("set mem-alloc-vec input error"),
-        _ => helper(),
+        _ => {
+                helper();
+                input = ProverInput {
+                    elf: "".into(),
+                    public_inputstream: "".into(),
+                    private_inputstream: "".into(),
+                    seg_size: 0,
+                    execute_only: false,
+                };
+            },
     };
 
     let start = Instant::now();
