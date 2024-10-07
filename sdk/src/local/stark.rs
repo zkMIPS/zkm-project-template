@@ -4,7 +4,11 @@ use elf::{endian::AnyEndian, ElfBytes};
 use zkm_emulator::state::State;
 use zkm_emulator::utils::split_prog_into_segs;
 
-pub fn prove_stark(input: &ProverInput, storedir: &str, result: &mut ProverResult) -> anyhow::Result<bool> {
+pub fn prove_stark(
+    input: &ProverInput,
+    storedir: &str,
+    result: &mut ProverResult,
+) -> anyhow::Result<bool> {
     let seg_path = format!("{}/segments", storedir);
     let seg_size = input.seg_size as usize;
     let file = ElfBytes::<AnyEndian>::minimal_parse(input.elf.as_slice())

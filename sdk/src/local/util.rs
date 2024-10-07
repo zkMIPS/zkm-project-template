@@ -21,7 +21,12 @@ use zkm_prover::verifier::verify_proof;
 
 const DEGREE_BITS_RANGE: [Range<usize>; 6] = [10..21, 12..22, 10..21, 10..21, 6..21, 13..23];
 
-pub fn prove_single_seg_common(seg_file: &str, basedir: &str, block: &str, file: &str) -> anyhow::Result<()> {
+pub fn prove_single_seg_common(
+    seg_file: &str,
+    basedir: &str,
+    block: &str,
+    file: &str,
+) -> anyhow::Result<()> {
     let seg_reader = BufReader::new(File::open(seg_file)?);
     let kernel = segment_kernel(basedir, block, file, seg_reader);
 
