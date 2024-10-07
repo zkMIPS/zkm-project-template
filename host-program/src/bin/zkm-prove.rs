@@ -1,6 +1,6 @@
 use common::file;
 use std::env;
-
+use serde::{Deserialize, Serialize};
 use std::path::Path;
 use std::time::Instant;
 
@@ -37,9 +37,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut input: ProverInput ;
     match args[1].as_str() {
-        "sha2-rust" => input = set_sha2_rust_intput(seg_size2,execute_only2),
-        "sha2-go" => input = set_sha2_go_intput(seg_size2,execute_only2),
-        "mem-alloc-vec" => input = set_mem_alloc_vec_intput(seg_size2,execute_only2),
+        "sha2-rust" => input = set_sha2_rust_intput(seg_size2,execute_only2).expect("set sha2-rust input error"),
+        "sha2-go" => input = set_sha2_go_intput(seg_size2,execute_only2).expect("set sha2-go input error"),
+        "mem-alloc-vec" => input = set_mem_alloc_vec_intput(seg_size2,execute_only2).expect("set mem-alloc-vec input error"),
         _ => helper(),
     };
 
