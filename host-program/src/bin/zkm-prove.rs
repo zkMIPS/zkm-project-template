@@ -1,6 +1,6 @@
 use common::file;
-use std::env;
 use serde::{Deserialize, Serialize};
+use std::env;
 use std::path::Path;
 use std::time::Instant;
 
@@ -33,19 +33,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tokio::fs::create_dir_all(&output_dir).await?;
 
     let input: ProverInput = match args[1].as_str() {
-        "sha2-rust" => set_sha2_rust_intput(seg_size2,execute_only2).expect("set sha2-rust input error"),
-        "sha2-go" => set_sha2_go_intput(seg_size2,execute_only2).expect("set sha2-go input error"),
-        "mem-alloc-vec" => set_mem_alloc_vec_intput(seg_size2,execute_only2).expect("set mem-alloc-vec input error"),
+        "sha2-rust" => {
+            set_sha2_rust_intput(seg_size2, execute_only2).expect("set sha2-rust input error")
+        }
+        "sha2-go" => set_sha2_go_intput(seg_size2, execute_only2).expect("set sha2-go input error"),
+        "mem-alloc-vec" => set_mem_alloc_vec_intput(seg_size2, execute_only2)
+            .expect("set mem-alloc-vec input error"),
         _ => {
-                helper();
-                ProverInput {
-                    elf: "".into(),
-                    public_inputstream: "".into(),
-                    private_inputstream: "".into(),
-                    seg_size: 0,
-                    execute_only: false,
-                }
-            },
+            helper();
+            ProverInput {
+                elf: "".into(),
+                public_inputstream: "".into(),
+                private_inputstream: "".into(),
+                seg_size: 0,
+                execute_only: false,
+            }
+        }
     };
 
     let start = Instant::now();
@@ -112,9 +115,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn set_sha2_rust_intput( seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
+fn set_sha2_rust_intput(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
     let elf_path = env::var("ELF_PATH").unwrap_or(
-        "../guest-program/sha2-rust/target/mips-unknown-linux-musl/release/zkm-mips-elf-sha2-rust".to_string());
+        "../guest-program/sha2-rust/target/mips-unknown-linux-musl/release/zkm-mips-elf-sha2-rust"
+            .to_string(),
+    );
     let args = env::var("ARGS").unwrap_or("data-to-hash".to_string());
     // assume the  arg[0] is the hash(input)(which is a public input), and the arg[1] is the input.
     let args: Vec<&str> = args.split_whitespace().collect();
@@ -137,7 +142,6 @@ fn set_sha2_rust_intput( seg_size_u: u32, execute_only_b: bool) -> anyhow::Resul
 
     Ok(input)
 }
-
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum DataId {
@@ -188,7 +192,7 @@ impl Data {
     }
 }
 
-fn set_sha2_go_intput( seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
+fn set_sha2_go_intput(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
     let elf_path =
         env::var("ELF_PATH").unwrap_or("../guest-program/sha2-go/zkm-mips-elf-sha2-go".to_string());
     let args = env::var("ARGS").unwrap_or("data-to-hash".to_string());
@@ -212,7 +216,7 @@ fn set_sha2_go_intput( seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<
     Ok(input)
 }
 
-fn set_mem_alloc_vec_intput( seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
+fn set_mem_alloc_vec_intput(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
     let elf_path =
         env::var("ELF_PATH").unwrap_or("../guest-program/mem-alloc-vec/target/mips-unknown-linux-musl/release/zkm-mips-elf-mem-alloc-vec".to_string());
     let input = ProverInput {
