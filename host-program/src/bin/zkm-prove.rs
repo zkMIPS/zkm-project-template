@@ -35,7 +35,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let output_dir = env::var("OUTPUT_DIR").unwrap_or("/tmp/zkm".to_string());
     tokio::fs::create_dir_all(&output_dir).await?;
 
-    let mut input: ProverInput ;
+    let  input: ProverInput ;
     match args[1].as_str() {
         "sha2-rust" => input = set_sha2_rust_intput(seg_size2,execute_only2).expect("set sha2-rust input error"),
         "sha2-go" => input = set_sha2_go_intput(seg_size2,execute_only2).expect("set sha2-go input error"),
