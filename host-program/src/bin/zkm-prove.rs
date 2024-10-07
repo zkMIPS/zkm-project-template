@@ -217,8 +217,7 @@ fn set_sha2_go_intput(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<P
 }
 
 fn set_mem_alloc_vec_intput(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
-    let elf_path =
-        env::var("ELF_PATH").unwrap_or("../guest-program/mem-alloc-vec/target/mips-unknown-linux-musl/release/zkm-mips-elf-mem-alloc-vec".to_string());
+    let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
     let input = ProverInput {
         elf: read(elf_path).unwrap(),
         public_inputstream: "".into(),
