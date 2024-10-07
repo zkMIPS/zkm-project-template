@@ -56,6 +56,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     match proving_result {
         Ok(Some(prover_result)) => {
             if !execute_only2 {
+                if prover_result.proof_with_public_inputs.is_empty() {
+                    log::info!(
+                        "Fail: snark_proof_with_public_inputs.len() is : {}",
+                        prover_result.proof_with_public_inputs.len()
+                    );
+                    return Err("proof_with_public_inputs.len() is too short".into());
+                }
                 let output_dir = "../contracts/verifier".to_string();
                 let output_path = Path::new(&output_dir);
                 let proof_result_path = output_path.join("snark_proof_with_public_inputs.json");
