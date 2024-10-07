@@ -181,7 +181,7 @@ The proof and contract file will be in the contracts/verifier and contracts/src
 Make any edits to [`run-network-proving.sh`](host-program/run-network-proving.sh) and run the program:
 
 ```sh
-./run-network-proving.sh sha2-rust
+./run-network-proving.sh sha2-go
 ```
 
 If successful, it will output a similar log:
