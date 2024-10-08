@@ -9,10 +9,18 @@ export RUST_LOG=info
 export SEG_SIZE=62144
 export ARGS="711e9609339e92b03ddc0a211827dba421f38f9ed8b9d806e1ffdd8c15ffa03d world!"
 #export ELF_PATH=${BASEDIR}/../guest-program/$program/target/mips-unknown-linux-musl/release/$program
-#export PUBLIC_INPUT_PATH=host-program/test-vectors/244.json
-#export OUTPUT_DIR=/tmp/$program
+
 echo "BASEDIR:$BASEDIR"
 
+echo "Compile guest-program ${program}"
+if [[ "$program" =~ .*go$ ]];then
+    cd $BASEDIR/../guest-program/$program
+    GOOS=linux GOARCH=mips GOMIPS=softfloat go build
+else
+    cd $BASEDIR/../guest-program/$program
+    cargo build -r --target=mips-unknown-linux-musl
+fi
+cd -
 
 nohup ../target/release/zkm-prove $program >./$program-network-proving.log 2>&1 &
-echo 'check out the log by tail -f $program-network-proving.log'
+echo "Check out the log by tail -f $program-network-proving.log"

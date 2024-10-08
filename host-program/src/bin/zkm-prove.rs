@@ -24,13 +24,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let prover_client = ProverClient::new().await;
     log::info!("new prover client,ok.");
 
-    let seg_size = env::var("SEG_SIZE").unwrap_or("65536".to_string());
+    let seg_size = env::var("SEG_SIZE").unwrap_or("8192".to_string());
     let seg_size2 = seg_size.parse::<_>().unwrap_or(65536);
     let execute_only = env::var("EXECUTE_ONLY").unwrap_or("false".to_string());
     let execute_only2 = execute_only.parse::<bool>().unwrap_or(false);
-    //let elf_path = env::var("ELF_PATH").unwrap();
-    let output_dir = env::var("OUTPUT_DIR").unwrap_or("/tmp/zkm".to_string());
-    tokio::fs::create_dir_all(&output_dir).await?;
 
     let input: ProverInput = match args[1].as_str() {
         "sha2-rust" => {
@@ -58,10 +55,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             if !execute_only2 {
                 if prover_result.proof_with_public_inputs.is_empty() {
                     log::info!(
-                        "Fail: snark_proof_with_public_inputs.len() is : {}",
-                        prover_result.proof_with_public_inputs.len()
+                        "Fail: snark_proof_with_public_inputs.len() is : {}.Please try setting SEG_SIZE={}",
+                        prover_result.proof_with_public_inputs.len(), SEG_SIZE/2
                     );
-                    return Err("proof_with_public_inputs.len() is too short".into());
+                    return Err("SEG_SIZE is excessively large".into());
                 }
                 let output_dir = "../contracts/verifier".to_string();
                 let output_path = Path::new(&output_dir);

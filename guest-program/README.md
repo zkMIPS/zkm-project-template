@@ -26,7 +26,7 @@ chmod +x install_mips_rust_tool
  
 ```
 cd zkm-project-template/guest-program/sha2-go
-GOOS=linux GOARCH=mips GOMIPS=softfloat go build  -o zkm-mips-elf-sha2-go
+GOOS=linux GOARCH=mips GOMIPS=softfloat go build  -o sha2-go
 ```
 
 * Compile the rust guest program

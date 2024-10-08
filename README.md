@@ -92,6 +92,7 @@ Please refer to [this](guest-program/README.md) guide
 ### 2. Build the host program
 
 ```sh
+cd zkm-project-template
 sdk/src/local/libsnark/compile.sh  # compile snark library
 cargo build --release              # build host programs
 ```
@@ -104,7 +105,7 @@ If the program executes successfully, it will generate one binary files in `targ
 ### 3. Generate groth16 proof and verifier contract
 
 ```sh
-cd host-program
+cd zkm-project-template/host-program
 ```
 
 > [!NOTE]

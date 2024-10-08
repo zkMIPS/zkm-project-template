@@ -9,14 +9,16 @@ export ARGS="711e9609339e92b03ddc0a211827dba421f38f9ed8b9d806e1ffdd8c15ffa03d wo
 export ELF_PATH=${BASEDIR}/../guest-program/$program/target/mips-unknown-linux-musl/release/$program
 
 echo "Compile guest-program ${program}"
-cd $BASEDIR/../guest-program/$program
-cargo build -r --target=mips-unknown-linux-musl
+if [[ "$program" =~ .*go$ ]];then
+    cd $BASEDIR/../guest-program/$program
+    GOOS=linux GOARCH=mips GOMIPS=softfloat go build -o $program
+else
+    cd $BASEDIR/../guest-program/$program
+    cargo build -r --target=mips-unknown-linux-musl
+fi
 cd -
 
-echo "Setup input for guest-program ${program}"
-#export PUBLIC_INPUT_PATH=host-program/test-vectors/244.json
-#export OUTPUT_DIR=/tmp/$program
 echo "BASEDIR:$BASEDIR"
 
 nohup ../target/release/zkm-prove $program >./$program-local-proving.log 2>&1 &
-echo 'Check out the log by tail -f $program-local-proving.log'
+echo "Check out the log by tail -f $program-local-proving.log"
