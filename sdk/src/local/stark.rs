@@ -25,7 +25,7 @@ pub fn prove_stark(
     if input.execute_only {
         return Ok(false);
     }
-
+    log::info!("!!!*******seg_num:{}", &seg_num);
     if seg_num == 1 {
         let seg_file = format!("{seg_path}/{}", 0);
         util::prove_single_seg_common(&seg_file, "", "", "")?;

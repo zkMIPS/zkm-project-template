@@ -26,8 +26,9 @@ chmod +x install_mips_rust_tool
  
 ```
 cd zkm-project-template/guest-program/sha2-go
-GOOS=linux GOARCH=mips GOMIPS=softfloat go build  -o zkm-mips-elf-sha2-go
+GOOS=linux GOARCH=mips GOMIPS=softfloat go build  -o sha2-go
 ```
+The compiled mips ELF is in the current path.
 
 * Compile the rust guest program
   
@@ -42,5 +43,5 @@ cd zkm-project-template/guest-program/mem-alloc-vec
 cargo build --target=mips-unknown-linux-musl --release
 ```
 
-The compiled mips ELF is in the zkm-project-template/guest-program/revme/target/mips-unknown-linux-musl/release/zkm-mips-elf-xxx
+The compiled mips ELF is in the zkm-project-template/guest-program/revme/target/mips-unknown-linux-musl/release/ .
 

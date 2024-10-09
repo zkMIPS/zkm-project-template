@@ -1,9 +1,9 @@
 use common::file;
 use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 use std::env;
 use std::path::Path;
 use std::time::Instant;
-
 use zkm_sdk::{prover::ProverInput, ProverClient};
 
 use std::fs::read;
@@ -24,13 +24,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let prover_client = ProverClient::new().await;
     log::info!("new prover client,ok.");
 
-    let seg_size = env::var("SEG_SIZE").unwrap_or("65536".to_string());
+    let seg_size = env::var("SEG_SIZE").unwrap_or("8192".to_string());
     let seg_size2 = seg_size.parse::<_>().unwrap_or(65536);
     let execute_only = env::var("EXECUTE_ONLY").unwrap_or("false".to_string());
     let execute_only2 = execute_only.parse::<bool>().unwrap_or(false);
-    //let elf_path = env::var("ELF_PATH").unwrap();
-    let output_dir = env::var("OUTPUT_DIR").unwrap_or("/tmp/zkm".to_string());
-    tokio::fs::create_dir_all(&output_dir).await?;
 
     let input: ProverInput = match args[1].as_str() {
         "sha2-rust" => {
@@ -56,6 +53,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     match proving_result {
         Ok(Some(prover_result)) => {
             if !execute_only2 {
+                if prover_result.proof_with_public_inputs.is_empty() {
+                    log::info!(
+                        "Fail: snark_proof_with_public_inputs.len() is : {}.Please try setting SEG_SIZE={}",
+                        prover_result.proof_with_public_inputs.len(), seg_size2/2
+                    );
+                    return Err("SEG_SIZE is excessively large".into());
+                }
                 let output_dir = "../contracts/verifier".to_string();
                 let output_path = Path::new(&output_dir);
                 let proof_result_path = output_path.join("snark_proof_with_public_inputs.json");
@@ -85,18 +89,37 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
                 log::info!("Generating proof successfully .The proof file and verifier contract are in the the path contracts/verifier and contracts/src .");
             } else {
-                if prover_result.output_stream.is_empty() {
-                    log::info!(
-                        "output_stream.len() is too short: {}",
-                        prover_result.output_stream.len()
-                    );
-                    return Err("output_stream.len() is too short".into());
+                match args[1].as_str() {
+                    "sha2-rust" => {
+                        //The guest program returns the basic type
+                        if prover_result.output_stream.is_empty() {
+                            log::info!(
+                                "output_stream.len() is too short: {}",
+                                prover_result.output_stream.len()
+                            );
+                            return Err("output_stream.len() is too short".into());
+                        }
+                        log::info!("Executing the guest program  successfully.");
+                        log::info!("ret_data: {:?}", prover_result.output_stream);
+                    }
+                    "sha2-go" => {
+                        //If the guest program returns the structure, the result need the bincode::deserialize !
+                        if prover_result.output_stream.is_empty() {
+                            log::info!(
+                                "output_stream.len() is too short: {}",
+                                prover_result.output_stream.len()
+                            );
+                            return Err("output_stream.len() is too short".into());
+                        }
+                        log::info!("Executing the guest program  successfully.");
+                        let ret_data: Data =
+                            bincode::deserialize_from(prover_result.output_stream.as_slice())
+                                .expect("deserialization failed");
+                        log::info!("ret_data: {:?}", ret_data);
+                    }
+                    "mem-alloc-vec" => log::info!("Executing the guest program successfully."), //The guest program returns nothing.
+                    _ => log::info!("Do nothing."),
                 }
-                log::info!("Executing the guest program  successfully.");
-                let ret_data: Data =
-                    bincode::deserialize_from(prover_result.output_stream.as_slice())
-                        .expect("deserialization failed");
-                log::info!("ret_data: {:?}", ret_data);
             }
         }
         Ok(None) => {
@@ -116,22 +139,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn set_sha2_rust_intput(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
-    let elf_path = env::var("ELF_PATH").unwrap_or(
-        "../guest-program/sha2-rust/target/mips-unknown-linux-musl/release/zkm-mips-elf-sha2-rust"
-            .to_string(),
-    );
-    let args = env::var("ARGS").unwrap_or("data-to-hash".to_string());
+    let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
+    let num_bytes: usize = 1024; //Notice! : if this value is small, it will not generate the snark proof.
+    let pri_input = vec![5u8; num_bytes];
+    let mut hasher = Sha256::new();
+    hasher.update(&pri_input);
+    let result = hasher.finalize();
+    let output: [u8; 32] = result.into();
     // assume the  arg[0] is the hash(input)(which is a public input), and the arg[1] is the input.
-    let args: Vec<&str> = args.split_whitespace().collect();
-    assert_eq!(args.len(), 2);
-    let public_input: Vec<u8> = hex::decode(args[0]).unwrap();
-    let private_input = args[1].as_bytes().to_vec();
+    let public_input = output.to_vec();
     let mut pub_buf = Vec::new();
     bincode::serialize_into(&mut pub_buf, &public_input)
         .expect("public_input serialization failed");
     let mut pri_buf = Vec::new();
-    bincode::serialize_into(&mut pri_buf, &private_input)
-        .expect("private_input serialization failed");
+    bincode::serialize_into(&mut pri_buf, &pri_input).expect("private_input serialization failed");
     let input = ProverInput {
         elf: read(elf_path).unwrap(),
         public_inputstream: pub_buf,
@@ -193,8 +214,7 @@ impl Data {
 }
 
 fn set_sha2_go_intput(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
-    let elf_path =
-        env::var("ELF_PATH").unwrap_or("../guest-program/sha2-go/zkm-mips-elf-sha2-go".to_string());
+    let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
     let args = env::var("ARGS").unwrap_or("data-to-hash".to_string());
     // assume the  arg[0] is the hash(input)(which is a public input), and the arg[1] is the input.
     let args: Vec<&str> = args.split_whitespace().collect();
