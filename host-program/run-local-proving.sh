@@ -1,3 +1,8 @@
+if [ $# -lt 1 ]; then
+    echo "usage: ./run_local_proving sha2-go [or sha2-rust or mem-alloc-vec]"
+    exit 1
+fi
+
 set -e
 program=$1
 BASEDIR=$(cd $(dirname $0); pwd)
@@ -12,12 +17,19 @@ echo "Compile guest-program ${program}"
 if [[ "$program" =~ .*go$ ]];then
     cd $BASEDIR/../guest-program/$program
     GOOS=linux GOARCH=mips GOMIPS=softfloat go build -o $program
+    export ELF_PATH=${BASEDIR}/../guest-program/$program/$program
 else
     cd $BASEDIR/../guest-program/$program
     cargo build -r --target=mips-unknown-linux-musl
 fi
 cd -
 
+if [ "$program" == "sha2-rust" ];then
+    export SEG_SIZE=65536
+elif [ "$program" == "mem-alloc-vec" ];then
+     export SEG_SIZE=65536
+fi
+echo "SEG_SIZE:$SEG_SIZE"
 echo "BASEDIR:$BASEDIR"
 
 nohup ../target/release/zkm-prove $program >./$program-local-proving.log 2>&1 &

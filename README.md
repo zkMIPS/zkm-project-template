@@ -100,7 +100,8 @@ cargo build --release              # build host programs
 If the program executes successfully, it will generate one binary files in `target/release`: `zkm-prove`
 
 > [!NOTE]
-> The host program executes local proving when the environmental variable `ZKM_PROVER` is set to "local" and performs network proving when `ZKM_PROVER` is set to "network"
+> You can run the guest program without generating a proof by setting the environmental variable `EXECUTE_ONLY` to "true".https://github.com/zkMIPS/zkm/issues/152
+
 
 ### 3. Generate groth16 proof and verifier contract
 
@@ -109,12 +110,21 @@ cd zkm-project-template/host-program
 ```
 
 > [!NOTE]
-> You can run the guest program without generating a proof by setting the environmental variable `EXECUTE_ONLY` to "true".https://github.com/zkMIPS/zkm/issues/152
+> 1. The host program executes local proving when the environmental variable `ZKM_PROVER` is set to "local" and performs network proving when `ZKM_PROVER` is set to "network"
+
+> 2. There are two script programs available: run_local_proving.sh and run_network_proving.sh. These scripts facilitate the generation of proofs on the local machine and over the proof network, respectively.
+
+> 3. There are three guest programs (sha2-rust, sha2-go, mem-alloc-vec), and the following will use sha2-go as an example to demonstrate local and network proofs.
+
+> [!WARNING]
+>  The environmental variable `SEG_SIZE` in the run-xxx_proving.sh affects the final proof generation. 
+>  The guest program's ELF with the input is split into segments according the SEG_SIZE, based on the cycle count.
+>  When generating proofs on the local machine, if the log shows "!!!*******seg_num: 1", please reduce SEG_SIZE or increase the input. If generating proofs through the proof network, SEG_SIZE must be within the range [65536, 262144]. 
 
 
 ### Example : `sha2-go`
 
-This program takes struct Data as public input
+This program takes struct Data as public input.
 
 #### Local Proving
 
@@ -179,6 +189,11 @@ The proof and contract file will be in the contracts/verifier and contracts/src
 
 #### Network Proving
 
+> [!NOTE]
+> The proving network may sometimes experience high traffic, causing proof tasks to be queued for hours.
+
+> The proving task requires several stages: queuing, splitting, proving, aggregating and finalizing. Each stage involves a varying duration.
+
 Make any edits to [`run-network-proving.sh`](host-program/run-network-proving.sh) and run the program:
 
 ```sh
@@ -204,12 +219,71 @@ If successful, it will output a similar log:
 
 The proof and contract file will be in the contracts/verifier and contracts/src
 
-#### 4. Deploy the Verifier Contract
+### 4. Deploy the Verifier Contract
 
 If your system does not has Foundry, please install it:
 
 ```sh
 curl -L https://foundry.paradigm.xyz | bash
 ```
+#### verify the snark proof in the previous step 
 
-Next, deploy the contract as detailed in [this](contracts/README.md) guide
+```
+cd  zkm-project-template/contracts
+forge test
+```
+
+If successful, it will output a similar log:
+
+```
+[⠊] Compiling...
+[⠊] Compiling 2 files with Solc 0.8.26
+[⠢] Solc 0.8.26 finished in 921.86ms
+Compiler run successful!
+
+Ran 1 test for test/verifier.t.sol:VerifierTest
+[PASS] test_ValidProof() (gas: 286833)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 8.16ms (7.51ms CPU time)
+
+Ran 1 test suite in 9.02ms (8.16ms CPU time): 1 tests passed, 0 failed, 0 skipped (1 total tests)
+```
+
+#### Deploy the contract 
+
+Please edit the following parameters according your aim blockchain.
+
+```
+forge script script/verifier.s.sol:VerifierScript --rpc-url https://eth-sepolia.g.alchemy.com/v2/RH793ZL_pQkZb7KttcWcTlOjPrN0BjOW --private-key df4bc5647fdb9600ceb4943d4adff3749956a8512e5707716357b13d5ee687d9
+```
+
+If successful, it will output a similar log:
+
+```
+[⠊] Compiling...
+[⠘] Compiling 2 files with Solc 0.8.26
+[⠊] Solc 0.8.26 finished in 699.26ms
+Compiler run successful!
+Script ran successfully.
+
+## Setting up 1 EVM.
+
+==========================
+
+Chain 11155111
+
+Estimated gas price: 0.000035894 gwei
+
+Estimated total gas used for script: 1228147
+
+Estimated amount required: 0.000000044083108418 ETH
+
+==========================
+
+SIMULATION COMPLETE. To broadcast these transactions, add --broadcast and wallet configuration(s) to the previous command. See forge script --help for more.
+
+Transactions saved to: /mnt/data/zkm-project-template/contracts/broadcast/verifier.s.sol/11155111/dry-run/run-latest.json
+
+Sensitive values saved to: /mnt/data/zkm-project-template/contracts/cache/verifier.s.sol/11155111/dry-run/run-latest.json
+```
+
+Next, deploy the contract as detailed in [this](contracts/README.md) guide.

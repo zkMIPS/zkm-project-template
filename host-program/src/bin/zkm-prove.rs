@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::env;
 use std::path::Path;
 use std::time::Instant;
-
+use sha2::{Digest, Sha256};
 use zkm_sdk::{prover::ProverInput, ProverClient};
 
 use std::fs::read;
@@ -56,7 +56,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 if prover_result.proof_with_public_inputs.is_empty() {
                     log::info!(
                         "Fail: snark_proof_with_public_inputs.len() is : {}.Please try setting SEG_SIZE={}",
-                        prover_result.proof_with_public_inputs.len(), SEG_SIZE/2
+                        prover_result.proof_with_public_inputs.len(), seg_size2/2
                     );
                     return Err("SEG_SIZE is excessively large".into());
                 }
@@ -121,20 +121,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 fn set_sha2_rust_intput(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
     let elf_path = env::var("ELF_PATH").unwrap_or(
-        "../guest-program/sha2-rust/target/mips-unknown-linux-musl/release/zkm-mips-elf-sha2-rust"
+        "../guest-program/sha2-rust/target/mips-unknown-linux-musl/release/sha2-rust"
             .to_string(),
     );
-    let args = env::var("ARGS").unwrap_or("data-to-hash".to_string());
+    let num_bytes: usize = 1024;  //Notice! : if this value is small, it will not generate the snark proof.
+    let pri_input = vec![5u8; num_bytes];
+    let mut hasher = Sha256::new();
+    hasher.update(&pri_input);
+    let result = hasher.finalize();
+    let output: [u8; 32] = result.into();
     // assume the  arg[0] is the hash(input)(which is a public input), and the arg[1] is the input.
-    let args: Vec<&str> = args.split_whitespace().collect();
-    assert_eq!(args.len(), 2);
-    let public_input: Vec<u8> = hex::decode(args[0]).unwrap();
-    let private_input = args[1].as_bytes().to_vec();
+    let public_input = result.into().to_vec();
     let mut pub_buf = Vec::new();
     bincode::serialize_into(&mut pub_buf, &public_input)
         .expect("public_input serialization failed");
     let mut pri_buf = Vec::new();
-    bincode::serialize_into(&mut pri_buf, &private_input)
+    bincode::serialize_into(&mut pri_buf, &pri_input)
         .expect("private_input serialization failed");
     let input = ProverInput {
         elf: read(elf_path).unwrap(),
@@ -198,7 +200,7 @@ impl Data {
 
 fn set_sha2_go_intput(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
     let elf_path =
-        env::var("ELF_PATH").unwrap_or("../guest-program/sha2-go/zkm-mips-elf-sha2-go".to_string());
+        env::var("ELF_PATH").unwrap_or("../guest-program/sha2-go/sha2-go".to_string());
     let args = env::var("ARGS").unwrap_or("data-to-hash".to_string());
     // assume the  arg[0] is the hash(input)(which is a public input), and the arg[1] is the input.
     let args: Vec<&str> = args.split_whitespace().collect();
@@ -221,7 +223,10 @@ fn set_sha2_go_intput(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<P
 }
 
 fn set_mem_alloc_vec_intput(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
-    let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
+    let elf_path = env::var("ELF_PATH").unwrap_or(
+        "../guest-program/mem-alloc-vec/target/mips-unknown-linux-musl/release/mem-alloc-vec"
+            .to_string(),
+    );
     let input = ProverInput {
         elf: read(elf_path).unwrap(),
         public_inputstream: "".into(),
@@ -232,3 +237,4 @@ fn set_mem_alloc_vec_intput(seg_size_u: u32, execute_only_b: bool) -> anyhow::Re
 
     Ok(input)
 }
+    
