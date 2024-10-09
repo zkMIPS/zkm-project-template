@@ -1,9 +1,9 @@
 use common::file;
 use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 use std::env;
 use std::path::Path;
 use std::time::Instant;
-use sha2::{Digest, Sha256};
 use zkm_sdk::{prover::ProverInput, ProverClient};
 
 use std::fs::read;
@@ -121,23 +121,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 fn set_sha2_rust_intput(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
     let elf_path = env::var("ELF_PATH").unwrap_or(
-        "../guest-program/sha2-rust/target/mips-unknown-linux-musl/release/sha2-rust"
-            .to_string(),
+        "../guest-program/sha2-rust/target/mips-unknown-linux-musl/release/sha2-rust".to_string(),
     );
-    let num_bytes: usize = 1024;  //Notice! : if this value is small, it will not generate the snark proof.
+    let num_bytes: usize = 1024; //Notice! : if this value is small, it will not generate the snark proof.
     let pri_input = vec![5u8; num_bytes];
     let mut hasher = Sha256::new();
     hasher.update(&pri_input);
     let result = hasher.finalize();
     let output: [u8; 32] = result.into();
     // assume the  arg[0] is the hash(input)(which is a public input), and the arg[1] is the input.
-    let public_input = result.into().to_vec();
+    let public_input = output.to_vec();
     let mut pub_buf = Vec::new();
     bincode::serialize_into(&mut pub_buf, &public_input)
         .expect("public_input serialization failed");
     let mut pri_buf = Vec::new();
-    bincode::serialize_into(&mut pri_buf, &pri_input)
-        .expect("private_input serialization failed");
+    bincode::serialize_into(&mut pri_buf, &pri_input).expect("private_input serialization failed");
     let input = ProverInput {
         elf: read(elf_path).unwrap(),
         public_inputstream: pub_buf,
@@ -199,8 +197,7 @@ impl Data {
 }
 
 fn set_sha2_go_intput(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
-    let elf_path =
-        env::var("ELF_PATH").unwrap_or("../guest-program/sha2-go/sha2-go".to_string());
+    let elf_path = env::var("ELF_PATH").unwrap_or("../guest-program/sha2-go/sha2-go".to_string());
     let args = env::var("ARGS").unwrap_or("data-to-hash".to_string());
     // assume the  arg[0] is the hash(input)(which is a public input), and the arg[1] is the input.
     let args: Vec<&str> = args.split_whitespace().collect();
@@ -237,4 +234,3 @@ fn set_mem_alloc_vec_intput(seg_size_u: u32, execute_only_b: bool) -> anyhow::Re
 
     Ok(input)
 }
-    
