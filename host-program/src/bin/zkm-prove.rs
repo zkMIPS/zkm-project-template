@@ -117,7 +117,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                     "mem-alloc-vec" => log::info!("Executing the guest program  successfully."),  //The  guest program returns nothing.
                     _ => ,
-                        
+                }
             }
         }
         Ok(None) => {
