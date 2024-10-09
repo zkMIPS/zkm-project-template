@@ -90,7 +90,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 log::info!("Generating proof successfully .The proof file and verifier contract are in the the path contracts/verifier and contracts/src .");
             } else {
                 match args[1].as_str() {
-                    "sha2-rust" => { //The guest program returns the basic type
+                    "sha2-rust" => {
+                        //The guest program returns the basic type
                         if prover_result.output_stream.is_empty() {
                             log::info!(
                                 "output_stream.len() is too short: {}",
@@ -101,7 +102,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         log::info!("Executing the guest program  successfully.");
                         log::info!("ret_data: {:?}", prover_result.output_stream);
                     }
-                    "sha2-go" => { //If the guest program returns the structure, the result need the bincode::deserialize !
+                    "sha2-go" => {
+                        //If the guest program returns the structure, the result need the bincode::deserialize !
                         if prover_result.output_stream.is_empty() {
                             log::info!(
                                 "output_stream.len() is too short: {}",
@@ -115,7 +117,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 .expect("deserialization failed");
                         log::info!("ret_data: {:?}", ret_data);
                     }
-                    "mem-alloc-vec" => log::info!("Executing the guest program  successfully."),  //The  guest program returns nothing.
+                    "mem-alloc-vec" => log::info!("Executing the guest program successfully."),  //The guest program returns nothing.
                     _ => log::info!("Do nothing."),
                 }
             }
