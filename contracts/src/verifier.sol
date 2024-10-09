@@ -201,10 +201,7 @@ contract Verifier {
 
         return 0;
     }
-    function verifyTx(
-            Proof memory proof, uint[2] memory input
-        ,uint[2] memory proof_commitment) public returns (bool r) {
-
+    function verifyTx(Proof memory proof, uint[2] memory input,uint[2] memory proof_commitment) public returns (bool r) {
         if (verify(input, proof , proof_commitment) == 0) {
             emit VerifyEvent(msg.sender);
             return true;

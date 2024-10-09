@@ -89,18 +89,35 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
                 log::info!("Generating proof successfully .The proof file and verifier contract are in the the path contracts/verifier and contracts/src .");
             } else {
-                if prover_result.output_stream.is_empty() {
-                    log::info!(
-                        "output_stream.len() is too short: {}",
-                        prover_result.output_stream.len()
-                    );
-                    return Err("output_stream.len() is too short".into());
-                }
-                log::info!("Executing the guest program  successfully.");
-                let ret_data: Data =
-                    bincode::deserialize_from(prover_result.output_stream.as_slice())
-                        .expect("deserialization failed");
-                log::info!("ret_data: {:?}", ret_data);
+                match args[1].as_str() {
+                    "sha2-rust" => { //The guest program returns the basic type
+                        if prover_result.output_stream.is_empty() {
+                            log::info!(
+                                "output_stream.len() is too short: {}",
+                                prover_result.output_stream.len()
+                            );
+                            return Err("output_stream.len() is too short".into());
+                        }
+                        log::info!("Executing the guest program  successfully.");
+                        log::info!("ret_data: {:?}", prover_result.output_stream);
+                    }
+                    "sha2-go" => { //If the guest program returns the structure, the result need the bincode::deserialize !
+                        if prover_result.output_stream.is_empty() {
+                            log::info!(
+                                "output_stream.len() is too short: {}",
+                                prover_result.output_stream.len()
+                            );
+                            return Err("output_stream.len() is too short".into());
+                        }
+                        log::info!("Executing the guest program  successfully.");
+                        let ret_data: Data =
+                            bincode::deserialize_from(prover_result.output_stream.as_slice())
+                                .expect("deserialization failed");
+                        log::info!("ret_data: {:?}", ret_data);
+                    }
+                    "mem-alloc-vec" => log::info!("Executing the guest program  successfully."),  //The  guest program returns nothing.
+                    _ => ,
+                        
             }
         }
         Ok(None) => {
@@ -196,6 +213,7 @@ impl Data {
 
 fn set_sha2_go_intput(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
     let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
+    let args = env::var("ARGS").unwrap_or("data-to-hash".to_string());
     // assume the  arg[0] is the hash(input)(which is a public input), and the arg[1] is the input.
     let args: Vec<&str> = args.split_whitespace().collect();
     assert_eq!(args.len(), 2);
