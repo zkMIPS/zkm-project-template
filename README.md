@@ -113,11 +113,9 @@ cd zkm-project-template/host-program
 > 1. The host program executes local proving when the environmental variable `ZKM_PROVER` is set to "local" and performs network proving when `ZKM_PROVER` is set to "network"
 
 > 2. There are two script programs available: run_local_proving.sh and run_network_proving.sh. These scripts facilitate the 
-
 generation of proofs on the local machine and over the proof network, respectively.
 
 > 3. There are three guest programs(sha2-rust, sha2-go, mem-alloc-vec), each capable of generating a SNARK proof on a machine 
-
 equipped with an AMD EPYC 7R13 processor and 250GB of memory. The following will use sha2-rust as an example to demonstrate local and network proofs.
 
 > [!WARNING]
@@ -125,9 +123,7 @@ equipped with an AMD EPYC 7R13 processor and 250GB of memory. The following will
 
 >  The guest program's ELF with the input is split into segments according the SEG_SIZE, based on the cycle count.
 
->  When generating proofs on the local machine, if the log shows "!!!*******seg_num: 1", please reduce SEG_SIZE or increase the input. 
-
-If generating proofs through the proof network, SEG_SIZE must be within the range [65536, 262144]. 
+>  When generating proofs on the local machine, if the log shows "!!!*******seg_num: 1", please reduce SEG_SIZE or increase the input. If generating proofs through the proof network, SEG_SIZE must be within the range [65536, 262144]. 
 
 
 ### Example : `sha2-rust`
@@ -203,7 +199,7 @@ The result proof and contract file will be in the contracts/verifier and contrac
 
 > The proving task requires several stages: queuing, splitting, proving, aggregating and finalizing. Each stage involves a varying duration.
 
-Make any edits to [`run-network-proving.sh`](host-program/run-network-proving.sh) and run the program:
+Must set the `PRIVATE_KEY` in [`run-network-proving.sh`](host-program/run-network-proving.sh) and run the program:
 
 ```sh
 ./run-network-proving.sh sha2-rust
