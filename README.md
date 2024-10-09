@@ -87,7 +87,7 @@ git clone https://github.com/zkMIPS/zkm-project-template.git
 
 ### 1. Build the guest program ELF
 
-Please refer to [this](guest-program/README.md) guide
+Please refer to [this](guest-program/README.md) guide.
 
 ### 2. Build the host program
 
@@ -101,7 +101,6 @@ If the program executes successfully, it will generate one binary files in `targ
 
 > [!NOTE]
 > You can run the guest program without generating a proof by setting the environmental variable `EXECUTE_ONLY` to "true".https://github.com/zkMIPS/zkm/issues/152
-
 
 ### 3. Generate groth16 proof and verifier contract
 
@@ -124,7 +123,6 @@ equipped with an AMD EPYC 7R13 processor and 250GB of memory. The following will
 >  The guest program's ELF with the input is split into segments according the SEG_SIZE, based on the cycle count.
 
 >  When generating proofs on the local machine, if the log shows "!!!*******seg_num: 1", please reduce SEG_SIZE or increase the input. If generating proofs through the proof network, SEG_SIZE must be within the range [65536, 262144]. 
-
 
 ### Example : `sha2-rust`
 
@@ -231,7 +229,7 @@ If your system does not has Foundry, please install it:
 ```sh
 curl -L https://foundry.paradigm.xyz | bash
 ```
-#### verify the snark proof generateing in the  step 3
+#### Verify the snark proof generateing in the step 3
 
 ```
 cd  zkm-project-template/contracts
@@ -253,7 +251,7 @@ Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 8.16ms (7.51ms CPU 
 Ran 1 test suite in 9.02ms (8.16ms CPU time): 1 tests passed, 0 failed, 0 skipped (1 total tests)
 ```
 
-#### Deploy the contract generateing in the  step 3
+#### Deploy the contract generateing in the step 3
 
 Please edit the following parameters according your aim blockchain.
 

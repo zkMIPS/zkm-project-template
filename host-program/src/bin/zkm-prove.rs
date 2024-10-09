@@ -120,9 +120,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn set_sha2_rust_intput(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
-    let elf_path = env::var("ELF_PATH").unwrap_or(
-        "../guest-program/sha2-rust/target/mips-unknown-linux-musl/release/sha2-rust".to_string(),
-    );
+    let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
     let num_bytes: usize = 1024; //Notice! : if this value is small, it will not generate the snark proof.
     let pri_input = vec![5u8; num_bytes];
     let mut hasher = Sha256::new();
@@ -197,8 +195,7 @@ impl Data {
 }
 
 fn set_sha2_go_intput(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
-    let elf_path = env::var("ELF_PATH").unwrap_or("../guest-program/sha2-go/sha2-go".to_string());
-    let args = env::var("ARGS").unwrap_or("data-to-hash".to_string());
+    let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
     // assume the  arg[0] is the hash(input)(which is a public input), and the arg[1] is the input.
     let args: Vec<&str> = args.split_whitespace().collect();
     assert_eq!(args.len(), 2);
@@ -220,10 +217,7 @@ fn set_sha2_go_intput(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<P
 }
 
 fn set_mem_alloc_vec_intput(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
-    let elf_path = env::var("ELF_PATH").unwrap_or(
-        "../guest-program/mem-alloc-vec/target/mips-unknown-linux-musl/release/mem-alloc-vec"
-            .to_string(),
-    );
+    let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
     let input = ProverInput {
         elf: read(elf_path).unwrap(),
         public_inputstream: "".into(),
