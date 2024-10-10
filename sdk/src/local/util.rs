@@ -194,7 +194,7 @@ pub fn prove_multi_seg_common(
     }
 
     let (block_proof, _block_public_values) =
-        all_circuits.prove_block(None, &agg_proof, updated_agg_public_values)?;
+        all_circuits.prove_block(None, &agg_proof, updated_agg_public_values.clone())?;
 
     log::info!(
         "proof size: {:?}",
@@ -216,6 +216,10 @@ pub fn prove_multi_seg_common(
 
     let wrapped_proof = wrapped_circuit.prove(&block_proof)?;
     wrapped_proof.save(outdir)?;
+
+    let outdir_path = std::path::Path::new(outdir);
+    let public_values_file = File::create(outdir_path.join("public_values.json"))?;
+    serde_json::to_writer(&public_values_file, &updated_agg_public_values)?;
 
     total_timing.filter(Duration::from_millis(100)).print();
     result

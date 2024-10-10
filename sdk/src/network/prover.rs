@@ -146,6 +146,7 @@ impl Prover for NetworkProver {
                         proof_with_public_inputs: get_status_response.proof_with_public_inputs,
                         stark_proof: vec![],
                         solidity_verifier: vec![],
+                        public_values: vec![],
                     };
                     if !get_status_response.stark_proof_url.is_empty() {
                         proof_result.stark_proof =
@@ -157,6 +158,11 @@ impl Prover for NetworkProver {
                             &get_status_response.solidity_verifier_url,
                         )
                         .await?;
+                    }
+                    if !get_status_response.public_values_url.is_empty() {
+                        proof_result.public_values =
+                            NetworkProver::download_file(&get_status_response.public_values_url)
+                                .await?;
                     }
                     return Ok(Some(proof_result));
                 }

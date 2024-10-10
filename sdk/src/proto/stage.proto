@@ -56,6 +56,7 @@ message GenerateProofResponse {
     string stark_proof_url = 5;
     string solidity_verifier_url = 6;
     bytes output_stream = 7;
+    string public_values_url = 8;
 }
 
 message GetStatusRequest {
@@ -71,4 +72,5 @@ message GetStatusResponse {
     string solidity_verifier_url = 6;
     bytes output_stream = 7;
     int32 step = 8; // Step
+    string public_values_url = 9;
 }

@@ -50,6 +50,8 @@ impl ProverTask {
                     .unwrap();
             result.solidity_verifier =
                 std::fs::read(format!("{}/verifier.sol", outputdir)).unwrap();
+            result.public_values =
+                std::fs::read(format!("{}/public_values.json", outputdir)).unwrap();
         } else {
             log::error!("Failed to generate snark proof.");
         }
