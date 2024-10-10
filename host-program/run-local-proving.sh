@@ -1,5 +1,5 @@
 if [ $# -lt 1 ]; then
-    echo "usage: ./run_local_proving sha2-go [or sha2-rust or mem-alloc-vec or revm]"
+    echo "usage: ./run_local_proving sha2-go [or sha2-rust or mem-alloc-vec or revme]"
     exit 1
 fi
 
