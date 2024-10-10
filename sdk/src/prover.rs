@@ -18,6 +18,7 @@ pub struct ProverResult {
     pub proof_with_public_inputs: Vec<u8>,
     pub stark_proof: Vec<u8>,
     pub solidity_verifier: Vec<u8>,
+    pub public_values: Vec<u8>,
 }
 
 #[async_trait]

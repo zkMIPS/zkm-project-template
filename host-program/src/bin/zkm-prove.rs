@@ -36,6 +36,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "sha2-go" => set_sha2_go_intput(seg_size2, execute_only2).expect("set sha2-go input error"),
         "mem-alloc-vec" => set_mem_alloc_vec_intput(seg_size2, execute_only2)
             .expect("set mem-alloc-vec input error"),
+        "revme" => set_revme_input(seg_size2, execute_only2).expect("set revme input error"),
         _ => {
             helper();
             ProverInput {
@@ -241,6 +242,20 @@ fn set_mem_alloc_vec_intput(seg_size_u: u32, execute_only_b: bool) -> anyhow::Re
     let input = ProverInput {
         elf: read(elf_path).unwrap(),
         public_inputstream: "".into(),
+        private_inputstream: "".into(),
+        seg_size: seg_size_u,
+        execute_only: execute_only_b,
+    };
+
+    Ok(input)
+}
+
+fn set_revme_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
+    let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
+    let json_path = env::var("JSON_PATH").expect("JSON PATH is missing");
+    let input = ProverInput {
+        elf: read(elf_path).unwrap(),
+        public_inputstream: read(json_path).unwrap(),
         private_inputstream: "".into(),
         seg_size: seg_size_u,
         execute_only: execute_only_b,
