@@ -31,10 +31,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let input: ProverInput = match args[1].as_str() {
         "sha2-rust" => {
-            set_sha2_rust_intput(seg_size2, execute_only2).expect("set sha2-rust input error")
+            set_sha2_rust_input(seg_size2, execute_only2).expect("set sha2-rust input error")
         }
-        "sha2-go" => set_sha2_go_intput(seg_size2, execute_only2).expect("set sha2-go input error"),
-        "mem-alloc-vec" => set_mem_alloc_vec_intput(seg_size2, execute_only2)
+        "sha2-go" => set_sha2_go_input(seg_size2, execute_only2).expect("set sha2-go input error"),
+        "mem-alloc-vec" => set_mem_alloc_vec_input(seg_size2, execute_only2)
             .expect("set mem-alloc-vec input error"),
         "revme" => set_revme_input(seg_size2, execute_only2).expect("set revme input error"),
         _ => {
@@ -139,7 +139,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn set_sha2_rust_intput(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
+fn set_sha2_rust_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
     let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
     let num_bytes: usize = 1024; //Notice! : if this value is small, it will not generate the snark proof.
     let pri_input = vec![5u8; num_bytes];
@@ -214,7 +214,7 @@ impl Data {
     }
 }
 
-fn set_sha2_go_intput(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
+fn set_sha2_go_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
     let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
     let args = env::var("ARGS").unwrap_or("data-to-hash".to_string());
     // assume the  arg[0] is the hash(input)(which is a public input), and the arg[1] is the input.
@@ -237,7 +237,7 @@ fn set_sha2_go_intput(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<P
     Ok(input)
 }
 
-fn set_mem_alloc_vec_intput(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
+fn set_mem_alloc_vec_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
     let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
     let input = ProverInput {
         elf: read(elf_path).unwrap(),
