@@ -13,7 +13,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::try_init().unwrap_or_default();
     let args: Vec<String> = env::args().collect();
     let helper = || {
-        log::info!("Help: {} sha2-rust | sha2-go | mem-alloc-vec | revme", args[0]);
+        log::info!(
+            "Help: {} sha2-rust | sha2-go | mem-alloc-vec | revme",
+            args[0]
+        );
         std::process::exit(-1);
     };
     if args.len() < 2 {
