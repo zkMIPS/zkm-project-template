@@ -150,6 +150,10 @@ library Pairing {
 }
 
 contract Verifier {
+    uint256 constant MASK = ~(uint256(0x7) << 253);
+    uint256 constant EMPTY_HASH = 0x3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855;
+    uint256 constant CIRCUIT_DIGEST = {{.Digest}};
+
     event VerifyEvent(address user);
     event Value(uint x, uint y);
 
@@ -210,6 +214,42 @@ contract Verifier {
             return false;
         }
         
+    }
+
+    function verifyUserData(
+        uint8[32] memory _userData,
+        uint32[8] memory _memRootBefore,
+        uint32[8] memory _memRootAfter
+    ) public pure returns (uint256) {
+        uint256 userData = 0;
+        for (uint256 i = 0; i < 32; i++) {
+            userData |= uint256(_userData[i]) << (8 * (31 - i));
+        }
+        uint256 memRootBefore = 0;
+        for (uint256 i = 0; i < 8; i++) {
+            memRootBefore |= uint256(_memRootBefore[i]) << (32 * (7 - i));
+        }
+        uint256 memRootAfter = 0;
+        for (uint256 i = 0; i < 8; i++) {
+            memRootAfter |= uint256(_memRootAfter[i]) << (32 * (7 - i));
+        }
+
+        bytes memory dataToHash = abi.encodePacked(
+            memRootBefore,
+            memRootAfter,
+            userData,
+            CIRCUIT_DIGEST,
+            getConstantSigmasCap()
+        );
+
+        uint256 hash_o = uint256(sha256(dataToHash)) & MASK;
+        uint256 hashValue = uint256(sha256(abi.encodePacked(EMPTY_HASH,hash_o))) & MASK;
+
+        return hashValue;
+    }
+
+    function getConstantSigmasCap() public pure returns (uint256[{{.Len}}] memory) {
+        return {{.Sigmas}};
     }
 }
 `

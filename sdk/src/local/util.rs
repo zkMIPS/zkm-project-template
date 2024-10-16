@@ -221,6 +221,12 @@ pub fn prove_multi_seg_common(
     let public_values_file = File::create(outdir_path.join("public_values.json"))?;
     serde_json::to_writer(&public_values_file, &updated_agg_public_values)?;
 
+    let block_public_inputs = serde_json::json!({
+        "public_inputs": block_proof.public_inputs,
+    });
+    let block_public_inputs_file = File::create(outdir_path.join("block_public_inputs.json"))?;
+    serde_json::to_writer(&block_public_inputs_file, &block_public_inputs)?;
+
     total_timing.filter(Duration::from_millis(100)).print();
     result
 }
