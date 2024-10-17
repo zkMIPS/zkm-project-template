@@ -114,8 +114,8 @@ cd zkm-project-template/host-program
 > 2. There are two script programs available: run_local_proving.sh and run_network_proving.sh. These scripts facilitate the 
 generation of proofs on the local machine and over the proof network, respectively.
 
-> 3. There are three guest programs(sha2-rust, sha2-go, mem-alloc-vec), each capable of generating a SNARK proof on a machine 
-equipped with an AMD EPYC 7R13 processor and 250GB of memory. The following will use sha2-rust as an example to demonstrate local and network proofs.
+> 3. There are four guest programs(sha2-rust, sha2-go, mem-alloc-vec,revme), each capable of generating a SNARK proof on a machine 
+equipped with an AMD EPYC 7R13 processor and 246GB of memory. The following will use sha2-rust and revme as an example to demonstrate local and network proofs.
 
 > [!WARNING]
 >  The environmental variable `SEG_SIZE` in the run-xxx_proving.sh affects the final proof generation. 
@@ -124,7 +124,7 @@ equipped with an AMD EPYC 7R13 processor and 250GB of memory. The following will
 
 >  When generating proofs on the local machine, if the log shows "!!!*******seg_num: 1", please reduce SEG_SIZE or increase the input. If generating proofs through the proof network, SEG_SIZE must be within the range [65536, 262144]. 
 
-### Example : `sha2-rust`
+### Example 1 : `sha2-rust`
 
 This host program sends the private input pri_input = vec![5u8; 1024] and its hash (hash(pri_input)) to the guest program for verification of the hash value.
 
@@ -290,3 +290,29 @@ Sensitive values saved to: /mnt/data/zkm-project-template/contracts/cache/verifi
 ```
 
 For more details, please refer to [this](contracts/README.md) guide.
+
+### Example 2 : `revme`
+
+The revme guest program takes a block data as input and its running is as same as the sha2-rust. Here, the focus is on explaining how to generate block data(the revme's input).
+
+#### Generating the public input about a specific block
+
+> [!NOTE]
+> The local node is the [GOAT](https://goat.network) test chain in the following example. You must use the Eth-Compatible local node.
+
+```sh
+cd ~
+git clone https://github.com/zkMIPS/revme
+cd revme
+RPC_URL=http://localhost:8545 CHAIN_ID=1337 BLOCK_NO=244 RUST_LOG=debug SUITE_JSON_PATH=./test-vectors/244.json cargo run --example process
+```
+
+If successfully, it will generate `244.json` in the path test-vectors
+
+```sh
+cp test-vectors/244.json zkm-project-template/host-program/test-vectors/
+```
+
+Next, you need to edit the `JSON_PATH` variable in the [`run-local-proving.sh`](host-program/run-local-proving.sh) or [`run-network-proving.sh`](host-program/run-network-proving.sh) to match the name of the  JSON file mentioned above.
+
+Then, you can execute the run-xxx-proving.sh by following the steps outlined in `Example 1: sha2-rust`.

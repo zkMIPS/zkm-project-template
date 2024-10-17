@@ -4,12 +4,19 @@ ZKM can generate proof for  Go and Rust (guest) Programs.
 
 * sha2-go
   
-A simple program that takes struct Data   as input, and operate the elements  as an output.
+  A simple program that takes struct Data   as input, and operates the elements  as an output.
 
 * sha2-rust
-It takes a public input and a private input ,then check the hash(private input)= public input.
+  
+  It takes a public input and a private input ,then checks the hash(private input)= public input.
 
-* mem-allox-vec
+* mem-alloc-vec
+  
+  It allocs memories for vector ,then operates the memory(push and pop).
+
+* revme
+
+  This program is more complex, taking a block data as input and simulating the Ethereum Virtual Machine's computation for that block.
 
 > [!NOTE]
 > If you want to compile the guest programs, you should use a x86 Ubuntu22 machine with Rust: 1.81.0-nightly and Go : 1.22.1
@@ -43,5 +50,11 @@ cd zkm-project-template/guest-program/mem-alloc-vec
 cargo build --target=mips-unknown-linux-musl --release
 ```
 
-The compiled mips ELF is in the zkm-project-template/guest-program/revme/target/mips-unknown-linux-musl/release/ .
+or
+```
+cd zkm-project-template/guest-program/revme
+cargo build --target=mips-unknown-linux-musl --release
+```
+
+The compiled mips ELF is in the zkm-project-template/guest-program/{sha2-rust,mem-alloc-vec,revme}/target/mips-unknown-linux-musl/release/ .
 

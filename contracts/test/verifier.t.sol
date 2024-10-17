@@ -56,6 +56,7 @@ struct VerifierProof {
 	PairingG1Point C ;
 }
 
+
 contract VerifierTest is Test {
     using stdJson for string;
 
@@ -116,6 +117,48 @@ contract VerifierTest is Test {
         bool ret = verifier.verifyTx(verifierProof, input, proofCommitment); 
        
          assert(ret == true); 
+
+    }
+
+    function test_ValidPublicInputs() public {
+        string memory root = vm.projectRoot();
+        string memory path1 = string.concat(root, "/verifier/snark_proof_with_public_inputs.json");
+        string memory json1 = vm.readFile(path1);
+        bytes memory publicWitness = json1.parseRaw(".PublicWitness");
+        string[] memory pubwit = abi.decode(publicWitness, ( string[]));
+        uint256  [2] memory input;
+         for (uint256 i = 0; i < pubwit.length; i++ ){
+            input[i]  =  vm.parseUint(pubwit[i]); //--> uint256
+        }
+
+        string memory path = string.concat(root, "/verifier/public_inputs.json");
+        string memory json = vm.readFile(path);
+
+        bytes memory rootBefore = json.parseRaw(".roots_before.root");
+        uint32[] memory rootBe = abi.decode(rootBefore, ( uint32[]));
+        uint32[8] memory rootb;
+        for (uint256 i = 0; i < rootBe.length; i++ ){
+             //console.log("--before[i=%d], value:%s", i, rootBe[i]);
+             rootb[i] = rootBe[i];
+        }
+        
+        bytes memory rootAfter = json.parseRaw(".roots_after.root");
+        uint32[] memory rootAf = abi.decode(rootAfter, ( uint32[]));
+        uint32[8] memory roota;
+        for (uint256 i = 0; i < rootAf.length; i++ ){
+             roota[i] = rootAf[i];
+        }
+        
+        bytes memory userdata = json.parseRaw(".userdata");
+        uint8[] memory dataU = abi.decode(userdata, ( uint8[]));
+        uint8[32] memory data;
+        for (uint256 i = 0; i < dataU.length; i++ ){
+             data[i] = dataU[i];
+        }
+       
+        uint256 returnNum = verifier.verifyUserData(data, rootb, roota);
+
+        assert(returnNum == input[0]); 
 
     }
 
