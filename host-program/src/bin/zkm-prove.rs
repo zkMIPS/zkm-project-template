@@ -77,6 +77,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         return Err("Proof: failed to write to file".into());
                     }
                 }
+                //public inputs
+                let output_dir = "../contracts/verifier".to_string();
+                let output_path = Path::new(&output_dir);
+                let proof_result_path = output_path.join("public_inputs.json");
+                let mut f = file::new(&proof_result_path.to_string_lossy());
+                match f.write(prover_result.public_values.as_slice()) {
+                    Ok(bytes_written) => {
+                        log::info!("public_inputs: successfully written {} bytes.", bytes_written);
+                    }
+                    Err(e) => {
+                        log::info!("public_inputs: failed to write to file: {}", e);
+                        return Err("public_inputs: failed to write to file".into());
+                    }
+                }
                 //contract
                 let output_dir = "../contracts/src".to_string();
                 let output_path = Path::new(&output_dir);
