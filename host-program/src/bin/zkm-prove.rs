@@ -48,6 +48,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 private_inputstream: "".into(),
                 seg_size: 0,
                 execute_only: false,
+                args: "".into(),
             }
         }
     };
@@ -164,6 +165,7 @@ fn set_sha2_rust_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<
         private_inputstream: pri_buf,
         seg_size: seg_size_u,
         execute_only: execute_only_b,
+        args: "".into(),
     };
 
     Ok(input)
@@ -236,6 +238,7 @@ fn set_sha2_go_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<Pr
         private_inputstream: "".into(),
         seg_size: seg_size_u,
         execute_only: execute_only_b,
+        args: "".into(),
     };
 
     Ok(input)
@@ -249,6 +252,7 @@ fn set_mem_alloc_vec_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Res
         private_inputstream: "".into(),
         seg_size: seg_size_u,
         execute_only: execute_only_b,
+        args: "".into(),
     };
 
     Ok(input)
@@ -263,6 +267,7 @@ fn set_revme_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<Prov
         private_inputstream: "".into(),
         seg_size: seg_size_u,
         execute_only: execute_only_b,
+        args: "".into(),
     };
 
     Ok(input)
