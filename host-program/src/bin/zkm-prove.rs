@@ -236,9 +236,9 @@ impl Data {
 
 fn set_sha2_go_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
     let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
-    let args = env::var("ARGS").unwrap_or("data-to-hash".to_string());
+    let args1 = env::var("ARGS").unwrap_or("data-to-hash".to_string());
     // assume the  arg[0] is the hash(input)(which is a public input), and the arg[1] is the input.
-    let args: Vec<&str> = args.split_whitespace().collect();
+    let args: Vec<&str> = args1.split_whitespace().collect();
     assert_eq!(args.len(), 2);
     let mut data = Data::new();
     // Fill in the input data
@@ -252,7 +252,7 @@ fn set_sha2_go_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<Pr
         private_inputstream: "".into(),
         seg_size: seg_size_u,
         execute_only: execute_only_b,
-        args: args,
+        args: args1,
     };
 
     Ok(input)
