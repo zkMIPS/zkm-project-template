@@ -174,7 +174,7 @@ fn set_sha2_rust_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<
         .expect("public_input serialization failed");
     let mut pri_buf = Vec::new();
     bincode::serialize_into(&mut pri_buf, &pri_input).expect("private_input serialization failed");
-    let public_str = String::from_utf8(&pub_buf);;
+    let public_str = String::from_utf8(pub_buf.clone());;
     let input = ProverInput {
         elf: read(elf_path).unwrap(),
         public_inputstream: pub_buf,
