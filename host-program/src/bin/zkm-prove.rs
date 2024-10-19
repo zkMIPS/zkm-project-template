@@ -252,7 +252,7 @@ fn set_sha2_go_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<Pr
         private_inputstream: "".into(),
         seg_size: seg_size_u,
         execute_only: execute_only_b,
-        args: "".into(),
+        args: args,
     };
 
     Ok(input)
