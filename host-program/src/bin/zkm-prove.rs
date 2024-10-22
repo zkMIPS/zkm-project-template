@@ -166,7 +166,9 @@ fn set_sha2_rust_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<
     hasher.update(&pri_input);
     let result = hasher.finalize();
     let output: [u8; 32] = result.into();
-    let public_str = hex::encode(result);
+    //let public_str = hex::encode(result);
+    let s = std::str::from_utf8(&output).unwrap();
+    let public_str: Vec<&str> = s.split_whitespace().collect();
     // assume the  arg[0] is the hash(input)(which is a public input), and the arg[1] is the input.
     let public_input = output.to_vec();
     let mut pub_buf = Vec::new();
@@ -174,7 +176,7 @@ fn set_sha2_rust_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<
         .expect("public_input serialization failed");
     let mut pri_buf = Vec::new();
     bincode::serialize_into(&mut pri_buf, &pri_input).expect("private_input serialization failed");
-    //let public_str = String::from_utf8(pub_buf.clone())?;
+    
     let input = ProverInput {
         elf: read(elf_path).unwrap(),
         public_inputstream: pub_buf,
