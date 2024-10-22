@@ -167,8 +167,8 @@ fn set_sha2_rust_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<
     let result = hasher.finalize();
     let output: [u8; 32] = result.into();
     //let public_str = hex::encode(result);
-    let s = std::str::from_utf8(&output).unwrap();
-    let public_str: Vec<&str> = s.split_whitespace().collect();
+    let public_str = std::str::from_utf8(&output).unwrap();
+    
     // assume the  arg[0] is the hash(input)(which is a public input), and the arg[1] is the input.
     let public_input = output.to_vec();
     let mut pub_buf = Vec::new();
