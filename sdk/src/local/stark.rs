@@ -13,24 +13,18 @@ pub fn prove_stark(
     let seg_size = input.seg_size as usize;
     let file = ElfBytes::<AnyEndian>::minimal_parse(input.elf.as_slice())
         .expect("opening elf file failed");
-    //let mut args: Vec<&str> = input.args.split_whitespace().collect();
-    //if args.len() > 2 {
-    //    args.truncate(2);
-    //}
-  
+    let mut args: Vec<&str> = input.args.split_whitespace().collect();
+    if args.len() > 1 {
+        args.truncate(1);
+    }
+    log::info!("args [len]:{}, [value]: {:?} ,", args[0].len(), args);
     let mut state = State::load_elf(&file);
     state.patch_elf(&file);
     state.patch_stack(vec![]);
-    //state.patch_stack(org_public_input);
+    state.patch_stack(args);
 
     state.input_stream.push(input.public_inputstream.clone());
     state.input_stream.push(input.private_inputstream.clone());
-
-    let org_public_input = state.read_public_values::<[u8; 32]>();
-    log::info!("public value: {:X?}", org_public_input);
-    log::info!("public value: {} in hex", hex::encode(org_public_input));
-    let mut args: Vec<&str> = hex::encode(org_public_input);
-    state.patch_stack(args);
 
     let (_total_steps, seg_num, state) = split_prog_into_segs(state, &seg_path, "", seg_size);
     result.output_stream = state.public_values_stream.clone();
