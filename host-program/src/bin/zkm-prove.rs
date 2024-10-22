@@ -254,7 +254,7 @@ fn set_sha2_go_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<Pr
         private_inputstream: "".into(),
         seg_size: seg_size_u,
         execute_only: execute_only_b,
-      //  args: args[0].to_string(),
+        args: args[0].to_string(),
     };
 
     Ok(input)
@@ -268,7 +268,7 @@ fn set_mem_alloc_vec_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Res
         private_inputstream: "".into(),
         seg_size: seg_size_u,
         execute_only: execute_only_b,
-      //  args: "".into(),
+        args: "".into(),
     };
 
     Ok(input)
@@ -283,7 +283,7 @@ fn set_revme_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<Prov
         private_inputstream: "".into(),
         seg_size: seg_size_u,
         execute_only: execute_only_b,
-      //  args: "".into(),
+        args: "".into(),
     };
 
     Ok(input)
