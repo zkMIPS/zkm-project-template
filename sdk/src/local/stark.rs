@@ -29,8 +29,8 @@ pub fn prove_stark(
     let org_public_input = state.read_public_values::<[u8; 32]>();
     log::info!("public value: {:X?}", org_public_input);
     log::info!("public value: {} in hex", hex::encode(org_public_input));
-    let mut args: Vec<&str> = org_public_input.split_whitespace().collect();
-    state.patch_stack(args);
+    //let mut args: Vec<&str> = hex::encode(org_public_input);
+    state.patch_stack(hex::encode(org_public_input));
 
     let (_total_steps, seg_num, state) = split_prog_into_segs(state, &seg_path, "", seg_size);
     result.output_stream = state.public_values_stream.clone();
