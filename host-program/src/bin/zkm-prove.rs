@@ -171,7 +171,7 @@ fn set_sha2_rust_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<
         Ok(v) => v,
         Err(e) => {
             log::info!("Invalid UTF-8 sequence: {}", e);
-            "".to_string()
+            &"".to_string()
         },
     };
     
