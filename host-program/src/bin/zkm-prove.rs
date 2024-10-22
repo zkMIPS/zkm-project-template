@@ -166,14 +166,15 @@ fn set_sha2_rust_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<
     hasher.update(&pri_input);
     let result = hasher.finalize();
     let output: [u8; 32] = result.into();
-    //let public_str = hex::encode(result);
-    let public_str = match std::str::from_utf8(&output) {
+    let public_str = hex::encode(result);
+    let first_32_chars = &public_str[..32];
+    /*let public_str = match std::str::from_utf8(&output) {
         Ok(v) => v,
         Err(e) => {
             log::info!("Invalid UTF-8 sequence: {}", e);
             &"".to_string()
         },
-    };
+    }; */
     
     // assume the  arg[0] is the hash(input)(which is a public input), and the arg[1] is the input.
     let public_input = output.to_vec();
@@ -189,7 +190,7 @@ fn set_sha2_rust_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<
         private_inputstream: pri_buf,
         seg_size: seg_size_u,
         execute_only: execute_only_b,
-        args: public_str.to_string(),
+        args: first_32_chars,
     };
 
     Ok(input)

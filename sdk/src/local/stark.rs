@@ -17,7 +17,12 @@ pub fn prove_stark(
     if args.len() > 1 {
         args.truncate(1);
     }
-    log::info!("args [len]:{}, [value]: {:?} ,", args[0].len(), args);
+    if args.len() > 0 {
+        log::info!("args [len]:{}, [value]: {:?} ,", args[0].len(), args);
+    }else{
+        log::info!("args is null ");
+    }
+    
     let mut state = State::load_elf(&file);
     state.patch_elf(&file);
     state.patch_stack(vec![]);
