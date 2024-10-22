@@ -18,8 +18,7 @@ pub fn prove_stark(
     //    args.truncate(2);
     //}
     let public_input = input.public_inputstream.clone();
-    let org_public_input = bincode::deserialize_from(public_input.as_slice())
-                                .expect("public_input deserialization failed");
+    let org_public_input = bincode::deserialize_from(public_input.as_slice()).expect("public_input deserialization failed");
     log::info!("args: {:?}", org_public_input);
     let mut state = State::load_elf(&file);
     state.patch_elf(&file);
