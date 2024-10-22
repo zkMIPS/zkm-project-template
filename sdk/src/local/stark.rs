@@ -13,15 +13,18 @@ pub fn prove_stark(
     let seg_size = input.seg_size as usize;
     let file = ElfBytes::<AnyEndian>::minimal_parse(input.elf.as_slice())
         .expect("opening elf file failed");
-    let mut args: Vec<&str> = input.args.split_whitespace().collect();
-    if args.len() > 2 {
-        args.truncate(2);
-    }
-    log::info!("args: {:?}", args);
+    //let mut args: Vec<&str> = input.args.split_whitespace().collect();
+    //if args.len() > 2 {
+    //    args.truncate(2);
+    //}
+    let public_input = input.public_inputstream.clone();
+    let org_public_input = bincode::deserialize_from(public_input.as_slice())
+                                .expect("public_input deserialization failed");
+    log::info!("args: {:?}", org_public_input);
     let mut state = State::load_elf(&file);
     state.patch_elf(&file);
     state.patch_stack(vec![]);
-    state.patch_stack(args);
+    state.patch_stack(org_public_input);
 
     state.input_stream.push(input.public_inputstream.clone());
     state.input_stream.push(input.private_inputstream.clone());

@@ -166,7 +166,7 @@ fn set_sha2_rust_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<
     hasher.update(&pri_input);
     let result = hasher.finalize();
     let output: [u8; 32] = result.into();
-    let public_str = hex::encode(result);
+    //let public_str = hex::encode(result);
     // assume the  arg[0] is the hash(input)(which is a public input), and the arg[1] is the input.
     let public_input = output.to_vec();
     let mut pub_buf = Vec::new();
@@ -181,7 +181,7 @@ fn set_sha2_rust_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<
         private_inputstream: pri_buf,
         seg_size: seg_size_u,
         execute_only: execute_only_b,
-        args: public_str,
+      //  args: public_str,
     };
 
     Ok(input)
@@ -254,7 +254,7 @@ fn set_sha2_go_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<Pr
         private_inputstream: "".into(),
         seg_size: seg_size_u,
         execute_only: execute_only_b,
-        args: args[0].to_string(),
+      //  args: args[0].to_string(),
     };
 
     Ok(input)
@@ -268,7 +268,7 @@ fn set_mem_alloc_vec_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Res
         private_inputstream: "".into(),
         seg_size: seg_size_u,
         execute_only: execute_only_b,
-        args: "".into(),
+      //  args: "".into(),
     };
 
     Ok(input)
@@ -283,7 +283,7 @@ fn set_revme_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<Prov
         private_inputstream: "".into(),
         seg_size: seg_size_u,
         execute_only: execute_only_b,
-        args: "".into(),
+      //  args: "".into(),
     };
 
     Ok(input)
