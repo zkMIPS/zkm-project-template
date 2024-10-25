@@ -171,6 +171,7 @@ fn set_sha2_rust_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<
     let mut pub_buf = Vec::new();
     bincode::serialize_into(&mut pub_buf, &public_input)
         .expect("public_input serialization failed");
+    
     let mut pri_buf = Vec::new();
     bincode::serialize_into(&mut pri_buf, &pri_input).expect("private_input serialization failed");
     
@@ -181,7 +182,7 @@ fn set_sha2_rust_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<
         seg_size: seg_size_u,
         execute_only: execute_only_b,
     };
-
+    log::info!("sha2_rust, bincode(pulic_input): {:?} ", &input.public_inputstream);
     Ok(input)
 }
 
