@@ -48,7 +48,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 private_inputstream: "".into(),
                 seg_size: 0,
                 execute_only: false,
-                args: "".into(),
             }
         }
     };
