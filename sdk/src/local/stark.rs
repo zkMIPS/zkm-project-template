@@ -13,20 +13,11 @@ pub fn prove_stark(
     let seg_size = input.seg_size as usize;
     let file = ElfBytes::<AnyEndian>::minimal_parse(input.elf.as_slice())
         .expect("opening elf file failed");
-    let mut args: Vec<&str> = input.args.split_whitespace().collect();
-    if args.len() > 1 {
-        args.truncate(1);
-    }
-    if args.len() > 0 {
-        log::info!("args [len]:{}, [value]: {:?} ,", args[0].len(), args);
-    }else{
-        log::info!("args is null ");
-    }
+    
     
     let mut state = State::load_elf(&file);
     state.patch_elf(&file);
     state.patch_stack(vec![]);
-    state.patch_stack(args);
 
     state.input_stream.push(input.public_inputstream.clone());
     state.input_stream.push(input.private_inputstream.clone());

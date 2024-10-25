@@ -98,7 +98,6 @@ impl Prover for NetworkProver {
             public_input_stream: input.public_inputstream.clone(),
             private_input_stream: input.private_inputstream.clone(),
             execute_only: input.execute_only,
-            args: input.args.clone(),
             ..Default::default()
         };
         self.sign_ecdsa(&mut request).await;

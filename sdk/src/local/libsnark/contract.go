@@ -217,14 +217,12 @@ contract Verifier {
     }
 
     function verifyUserData(
-        uint8[32] memory _userData,
+        bytes memory _userData,
         uint32[8] memory _memRootBefore,
         uint32[8] memory _memRootAfter
     ) public pure returns (uint256) {
-        uint256 userData = 0;
-        for (uint256 i = 0; i < 32; i++) {
-            userData |= uint256(_userData[i]) << (8 * (31 - i));
-        }
+        bytes32 userData = sha256(_userData);
+
         uint256 memRootBefore = 0;
         for (uint256 i = 0; i < 8; i++) {
             memRootBefore |= uint256(_memRootBefore[i]) << (32 * (7 - i));
