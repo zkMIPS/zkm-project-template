@@ -225,7 +225,7 @@ contract Verifier {
         uint32[8] memory _memRootAfter
     ) public pure returns (uint256) {
         bytes32 userData = sha256(_userData);
-console.log("********* userData :%s",userData);
+console.log("********* userData 11111111");
         uint256 memRootBefore = 0;
         for (uint256 i = 0; i < 8; i++) {
             memRootBefore |= uint256(_memRootBefore[i]) << (32 * (7 - i));
