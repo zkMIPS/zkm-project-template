@@ -80,6 +80,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 //public inputs
                 let output_dir = "../contracts/verifier".to_string();
                 let output_path = Path::new(&output_dir);
+                //replace the user data with the bincode of the public_input
+                
                 let proof_result_path = output_path.join("public_inputs.json");
                 let mut f = file::new(&proof_result_path.to_string_lossy());
                 match f.write(prover_result.public_values.as_slice()) {

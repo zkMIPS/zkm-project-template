@@ -151,12 +151,13 @@ contract VerifierTest is Test {
         
         bytes memory userdata = json.parseRaw(".userdata");
         uint8[] memory dataU = abi.decode(userdata, ( uint8[]));
-        uint8[32] memory data;
+        uint8[40] memory data;
         for (uint256 i = 0; i < dataU.length; i++ ){
              data[i] = dataU[i];
+             console.log("--user data[i=%d], value:%s", i, dataU[i]);
         }
        
-        uint256 returnNum = verifier.verifyUserData(data, rootb, roota);
+        uint256 returnNum = verifier.verifyUserData(userdata, rootb, roota);
 
         assert(returnNum == input[0]); 
 
