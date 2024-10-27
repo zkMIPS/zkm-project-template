@@ -94,7 +94,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }
                 //check the userdata = hash(bing(public_input))
-                if !check_public_input(&input.public_inputstream, &proof_result_path){
+                if !check_public_inputs(&input.public_inputstream, &proof_result_path){
                     log::info!("public_inputs check false.");
                     return Err("public_inputs check false.".into());
                 }
@@ -261,20 +261,22 @@ fn set_sha2_go_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<Pr
         seg_size: seg_size_u,
         execute_only: execute_only_b,
     };
-
+    log::info!("sha2_go, bincode(pulic_input): {:?} ", &input.public_inputstream);
     Ok(input)
 }
 
 fn set_mem_alloc_vec_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
     let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
+    //let mut buf = Vec::new();
+    //bincode::serialize_into(&mut buf, &"0".into()).expect("serialization failed");
     let input = ProverInput {
         elf: read(elf_path).unwrap(),
-        public_inputstream: "".into(),
+        public_inputstream: "0".into(),
         private_inputstream: "".into(),
         seg_size: seg_size_u,
         execute_only: execute_only_b,
     };
-
+    log::info!("set_mem_alloc_vec_input, bincode(pulic_input): {:?} ", &input.public_inputstream);
     Ok(input)
 }
 
@@ -288,7 +290,7 @@ fn set_revme_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<Prov
         seg_size: seg_size_u,
         execute_only: execute_only_b,
     };
-
+    log::info!("revme, bincode(pulic_input): {:?} ", &input.public_inputstream);
     Ok(input)
 }
 
@@ -304,7 +306,7 @@ struct Roots {
     root: Vec<u64>,
 }
 
-fn check_public_input(public_inputstream: &Vec<u8>, file: &Path) -> bool {
+fn check_public_inputs(public_inputstream: &Vec<u8>, file: &Path) -> bool {
     let mut hasher = Sha256::new();
     hasher.update(&public_inputstream);
     let result_hs = hasher.finalize();

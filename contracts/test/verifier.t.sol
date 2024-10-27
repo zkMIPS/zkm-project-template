@@ -120,7 +120,7 @@ contract VerifierTest is Test {
 
     }
 
-    function test_ValidPublicInputs() public {
+    function test_ValidPublicInputs() public view {
         string memory root = vm.projectRoot();
         string memory path1 = string.concat(root, "/verifier/snark_proof_with_public_inputs.json");
         string memory json1 = vm.readFile(path1);
@@ -151,7 +151,7 @@ contract VerifierTest is Test {
         
         bytes memory userdata = json.parseRaw(".userdata");
         uint8[] memory dataU = abi.decode(userdata, ( uint8[]));
-        uint8[40] memory data;
+        uint8[32] memory data;
         for (uint256 i = 0; i < dataU.length; i++ ){
              data[i] = dataU[i];
         }
