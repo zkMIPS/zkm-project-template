@@ -154,10 +154,9 @@ contract VerifierTest is Test {
         uint8[40] memory data;
         for (uint256 i = 0; i < dataU.length; i++ ){
              data[i] = dataU[i];
-             console.log("--user data[i=%d], value:%s", i, dataU[i]);
         }
        
-        uint256 returnNum = verifier.verifyUserData(userdata, rootb, roota);
+        uint256 returnNum = verifier.verifyUserData(data, rootb, roota);
 
         assert(returnNum == input[0]); 
 
