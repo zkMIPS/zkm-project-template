@@ -8,7 +8,7 @@
 cd zkm-project-template/sdk/src/local/libsnark
 ./compile.sh
 ```
-If successful, it will generate the libsnark.so in sdk/src/local/libsnark/
+  If successful, it will generate the libsnark.so in sdk/src/local/libsnark/
 
 2. To instruct your Rust environment on the location of the libsnark.so , you can set the LD_LIBRARY_PATH environment variable. For example:
 
@@ -18,10 +18,10 @@ export LD_LIBRARY_PATH=Your BASEDIR/zkm-project-template/sdk/src/local/libsnark:
 
 3. Import the SDK
    
-Add the following dependency to your Cargo.toml file.
+  Add the following dependency to your Cargo.toml file.
 ```
 [dependencies]
-zkm-sdk = { path = "../sdk", features = ["snark"] }
+zkm-sdk = { git = "https://github.com/zkMIPS/zkm-project-template", branch = "main", features = ["snark"] }
 ```
 
 ## Don't use the libsnark
@@ -30,8 +30,8 @@ zkm-sdk = { path = "../sdk", features = ["snark"] }
   
 2. Import the SDK
    
-Add the following dependency to your Cargo.toml file.
+  Add the following dependency to your Cargo.toml file.
 ```
 [dependencies]
-zkm-sdk = { path = "../sdk"}
+zkm-sdk = { git = "https://github.com/zkMIPS/zkm-project-template", branch = "main" }
 ```
