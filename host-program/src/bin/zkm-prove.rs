@@ -320,6 +320,7 @@ fn check_public_inputs(public_inputstream: &Vec<u8>, file: &Path) -> bool {
     let userdata = public_inputs.userdata;
 
     if userdata == output_hs {
+        log::info!(" hash(bincode(pulic_input)): {:?} ", &output_hs);
         return true;
     } else {
         log::info!("public inputs is different. the file's is: {:?}, host's is :{:?} ", userdata, output_hs);
