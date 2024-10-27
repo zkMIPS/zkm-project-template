@@ -150,7 +150,7 @@ contract VerifierTest is Test {
         }
         
         bytes memory userdata = json.parseRaw(".userdata");
-        console.log("--userdata.len:%d", userdata.length)
+        console.log("--userdata.len:%d", userdata.length);
         /*uint8[] memory dataU = abi.decode(userdata, ( uint8[]));
         uint8[32] memory data;
         for (uint256 i = 0; i < dataU.length; i++ ){
