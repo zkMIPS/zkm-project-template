@@ -94,7 +94,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }
                 //check the userdata = hash(bing(public_input))
-                if !check_public_inputs(&input.public_inputstream, &proof_result_path){
+                if !replace_public_inputs(&input.public_inputstream, &proof_result_path){
                     log::info!("public_inputs check false.");
                     return Err("public_inputs check false.".into());
                 }
@@ -306,7 +306,7 @@ struct Roots {
     root: Vec<u64>,
 }
 
-fn check_public_inputs(public_inputstream: &Vec<u8>, file: &Path) -> bool {
+fn replace_public_inputs(public_inputstream: &Vec<u8>, file: &Path) -> bool {
     let mut hasher = Sha256::new();
     hasher.update(&public_inputstream);
     let result_hs = hasher.finalize();
@@ -314,16 +314,30 @@ fn check_public_inputs(public_inputstream: &Vec<u8>, file: &Path) -> bool {
 
     let file_contents = std::fs::read_to_string(file).expect("Failed to read file");
 
-    let public_inputs: PublicInputs = serde_json::from_str(&file_contents)
+    let mut public_inputs: PublicInputs = serde_json::from_str(&file_contents)
         .expect("Failed to parse JSON");
 
     let userdata = public_inputs.userdata;
 
     if userdata == output_hs {
         log::info!(" hash(bincode(pulic_input)): {:?} ", &output_hs);
-        return true;
+       
     } else {
         log::info!("public inputs is different. the file's is: {:?}, host's is :{:?} ", userdata, output_hs);
         return false;
     }
+
+    // edit the userdata 
+    if let Some(userdata) = public_inputs["userdata"].as_array_mut() {
+        *userdata = public_inputstream.as_array().unwrap().clone();
+    } else {
+        panic!("userdata is not an array");
+    }
+
+    let mut fp = File::create(file).expect("Unable to create file");
+
+    // save the new contents
+    to_writer(&mut fp, &public_inputs)
+        .expect("Unable to write to public input file");
+    return true;
 }
