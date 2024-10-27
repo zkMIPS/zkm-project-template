@@ -149,17 +149,17 @@ contract VerifierTest is Test {
              roota[i] = rootAf[i];
         }
         
-        bytes memory userdata = json.parseRaw(".userdata");
-        console.log("--userdata.len:%d", userdata.length);
-        /*uint8[] memory dataU = abi.decode(userdata, ( uint8[]));
-        uint8[32] memory data;
-        for (uint256 i = 0; i < dataU.length; i++ ){
-             data[i] = dataU[i];
-             console.log("--data[i=%d], value:%s", i, data[i]);
-        }*/
-       
-        uint256 returnNum = verifier.calculatePublicInput(userdata, rootb, roota);
+        bytes  userdata = json.parseRaw(".userdata");
+        uint8[] memory dataU = abi.decode(userdata, ( uint8[]));
+        //bytes memory data = abi.encodePacked(dataU);
+        bytes memory data = new bytes(dataU.length);
+        for (uint256 i = 0; i < data.length; i++) {
+            data[i] = bytes1(dataU[i]);    
+            //console.log("--data[i=%d], value:%s", i, uint8(data[i]));
+        }
 
+       
+        uint256 returnNum = verifier.calculatePublicInput(data, rootb, roota);
         assert(returnNum == input[0]); 
 
     }
