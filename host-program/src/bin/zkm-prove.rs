@@ -1,5 +1,6 @@
 use common::file;
 use serde::{Deserialize, Serialize};
+use serde_json;
 use sha2::{Digest, Sha256};
 use std::env;
 use std::path::Path;
@@ -80,8 +81,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 //public inputs
                 let output_dir = "../contracts/verifier".to_string();
                 let output_path = Path::new(&output_dir);
-                //replace the user data with the bincode of the public_input
-                
+                //
                 let proof_result_path = output_path.join("public_inputs.json");
                 let mut f = file::new(&proof_result_path.to_string_lossy());
                 match f.write(prover_result.public_values.as_slice()) {
@@ -92,6 +92,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         log::info!("public_inputs: failed to write to file: {}", e);
                         return Err("public_inputs: failed to write to file".into());
                     }
+                }
+                //check the userdata = hash(bing(public_input))
+                if !check_public_input(&input.public_inputstream, &proof_result_path){
+                    log::info!("public_inputs check false.");
+                    return Err("public_inputs check false.".into());
                 }
                 //contract
                 let output_dir = "../contracts/src".to_string();
@@ -285,4 +290,37 @@ fn set_revme_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<Prov
     };
 
     Ok(input)
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct PublicInputs {
+    roots_before: Roots,
+    roots_after: Roots,
+    userdata: Vec<u8>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Roots {
+    root: Vec<u64>,
+}
+
+fn check_public_input(public_inputstream: Vec<u8>, file: &Path) -> bool {
+    let mut hasher = Sha256::new();
+    hasher.update(&input.public_inputstream);
+    let result_hs = hasher.finalize();
+    let output_hs: [u8; 32] = result_hs.into();
+
+    let file_contents = std::fs::read_to_string(file).expect("Failed to read file");
+
+    let public_inputs: PublicInputs = serde_json::from_str(&file_contents)
+        .expect("Failed to parse JSON");
+
+    let userdata = public_inputs.userdata;
+
+    if userdata == output_hs {
+        return true;
+    } else {
+        log::info!("public inputs is different. the file's is: {:?}, host's is :{:?} ", userdata, output_hs);
+        return false;
+    }
 }
