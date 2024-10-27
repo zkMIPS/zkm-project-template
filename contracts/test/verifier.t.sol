@@ -149,7 +149,7 @@ contract VerifierTest is Test {
              roota[i] = rootAf[i];
         }
         
-        bytes  userdata = json.parseRaw(".userdata");
+        bytes memory userdata = json.parseRaw(".userdata");
         uint8[] memory dataU = abi.decode(userdata, ( uint8[]));
         //bytes memory data = abi.encodePacked(dataU);
         bytes memory data = new bytes(dataU.length);
