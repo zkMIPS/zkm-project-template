@@ -304,9 +304,9 @@ struct Roots {
     root: Vec<u64>,
 }
 
-fn check_public_input(public_inputstream: Vec<u8>, file: &Path) -> bool {
+fn check_public_input(public_inputstream: &Vec<u8>, file: &Path) -> bool {
     let mut hasher = Sha256::new();
-    hasher.update(&input.public_inputstream);
+    hasher.update(&public_inputstream);
     let result_hs = hasher.finalize();
     let output_hs: [u8; 32] = result_hs.into();
 
