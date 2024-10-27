@@ -8,6 +8,8 @@ use std::time::Instant;
 use zkm_sdk::{prover::ProverInput, ProverClient};
 use hex;
 use std::fs::read;
+use serde_json::{json, to_writer};
+use std::fs::File;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -328,8 +330,9 @@ fn replace_public_inputs(public_inputstream: &Vec<u8>, file: &Path) -> bool {
     }
 
     // edit the userdata 
+    let new_userdata = json!(public_inputstream);
     if let Some(userdata) = public_inputs["userdata"].as_array_mut() {
-        *userdata = public_inputstream.as_array().unwrap().clone();
+        *userdata = new_userdata.as_array().unwrap().clone();
     } else {
         panic!("userdata is not an array");
     }
