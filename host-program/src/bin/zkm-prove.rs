@@ -81,22 +81,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }
                 //public inputs
-                let output_dir = "../contracts/verifier".to_string();
-                let output_path = Path::new(&output_dir);
-                //
-                let proof_result_path = output_path.join("public_inputs.json");
-                let mut f = file::new(&proof_result_path.to_string_lossy());
-                match f.write(prover_result.public_values.as_slice()) {
-                    Ok(bytes_written) => {
-                        log::info!("public_inputs: successfully written {} bytes.", bytes_written);
-                    }
-                    Err(e) => {
-                        log::info!("public_inputs: failed to write to file: {}", e);
-                        return Err("public_inputs: failed to write to file".into());
-                    }
-                }
-                //check the userdata = hash(bing(public_input))
-                if !replace_public_inputs(&input.public_inputstream, &proof_result_path){
+                if !replace_public_inputs(&input.public_inputstream, &prover_result.public_values) {
                     log::info!("public_inputs check false.");
                     return Err("public_inputs check false.".into());
                 }
@@ -308,15 +293,19 @@ struct Roots {
     root: Vec<u64>,
 }
 
-fn replace_public_inputs(public_inputstream: &Vec<u8>, file: &Path) -> bool {
+fn replace_public_inputs(public_inputstream: &Vec<u8>, proof_public_inputs: &Vec<u8>) -> bool {
+    let output_dir = "../contracts/verifier".to_string();
+    let output_path = Path::new(&output_dir);
+    let proof_result_path = output_path.join("public_inputs.json");
+   
     let mut hasher = Sha256::new();
     hasher.update(&public_inputstream);
     let result_hs = hasher.finalize();
     let output_hs: [u8; 32] = result_hs.into();
 
-    let file_contents = std::fs::read_to_string(file).expect("Failed to read file");
+    //let file_contents = std::fs::read_to_string(file).expect("Failed to read file");
 
-    let mut public_inputs: PublicInputs = serde_json::from_str(&file_contents)
+    let mut public_inputs: PublicInputs = serde_json::from_str(&proof_public_inputs)
         .expect("Failed to parse JSON");
 
     let userdata = public_inputs.userdata;
@@ -329,16 +318,10 @@ fn replace_public_inputs(public_inputstream: &Vec<u8>, file: &Path) -> bool {
         return false;
     }
 
-    // edit the userdata 
-    let new_userdata = json!(public_inputstream);
-    if let Some(userdata) = public_inputs["userdata"].as_array_mut() {
-        *userdata = new_userdata.as_array().unwrap().clone();
-    } else {
-        panic!("userdata is not an array");
-    }
-
-    let mut fp = File::create(file).expect("Unable to create file");
-
+    //update  userdata 
+    public_inputs.userdata = public_inputstream;
+    let mut fp = File::create(proof_result_path).expect("Unable to create file");
+    //let block_public_inputs = serde_json::json!({"public_inputs": block_proof.public_inputs,});
     // save the new contents
     to_writer(&mut fp, &public_inputs)
         .expect("Unable to write to public input file");
