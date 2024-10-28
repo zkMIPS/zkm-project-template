@@ -84,25 +84,28 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         return Err("Proof: failed to write to file".into());
                     }
                 }
-                
+
                 //2.handle the public inputs 
-                match update_public_inputs_with_bincode(input.public_inputstream, &prover_result.public_values) {
-                    Ok(public_inputs) => {
-                        //println!("Updated public inputs: {:?}", public_inputs);
+                let public_inputs = update_public_inputs_with_bincode(input.public_inputstream, &prover_result.public_values); 
+                match public_inputs {
+                    Ok(Some(inputs)) => {
                         let output_dir = "../contracts/verifier".to_string();
                         let output_path = Path::new(&output_dir);
                         let public_inputs_path = output_path.join("public_inputs.json");
                         let mut fp = File::create(public_inputs_path).expect("Unable to create file");
-
                         //save the json file
-                        to_writer(&mut fp, &public_inputs)
-                            .expect("Unable to write to public input file");
-                    },
+                        to_writer(&mut fp, &inputs).expect("Unable to write to public input file");
+                    }
+                    Ok(None) => {
+                        log::info!("Failed to update the public inputs.");
+                        return Err("Failed to update the public inputs.".into());
+                    }
                     Err(e) => {
-                        return Err("Error updating public inputs".into());
+                        log::info!("Failed to update the public inputs. error: {}", e);
+                        return Err("Failed to update the public inputs.".into());
                     }
                 }
-   
+                
                 //3.contract
                 let output_dir = "../contracts/src".to_string();
                 let output_path = Path::new(&output_dir);
@@ -303,7 +306,7 @@ struct Roots {
     root: Vec<u64>,
 }
 
-fn update_public_inputs_with_bincode(public_inputstream: Vec<u8>, proof_public_inputs: &Vec<u8>) -> Result<PublicInputs> {   
+fn update_public_inputs_with_bincode(public_inputstream: Vec<u8>, proof_public_inputs: &Vec<u8>) -> anyhow::Result<Option<PublicInputs>> {   
     let mut hasher = Sha256::new();
     hasher.update(&public_inputstream);
     let result_hs = hasher.finalize();
@@ -319,10 +322,10 @@ fn update_public_inputs_with_bincode(public_inputstream: Vec<u8>, proof_public_i
         log::info!(" hash(bincode(pulic_input)): {:?} ", &output_hs); 
     } else {
         log::info!("public inputs's hash is different. the proof's is: {:?}, host's is :{:?} ", userdata, output_hs);
-        return Err(Error::msg("Public inputs's hash does not match the proof's userdata"));
+        return Err(anyhow::anyhow!("Public inputs's hash does not match the proof's userdata."));
     }
 
     //2, update  userdata with bincode(host's  public_inputs).
     public_inputs.userdata = public_inputstream;
-    Ok(public_inputs)
+    Ok(Some(public_inputs))
 }
