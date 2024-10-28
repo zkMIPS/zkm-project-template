@@ -253,9 +253,6 @@ fn set_sha2_go_input(seg_size_u: u32, execute_only_b: bool, elf_path: String, ar
 }
 
 fn set_mem_alloc_vec_input(seg_size_u: u32, execute_only_b: bool, elf_path: String) -> anyhow::Result<ProverInput> {
-    let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
-    //let mut buf = Vec::new();
-    //bincode::serialize_into(&mut buf, &"0".into()).expect("serialization failed");
     let input = ProverInput {
         elf: read(elf_path).unwrap(),
         public_inputstream: "0".into(),  //if the public input is empty, please using "0"
