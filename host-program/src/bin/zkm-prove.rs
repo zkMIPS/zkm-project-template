@@ -8,7 +8,7 @@ use std::time::Instant;
 use zkm_sdk::{prover::ProverInput, ProverClient};
 use hex;
 use std::fs::read;
-use serde_json::{json, to_writer};
+use serde_json::to_writer;
 use std::fs::File;
 
 #[tokio::main]
@@ -303,25 +303,21 @@ fn replace_public_inputs(public_inputstream: Vec<u8>, proof_public_inputs: &Vec<
     let result_hs = hasher.finalize();
     let output_hs: [u8; 32] = result_hs.into();
 
-    //let file_contents = std::fs::read_to_string(file).expect("Failed to read file");
     let slice_bt: &[u8] = &proof_public_inputs;
     let mut public_inputs: PublicInputs = serde_json::from_slice(slice_bt)
         .expect("Failed to parse JSON");
 
     let userdata = public_inputs.userdata;
-
     if userdata == output_hs {
-        log::info!(" hash(bincode(pulic_input)): {:?} ", &output_hs);
-       
+        log::info!(" hash(bincode(pulic_input)): {:?} ", &output_hs); 
     } else {
-        log::info!("public inputs is different. the file's is: {:?}, host's is :{:?} ", userdata, output_hs);
+        log::info!("public inputs is different. the sdk's is: {:?}, host's is :{:?} ", userdata, output_hs);
         return false;
     }
 
-    //update  userdata 
+    //update  userdata with bincode(public_inputs). The old userdata is hash(bincode(pulic_inputs)).
     public_inputs.userdata = public_inputstream;
     let mut fp = File::create(proof_result_path).expect("Unable to create file");
-    //let block_public_inputs = serde_json::json!({"public_inputs": block_proof.public_inputs,});
     // save the new contents
     to_writer(&mut fp, &public_inputs)
         .expect("Unable to write to public input file");
