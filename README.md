@@ -114,8 +114,7 @@ cd zkm-project-template/host-program
 > 2. There are two script programs available: run_local_proving.sh and run_network_proving.sh. These scripts facilitate the 
 generation of proofs on the local machine and over the proof network, respectively.
 
-> 3. There are four guest programs(sha2-rust, sha2-go, mem-alloc-vec,revme), each capable of generating a SNARK proof on a machine 
-equipped with an AMD EPYC 7R13 processor and 246GB of memory. The following will use sha2-rust and revme as an example to demonstrate local and network proofs.
+> 3. There are four guest programs(sha2-rust, sha2-go, mem-alloc-vec,revme). The following will use sha2-rust and revme as an example to demonstrate local and network proofs.
 
 > [!WARNING]
 >  The environmental variable `SEG_SIZE` in the run-xxx_proving.sh affects the final proof generation. 
@@ -298,7 +297,7 @@ The revme guest program takes a block data as input and its running is as same a
 #### Generating the public input about a specific block
 
 > [!NOTE]
-> The local node is the [GOAT](https://goat.network) test chain in the following example. You must use the Eth-Compatible local node.
+> The local node connects  ZKM test chain in the following example. You must use the Eth-Compatible local node.
 
 ```sh
 cd ~

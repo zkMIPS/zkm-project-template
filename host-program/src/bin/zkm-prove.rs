@@ -34,15 +34,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let seg_size2 = seg_size.parse::<_>().unwrap_or(65536);
     let execute_only = env::var("EXECUTE_ONLY").unwrap_or("false".to_string());
     let execute_only2 = execute_only.parse::<bool>().unwrap_or(false);
+    let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
+    let args_parameter = env::var("ARGS").unwrap_or("data-to-hash".to_string());
 
     let input: ProverInput = match args[1].as_str() {
         "sha2-rust" => {
-            set_sha2_rust_input(seg_size2, execute_only2).expect("set sha2-rust input error")
+            set_sha2_rust_input(seg_size2, execute_only2, elf_path).expect("set sha2-rust input error")
         }
-        "sha2-go" => set_sha2_go_input(seg_size2, execute_only2).expect("set sha2-go input error"),
-        "mem-alloc-vec" => set_mem_alloc_vec_input(seg_size2, execute_only2)
+        "sha2-go" => set_sha2_go_input(seg_size2, execute_only2, elf_path, args_parameter).expect("set sha2-go input error"),
+        "mem-alloc-vec" => set_mem_alloc_vec_input(seg_size2, execute_only2, elf_path)
             .expect("set mem-alloc-vec input error"),
-        "revme" => set_revme_input(seg_size2, execute_only2).expect("set revme input error"),
+        "revme" => set_revme_input(seg_size2, execute_only2, elf_path).expect("set revme input error"),
         _ => {
             helper();
             ProverInput {
@@ -80,10 +82,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         return Err("Proof: failed to write to file".into());
                     }
                 }
-                //public inputs
-                if !replace_public_inputs(input.public_inputstream, &prover_result.public_values) {
-                    log::info!("public_inputs check false.");
-                    return Err("public_inputs check false.".into());
+                //Handle the public inputs 
+                if !update_public_inputs_with_bincode(input.public_inputstream, &prover_result.public_values) {
+                    log::info!("the proof's public_inputs  has something wrong.");
+                    return Err("the proof's public_inputs  has something wrong.".into());
                 }
                 //contract
                 let output_dir = "../contracts/src".to_string();
@@ -151,8 +153,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn set_sha2_rust_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
-    let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
+fn set_sha2_rust_input(seg_size_u: u32, execute_only_b: bool, elf_path: string) -> anyhow::Result<ProverInput> {
     let num_bytes: usize = 1024; //Notice! : if this value is small, it will not generate the snark proof.
     let pri_input = vec![5u8; num_bytes];
     let mut hasher = Sha256::new();
@@ -229,11 +230,9 @@ impl Data {
     }
 }
 
-fn set_sha2_go_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
-    let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
-    let args1 = env::var("ARGS").unwrap_or("data-to-hash".to_string());
+fn set_sha2_go_input(seg_size_u: u32, execute_only_b: bool, elf_path: string, args: string) -> anyhow::Result<ProverInput> {
     // assume the  arg[0] is the hash(input)(which is a public input), and the arg[1] is the input.
-    let args: Vec<&str> = args1.split_whitespace().collect();
+    let args: Vec<&str> = args.split_whitespace().collect();
     assert_eq!(args.len(), 2);
     let mut data = Data::new();
     // Fill in the input data
@@ -252,13 +251,13 @@ fn set_sha2_go_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<Pr
     Ok(input)
 }
 
-fn set_mem_alloc_vec_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
+fn set_mem_alloc_vec_input(seg_size_u: u32, execute_only_b: bool, elf_path: string) -> anyhow::Result<ProverInput> {
     let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
     //let mut buf = Vec::new();
     //bincode::serialize_into(&mut buf, &"0".into()).expect("serialization failed");
     let input = ProverInput {
         elf: read(elf_path).unwrap(),
-        public_inputstream: "0".into(),
+        public_inputstream: "0".into(),  //if the public input is empty, please using "0"
         private_inputstream: "".into(),
         seg_size: seg_size_u,
         execute_only: execute_only_b,
@@ -267,9 +266,7 @@ fn set_mem_alloc_vec_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Res
     Ok(input)
 }
 
-fn set_revme_input(seg_size_u: u32, execute_only_b: bool) -> anyhow::Result<ProverInput> {
-    let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
-    let json_path = env::var("JSON_PATH").expect("JSON PATH is missing");
+fn set_revme_input(seg_size_u: u32, execute_only_b: bool, elf_path: string, json_path: string) -> anyhow::Result<ProverInput> {
     let input = ProverInput {
         elf: read(elf_path).unwrap(),
         public_inputstream: read(json_path).unwrap(),
@@ -293,7 +290,7 @@ struct Roots {
     root: Vec<u64>,
 }
 
-fn replace_public_inputs(public_inputstream: Vec<u8>, proof_public_inputs: &Vec<u8>) -> bool {
+fn update_public_inputs_with_bincode(public_inputstream: Vec<u8>, proof_public_inputs: &Vec<u8>) -> bool {
     let output_dir = "../contracts/verifier".to_string();
     let output_path = Path::new(&output_dir);
     let proof_result_path = output_path.join("public_inputs.json");
@@ -307,18 +304,20 @@ fn replace_public_inputs(public_inputstream: Vec<u8>, proof_public_inputs: &Vec<
     let mut public_inputs: PublicInputs = serde_json::from_slice(slice_bt)
         .expect("Failed to parse JSON");
 
+    //1,check the userdata (from sdk' proof) = hash(bincode(host's public_inputs)) ?
     let userdata = public_inputs.userdata;
     if userdata == output_hs {
         log::info!(" hash(bincode(pulic_input)): {:?} ", &output_hs); 
     } else {
-        log::info!("public inputs is different. the sdk's is: {:?}, host's is :{:?} ", userdata, output_hs);
+        log::info!("public inputs's hash is different. the sdk's is: {:?}, host's is :{:?} ", userdata, output_hs);
         return false;
     }
 
-    //update  userdata with bincode(public_inputs). The old userdata is hash(bincode(pulic_inputs)).
+    //2, update  userdata with bincode(host's  public_inputs).
     public_inputs.userdata = public_inputstream;
     let mut fp = File::create(proof_result_path).expect("Unable to create file");
-    // save the new contents
+
+    //3, save the json file
     to_writer(&mut fp, &public_inputs)
         .expect("Unable to write to public input file");
     return true;

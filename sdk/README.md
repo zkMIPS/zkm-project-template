@@ -2,7 +2,7 @@
 
 ## Use the libsnark
 
-1. The  compile.sh in the path sdk/src/local/libsnark only supports X86_64 linux.
+1. The  compile.sh in the path sdk/src/local/libsnark only supports X86_64 linux.For MacOS, there is a [Dockerfile](../Dockerfile) in the template.
    
 ```
 cd zkm-project-template/sdk/src/local/libsnark

@@ -138,7 +138,6 @@ contract VerifierTest is Test {
         uint32[] memory rootBe = abi.decode(rootBefore, ( uint32[]));
         uint32[8] memory rootb;
         for (uint256 i = 0; i < rootBe.length; i++ ){
-             //console.log("--before[i=%d], value:%s", i, rootBe[i]);
              rootb[i] = rootBe[i];
         }
         
@@ -151,11 +150,9 @@ contract VerifierTest is Test {
         
         bytes memory userdata = json.parseRaw(".userdata");
         uint8[] memory dataU = abi.decode(userdata, ( uint8[]));
-        //bytes memory data = abi.encodePacked(dataU);
         bytes memory data = new bytes(dataU.length);
         for (uint256 i = 0; i < data.length; i++) {
             data[i] = bytes1(dataU[i]);    
-            //console.log("--data[i=%d], value:%s", i, uint8(data[i]));
         }
 
        
