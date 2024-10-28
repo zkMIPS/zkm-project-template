@@ -36,6 +36,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let execute_only2 = execute_only.parse::<bool>().unwrap_or(false);
     let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
     let args_parameter = env::var("ARGS").unwrap_or("data-to-hash".to_string());
+    let json_path = env::var("JSON_PATH").expect("JSON PATH is missing");
 
     let input: ProverInput = match args[1].as_str() {
         "sha2-rust" => {
@@ -44,7 +45,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "sha2-go" => set_sha2_go_input(seg_size2, execute_only2, elf_path, args_parameter).expect("set sha2-go input error"),
         "mem-alloc-vec" => set_mem_alloc_vec_input(seg_size2, execute_only2, elf_path)
             .expect("set mem-alloc-vec input error"),
-        "revme" => set_revme_input(seg_size2, execute_only2, elf_path).expect("set revme input error"),
+        "revme" => set_revme_input(seg_size2, execute_only2, elf_path, json_path).expect("set revme input error"),
         _ => {
             helper();
             ProverInput {
@@ -153,7 +154,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn set_sha2_rust_input(seg_size_u: u32, execute_only_b: bool, elf_path: string) -> anyhow::Result<ProverInput> {
+fn set_sha2_rust_input(seg_size_u: u32, execute_only_b: bool, elf_path: String) -> anyhow::Result<ProverInput> {
     let num_bytes: usize = 1024; //Notice! : if this value is small, it will not generate the snark proof.
     let pri_input = vec![5u8; num_bytes];
     let mut hasher = Sha256::new();
@@ -230,7 +231,7 @@ impl Data {
     }
 }
 
-fn set_sha2_go_input(seg_size_u: u32, execute_only_b: bool, elf_path: string, args: string) -> anyhow::Result<ProverInput> {
+fn set_sha2_go_input(seg_size_u: u32, execute_only_b: bool, elf_path: String, args: String) -> anyhow::Result<ProverInput> {
     // assume the  arg[0] is the hash(input)(which is a public input), and the arg[1] is the input.
     let args: Vec<&str> = args.split_whitespace().collect();
     assert_eq!(args.len(), 2);
@@ -251,7 +252,7 @@ fn set_sha2_go_input(seg_size_u: u32, execute_only_b: bool, elf_path: string, ar
     Ok(input)
 }
 
-fn set_mem_alloc_vec_input(seg_size_u: u32, execute_only_b: bool, elf_path: string) -> anyhow::Result<ProverInput> {
+fn set_mem_alloc_vec_input(seg_size_u: u32, execute_only_b: bool, elf_path: String) -> anyhow::Result<ProverInput> {
     let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
     //let mut buf = Vec::new();
     //bincode::serialize_into(&mut buf, &"0".into()).expect("serialization failed");
@@ -266,7 +267,7 @@ fn set_mem_alloc_vec_input(seg_size_u: u32, execute_only_b: bool, elf_path: stri
     Ok(input)
 }
 
-fn set_revme_input(seg_size_u: u32, execute_only_b: bool, elf_path: string, json_path: string) -> anyhow::Result<ProverInput> {
+fn set_revme_input(seg_size_u: u32, execute_only_b: bool, elf_path: String, json_path: String) -> anyhow::Result<ProverInput> {
     let input = ProverInput {
         elf: read(elf_path).unwrap(),
         public_inputstream: read(json_path).unwrap(),
