@@ -81,7 +81,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }
                 //public inputs
-                if !replace_public_inputs(&input.public_inputstream, &prover_result.public_values) {
+                if !replace_public_inputs(input.public_inputstream, &prover_result.public_values) {
                     log::info!("public_inputs check false.");
                     return Err("public_inputs check false.".into());
                 }
