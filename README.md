@@ -314,4 +314,4 @@ cp test-vectors/244.json zkm-project-template/host-program/test-vectors/
 
 Next, you need to edit the `JSON_PATH` variable in the [`run-local-proving.sh`](host-program/run-local-proving.sh) or [`run-network-proving.sh`](host-program/run-network-proving.sh) to match the name of the  JSON file mentioned above.
 
-Then, you can execute the run-xxx-proving.sh by following the steps outlined in `Example 1: sha2-rust`.
+Then, you can execute the run-xxx-proving.sh by following the steps outlined in [`Example 1: sha2-rust`](### Example 1 : `sha2-rust`).
