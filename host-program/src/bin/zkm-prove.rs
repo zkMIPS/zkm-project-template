@@ -293,7 +293,7 @@ struct Roots {
     root: Vec<u64>,
 }
 
-fn replace_public_inputs(public_inputstream: &Vec<u8>, proof_public_inputs: &Vec<u8>) -> bool {
+fn replace_public_inputs(public_inputstream: Vec<u8>, proof_public_inputs: &Vec<u8>) -> bool {
     let output_dir = "../contracts/verifier".to_string();
     let output_path = Path::new(&output_dir);
     let proof_result_path = output_path.join("public_inputs.json");
@@ -305,7 +305,7 @@ fn replace_public_inputs(public_inputstream: &Vec<u8>, proof_public_inputs: &Vec
 
     //let file_contents = std::fs::read_to_string(file).expect("Failed to read file");
 
-    let mut public_inputs: PublicInputs = serde_json::from_str(&proof_public_inputs)
+    let mut public_inputs: PublicInputs = serde_json::from_str(proof_public_inputs.as_slice())
         .expect("Failed to parse JSON");
 
     let userdata = public_inputs.userdata;
