@@ -304,8 +304,8 @@ fn replace_public_inputs(public_inputstream: Vec<u8>, proof_public_inputs: &Vec<
     let output_hs: [u8; 32] = result_hs.into();
 
     //let file_contents = std::fs::read_to_string(file).expect("Failed to read file");
-
-    let mut public_inputs: PublicInputs = serde_json::from_slice(proof_public_inputs.as_slice().as_bytes())
+    let slice_bt: &[u8] = &proof_public_inputs;
+    let mut public_inputs: PublicInputs = serde_json::from_slice(slice_bt)
         .expect("Failed to parse JSON");
 
     let userdata = public_inputs.userdata;
