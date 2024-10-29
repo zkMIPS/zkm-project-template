@@ -124,7 +124,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         return Err("Contract: failed to write to file".into());
                     }
                 }
-                log::info!("Generating proof successfully .The proof file and verifier contract are in the the path {}/{verifier,src} .", proof_results_path);
+                log::info!("Generating proof successfully .The proof file and verifier contract are in the the path {}/{{verifier,src}} .", proof_results_path);
             } else {
                 match args[1].as_str() {
                     "sha2-rust" => {
