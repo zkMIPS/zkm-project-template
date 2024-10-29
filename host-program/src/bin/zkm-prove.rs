@@ -37,6 +37,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
     let args_parameter = env::var("ARGS").unwrap_or("data-to-hash".to_string());
     let json_path = env::var("JSON_PATH").expect("JSON PATH is missing");
+    let proof_results_path = env::var("PROOF_RESULTS_PATH").expect("PROOF RESULTS PATH is missing");
 
     let input: ProverInput = match args[1].as_str() {
         "sha2-rust" => {
@@ -71,7 +72,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     return Err("SEG_SIZE is excessively large".into());
                 }
                 //1.snark proof
-                let output_dir = "../contracts/verifier".to_string();
+                let output_dir = format!("{}/verifier", proof_results_path);
                 let output_path = Path::new(&output_dir);
                 let proof_result_path = output_path.join("snark_proof_with_public_inputs.json");
                 let mut f = file::new(&proof_result_path.to_string_lossy());
@@ -89,7 +90,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let public_inputs = update_public_inputs_with_bincode(input.public_inputstream, &prover_result.public_values); 
                 match public_inputs {
                     Ok(Some(inputs)) => {
-                        let output_dir = "../contracts/verifier".to_string();
+                        let output_dir = format!("{}/verifier", proof_results_path);
                         let output_path = Path::new(&output_dir);
                         let public_inputs_path = output_path.join("public_inputs.json");
                         let mut fp = File::create(public_inputs_path).expect("Unable to create file");
@@ -107,7 +108,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
                 
                 //3.contract
-                let output_dir = "../contracts/src".to_string();
+                let output_dir = format!("{}/src", proof_results_path);
                 let output_path = Path::new(&output_dir);
                 let contract_path = output_path.join("verifier.sol");
                 let mut f = file::new(&contract_path.to_string_lossy());
