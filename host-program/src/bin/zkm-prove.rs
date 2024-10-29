@@ -55,6 +55,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 private_inputstream: "".into(),
                 seg_size: 0,
                 execute_only: false,
+                args: "".into(),
             }
         }
     };
@@ -199,6 +200,7 @@ fn set_sha2_rust_input(seg_size_u: u32, execute_only_b: bool, elf_path: String) 
         private_inputstream: pri_buf,
         seg_size: seg_size_u,
         execute_only: execute_only_b,
+        args: "".into(),
     };
     log::info!("sha2_rust, bincode(pulic_input): {:?} ", &input.public_inputstream);
     Ok(input)
@@ -269,6 +271,7 @@ fn set_sha2_go_input(seg_size_u: u32, execute_only_b: bool, elf_path: String, ar
         private_inputstream: "".into(), //the private input is empty
         seg_size: seg_size_u,
         execute_only: execute_only_b,
+        args: "".into(),
     };
     log::info!("sha2_go, bincode(pulic_input): {:?} ", &input.public_inputstream);
     Ok(input)
@@ -281,6 +284,7 @@ fn set_mem_alloc_vec_input(seg_size_u: u32, execute_only_b: bool, elf_path: Stri
         private_inputstream: "".into(), //the private input is empty
         seg_size: seg_size_u,
         execute_only: execute_only_b,
+        args: "".into(),
     };
     log::info!("set_mem_alloc_vec_input, bincode(pulic_input): {:?} ", &input.public_inputstream);
     Ok(input)
@@ -293,6 +297,7 @@ fn set_revme_input(seg_size_u: u32, execute_only_b: bool, elf_path: String, json
         private_inputstream: "".into(), //the private input is empty
         seg_size: seg_size_u,
         execute_only: execute_only_b,
+        args: "".into(),
     };
     log::info!("revme, bincode(pulic_input): {:?} ", &input.public_inputstream);
     Ok(input)

@@ -13,8 +13,6 @@ pub fn prove_stark(
     let seg_size = input.seg_size as usize;
     let file = ElfBytes::<AnyEndian>::minimal_parse(input.elf.as_slice())
         .expect("opening elf file failed");
-    
-    
     let mut state = State::load_elf(&file);
     state.patch_elf(&file);
     state.patch_stack(vec![]);
