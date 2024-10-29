@@ -1,15 +1,15 @@
 use common::file;
+//use hex;
 use serde::{Deserialize, Serialize};
-use serde_json;
+//use serde_json;
+use serde_json::to_writer;
 use sha2::{Digest, Sha256};
 use std::env;
+use std::fs::read;
+use std::fs::File;
 use std::path::Path;
 use std::time::Instant;
 use zkm_sdk::{prover::ProverInput, ProverClient};
-use hex;
-use std::fs::read;
-use serde_json::to_writer;
-use std::fs::File;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -40,13 +40,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     log::info!("new prover client,ok.");
 
     let input: ProverInput = match args[1].as_str() {
-        "sha2-rust" => {
-            set_sha2_rust_input(seg_size2, execute_only2, elf_path).expect("set sha2-rust input error")
-        }
-        "sha2-go" => set_sha2_go_input(seg_size2, execute_only2, elf_path, args_parameter).expect("set sha2-go input error"),
+        "sha2-rust" => set_sha2_rust_input(seg_size2, execute_only2, elf_path)
+            .expect("set sha2-rust input error"),
+        "sha2-go" => set_sha2_go_input(seg_size2, execute_only2, elf_path, args_parameter)
+            .expect("set sha2-go input error"),
         "mem-alloc-vec" => set_mem_alloc_vec_input(seg_size2, execute_only2, elf_path)
             .expect("set mem-alloc-vec input error"),
-        "revme" => set_revme_input(seg_size2, execute_only2, elf_path, json_path).expect("set revme input error"),
+        "revme" => set_revme_input(seg_size2, execute_only2, elf_path, json_path)
+            .expect("set revme input error"),
         _ => {
             helper();
             ProverInput {
@@ -88,15 +89,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }
 
-                //2.handle the public inputs 
-                let public_inputs = update_public_inputs_with_bincode(input.public_inputstream, &prover_result.public_values); 
+                //2.handle the public inputs
+                let public_inputs = update_public_inputs_with_bincode(
+                    input.public_inputstream,
+                    &prover_result.public_values,
+                );
                 match public_inputs {
                     Ok(Some(inputs)) => {
                         let output_dir = format!("{}/verifier", proof_results_path);
                         tokio::fs::create_dir_all(&output_dir).await?;
                         let output_path = Path::new(&output_dir);
                         let public_inputs_path = output_path.join("public_inputs.json");
-                        let mut fp = File::create(public_inputs_path).expect("Unable to create file");
+                        let mut fp =
+                            File::create(public_inputs_path).expect("Unable to create file");
                         //save the json file
                         to_writer(&mut fp, &inputs).expect("Unable to write to public input file");
                     }
@@ -109,7 +114,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         return Err("Failed to update the public inputs.".into());
                     }
                 }
-                
+
                 //3.contract
                 let output_dir = format!("{}/src", proof_results_path);
                 tokio::fs::create_dir_all(&output_dir).await?;
@@ -177,23 +182,27 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn set_sha2_rust_input(seg_size_u: u32, execute_only_b: bool, elf_path: String) -> anyhow::Result<ProverInput> {
+fn set_sha2_rust_input(
+    seg_size_u: u32,
+    execute_only_b: bool,
+    elf_path: String,
+) -> anyhow::Result<ProverInput> {
     let num_bytes: usize = 1024; //Notice! : if this value is small, it will not generate the  proof.
     let pri_input = vec![5u8; num_bytes];
     let mut hasher = Sha256::new();
     hasher.update(&pri_input);
     let result = hasher.finalize();
     let output: [u8; 32] = result.into();
-    
+
     // assume the  arg[0] = hash(public input), and the arg[1] = public input.
     let public_input = output.to_vec();
     let mut pub_buf = Vec::new();
     bincode::serialize_into(&mut pub_buf, &public_input)
         .expect("public_input serialization failed");
-    
+
     let mut pri_buf = Vec::new();
     bincode::serialize_into(&mut pri_buf, &pri_input).expect("private_input serialization failed");
-    
+
     let input = ProverInput {
         elf: read(elf_path).unwrap(),
         public_inputstream: pub_buf,
@@ -202,7 +211,10 @@ fn set_sha2_rust_input(seg_size_u: u32, execute_only_b: bool, elf_path: String) 
         execute_only: execute_only_b,
         args: "".into(),
     };
-    log::info!("sha2_rust, bincode(pulic_input): {:?} ", &input.public_inputstream);
+    log::info!(
+        "sha2_rust, bincode(pulic_input): {:?} ",
+        &input.public_inputstream
+    );
     Ok(input)
 }
 
@@ -255,7 +267,12 @@ impl Data {
     }
 }
 
-fn set_sha2_go_input(seg_size_u: u32, execute_only_b: bool, elf_path: String, args: String) -> anyhow::Result<ProverInput> {
+fn set_sha2_go_input(
+    seg_size_u: u32,
+    execute_only_b: bool,
+    elf_path: String,
+    args: String,
+) -> anyhow::Result<ProverInput> {
     // assume the  arg[0] is the hash(input)(which is a public input), and the arg[1] is the input.
     let args: Vec<&str> = args.split_whitespace().collect();
     assert_eq!(args.len(), 2);
@@ -273,11 +290,18 @@ fn set_sha2_go_input(seg_size_u: u32, execute_only_b: bool, elf_path: String, ar
         execute_only: execute_only_b,
         args: "".into(),
     };
-    log::info!("sha2_go, bincode(pulic_input): {:?} ", &input.public_inputstream);
+    log::info!(
+        "sha2_go, bincode(pulic_input): {:?} ",
+        &input.public_inputstream
+    );
     Ok(input)
 }
 
-fn set_mem_alloc_vec_input(seg_size_u: u32, execute_only_b: bool, elf_path: String) -> anyhow::Result<ProverInput> {
+fn set_mem_alloc_vec_input(
+    seg_size_u: u32,
+    execute_only_b: bool,
+    elf_path: String,
+) -> anyhow::Result<ProverInput> {
     let input = ProverInput {
         elf: read(elf_path).unwrap(),
         public_inputstream: "".into(),  //the public input is empty
@@ -286,11 +310,19 @@ fn set_mem_alloc_vec_input(seg_size_u: u32, execute_only_b: bool, elf_path: Stri
         execute_only: execute_only_b,
         args: "".into(),
     };
-    log::info!("set_mem_alloc_vec_input, bincode(pulic_input): {:?} ", &input.public_inputstream);
+    log::info!(
+        "set_mem_alloc_vec_input, bincode(pulic_input): {:?} ",
+        &input.public_inputstream
+    );
     Ok(input)
 }
 
-fn set_revme_input(seg_size_u: u32, execute_only_b: bool, elf_path: String, json_path: String) -> anyhow::Result<ProverInput> {
+fn set_revme_input(
+    seg_size_u: u32,
+    execute_only_b: bool,
+    elf_path: String,
+    json_path: String,
+) -> anyhow::Result<ProverInput> {
     let input = ProverInput {
         elf: read(elf_path).unwrap(),
         public_inputstream: read(json_path).unwrap(),
@@ -299,7 +331,10 @@ fn set_revme_input(seg_size_u: u32, execute_only_b: bool, elf_path: String, json
         execute_only: execute_only_b,
         args: "".into(),
     };
-    log::info!("revme, bincode(pulic_input): {:?} ", &input.public_inputstream);
+    log::info!(
+        "revme, bincode(pulic_input): {:?} ",
+        &input.public_inputstream
+    );
     Ok(input)
 }
 
@@ -315,23 +350,32 @@ struct Roots {
     root: Vec<u64>,
 }
 
-fn update_public_inputs_with_bincode(public_inputstream: Vec<u8>, proof_public_inputs: &Vec<u8>) -> anyhow::Result<Option<PublicInputs>> {   
+fn update_public_inputs_with_bincode(
+    public_inputstream: Vec<u8>,
+    proof_public_inputs: &Vec<u8>,
+) -> anyhow::Result<Option<PublicInputs>> {
     let mut hasher = Sha256::new();
     hasher.update(&public_inputstream);
     let result_hs = hasher.finalize();
     let output_hs: [u8; 32] = result_hs.into();
 
-    let slice_bt: &[u8] = &proof_public_inputs;
-    let mut public_inputs: PublicInputs = serde_json::from_slice(slice_bt)
-        .expect("Failed to parse JSON");
+    let slice_bt: &[u8] = proof_public_inputs;
+    let mut public_inputs: PublicInputs =
+        serde_json::from_slice(slice_bt).expect("Failed to parse JSON");
 
     //1.check the userdata (from the proof) = hash(bincode(host's public_inputs)) ?
     let userdata = public_inputs.userdata;
     if userdata == output_hs {
-        log::info!(" hash(bincode(pulic_input)): {:?} ", &output_hs); 
+        log::info!(" hash(bincode(pulic_input)): {:?} ", &output_hs);
     } else {
-        log::info!("public inputs's hash is different. the proof's is: {:?}, host's is :{:?} ", userdata, output_hs);
-        return Err(anyhow::anyhow!("Public inputs's hash does not match the proof's userdata."));
+        log::info!(
+            "public inputs's hash is different. the proof's is: {:?}, host's is :{:?} ",
+            userdata,
+            output_hs
+        );
+        return Err(anyhow::anyhow!(
+            "Public inputs's hash does not match the proof's userdata."
+        ));
     }
 
     //2, update  userdata with bincode(host's  public_inputs).
