@@ -352,7 +352,7 @@ struct Roots {
 
 fn update_public_inputs_with_bincode(
     public_inputstream: Vec<u8>,
-    proof_public_inputs: &Vec<u8>,
+    proof_public_inputs: &[u8],
 ) -> anyhow::Result<Option<PublicInputs>> {
     let mut hasher = Sha256::new();
     hasher.update(&public_inputstream);
