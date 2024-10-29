@@ -26,10 +26,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         helper();
     }
 
-    log::info!("new prover client.");
-    let prover_client = ProverClient::new().await;
-    log::info!("new prover client,ok.");
-
     let seg_size = env::var("SEG_SIZE").unwrap_or("8192".to_string());
     let seg_size2 = seg_size.parse::<_>().unwrap_or(65536);
     let execute_only = env::var("EXECUTE_ONLY").unwrap_or("false".to_string());
@@ -37,7 +33,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
     let args_parameter = env::var("ARGS").unwrap_or("data-to-hash".to_string());
     let json_path = env::var("JSON_PATH").expect("JSON PATH is missing");
-    let proof_results_path = env::var("PROOF_RESULTS_PATH").expect("PROOF RESULTS PATH is missing");
+    let proof_results_path = env::var("PROOF_RESULTS_PATH").unwrap_or("../contracts".to_string());
+
+    log::info!("new prover client.");
+    let prover_client = ProverClient::new().await;
+    log::info!("new prover client,ok.");
 
     let input: ProverInput = match args[1].as_str() {
         "sha2-rust" => {
@@ -73,6 +73,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
                 //1.snark proof
                 let output_dir = format!("{}/verifier", proof_results_path);
+                tokio::fs::create_dir_all(&output_dir).await?;
                 let output_path = Path::new(&output_dir);
                 let proof_result_path = output_path.join("snark_proof_with_public_inputs.json");
                 let mut f = file::new(&proof_result_path.to_string_lossy());
@@ -91,6 +92,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 match public_inputs {
                     Ok(Some(inputs)) => {
                         let output_dir = format!("{}/verifier", proof_results_path);
+                        tokio::fs::create_dir_all(&output_dir).await?;
                         let output_path = Path::new(&output_dir);
                         let public_inputs_path = output_path.join("public_inputs.json");
                         let mut fp = File::create(public_inputs_path).expect("Unable to create file");
@@ -109,6 +111,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 
                 //3.contract
                 let output_dir = format!("{}/src", proof_results_path);
+                tokio::fs::create_dir_all(&output_dir).await?;
                 let output_path = Path::new(&output_dir);
                 let contract_path = output_path.join("verifier.sol");
                 let mut f = file::new(&contract_path.to_string_lossy());
@@ -121,7 +124,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         return Err("Contract: failed to write to file".into());
                     }
                 }
-                log::info!("Generating proof successfully .The proof file and verifier contract are in the the path contracts/verifier and contracts/src .");
+                log::info!("Generating proof successfully .The proof file and verifier contract are in the the path {}/{verifier,src} .", proof_results_path);
             } else {
                 match args[1].as_str() {
                     "sha2-rust" => {
