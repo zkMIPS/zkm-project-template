@@ -217,14 +217,12 @@ pub fn prove_multi_seg_common(
     let wrapped_proof = wrapped_circuit.prove(&block_proof)?;
     wrapped_proof.save(outdir)?;
 
-
     let block_public_inputs = serde_json::json!({
         "public_inputs": block_proof.public_inputs,
     });
     let outdir_path = std::path::Path::new(outdir);
     let public_values_file = File::create(outdir_path.join("public_values.json"))?;
     serde_json::to_writer(&public_values_file, &updated_agg_public_values)?;
-    
     let block_public_inputs_file = File::create(outdir_path.join("block_public_inputs.json"))?;
     serde_json::to_writer(&block_public_inputs_file, &block_public_inputs)?;
 
