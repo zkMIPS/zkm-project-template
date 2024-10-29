@@ -266,7 +266,7 @@ fn set_sha2_go_input(seg_size_u: u32, execute_only_b: bool, elf_path: String, ar
     let input = ProverInput {
         elf: read(elf_path).unwrap(),
         public_inputstream: buf,
-        private_inputstream: "".into(),
+        private_inputstream: "".into(), //the private input is empty
         seg_size: seg_size_u,
         execute_only: execute_only_b,
     };
@@ -277,8 +277,8 @@ fn set_sha2_go_input(seg_size_u: u32, execute_only_b: bool, elf_path: String, ar
 fn set_mem_alloc_vec_input(seg_size_u: u32, execute_only_b: bool, elf_path: String) -> anyhow::Result<ProverInput> {
     let input = ProverInput {
         elf: read(elf_path).unwrap(),
-        public_inputstream: "0".into(),  //if the public input is empty, please using "0"
-        private_inputstream: "".into(),
+        public_inputstream: "".into(),  //the public input is empty
+        private_inputstream: "".into(), //the private input is empty
         seg_size: seg_size_u,
         execute_only: execute_only_b,
     };
@@ -290,7 +290,7 @@ fn set_revme_input(seg_size_u: u32, execute_only_b: bool, elf_path: String, json
     let input = ProverInput {
         elf: read(elf_path).unwrap(),
         public_inputstream: read(json_path).unwrap(),
-        private_inputstream: "".into(),
+        private_inputstream: "".into(), //the private input is empty
         seg_size: seg_size_u,
         execute_only: execute_only_b,
     };
