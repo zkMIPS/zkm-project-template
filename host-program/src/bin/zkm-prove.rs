@@ -75,6 +75,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }else { //network proving
                         log::info!(
                             "Fail: the SEG_SIZE={} out of the range of the proof network's.", seg_size2);
+                        return Err("SEG_SIZE is out of the range of the proof network's".into());
                     }
                 }
                 //1.snark proof
