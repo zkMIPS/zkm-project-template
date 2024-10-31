@@ -172,7 +172,8 @@ impl Prover for NetworkProver {
                         "generate_proof failed status: {}",
                         get_status_response.status
                     );
-                    return Ok(None);
+                    //return Ok(None);
+                    return Err(anyhow::anyhow!("generate_proof failed status: {}", get_status_response.status"));
                 }
             }
         }
