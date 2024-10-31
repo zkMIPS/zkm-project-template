@@ -68,13 +68,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Ok(Some(prover_result)) => {
             if !execute_only2 {
                 if prover_result.proof_with_public_inputs.is_empty() {
-                    if zkm_prover.to_lowercase() == "local".to_string(){ //local proving
-                        log::info!(
-                            "Fail: please try setting SEG_SIZE={}", seg_size2/2);
+                    if zkm_prover.to_lowercase() == *"local".to_string() {
+                        //local proving
+                        log::info!("Fail: please try setting SEG_SIZE={}", seg_size2 / 2);
                         return Err("SEG_SIZE is excessively large".into());
-                    }else { //network proving
+                    } else {
+                        //network proving
                         log::info!(
-                            "Fail: the SEG_SIZE={} out of the range of the proof network's.", seg_size2);
+                            "Fail: the SEG_SIZE={} out of the range of the proof network's.",
+                            seg_size2
+                        );
                         return Err("SEG_SIZE is out of the range of the proof network's".into());
                     }
                 }
