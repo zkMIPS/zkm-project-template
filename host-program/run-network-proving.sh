@@ -1,5 +1,5 @@
 if [ $# -lt 1 ]; then
-    echo "usage: ./run_network_proving sha2-go [or sha2-rust or mem-alloc-vec or revme]"
+    echo "usage: ./run_network_proving sha2-go [or sha2-rust or mem-alloc-vec or revme or minigeth]"
     exit 1
 fi
 
@@ -18,12 +18,18 @@ export ELF_PATH=${BASEDIR}/../guest-program/$program/target/mips-unknown-linux-m
 export JSON_PATH=${BASEDIR}/test-vectors/test.json
 export PROOF_RESULTS_PATH=${BASEDIR}/../contracts
 export EXECUTE_ONLY=false
+export BLOCK_NO=13284469
+export BLOCK_PATH=${BASEDIR}/test-vectors/0_13284469
 
 echo "Compile guest-program ${program}"
 if [[ "$program" =~ .*go$ ]];then
     cd $BASEDIR/../guest-program/$program
     GOOS=linux GOARCH=mips GOMIPS=softfloat go build -o $program
     export ELF_PATH=${BASEDIR}/../guest-program/$program/$program
+elif [ "$program" == "minigeth" ];then
+    cd $BASEDIR/../guest-program/$program/mipsevm
+    ./build.sh
+    export ELF_PATH=${BASEDIR}/../guest-program/$program/mipsevm/$program
 else
     cd $BASEDIR/../guest-program/$program
     cargo build -r --target=mips-unknown-linux-musl

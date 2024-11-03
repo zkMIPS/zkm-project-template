@@ -1,12 +1,13 @@
 use common::tls::Config;
 use stage_service::stage_service_client::StageServiceClient;
-use stage_service::{GenerateProofRequest, GetStatusRequest};
+use stage_service::{BlockFileItem, GenerateProofRequest, GetStatusRequest};
 use std::env;
 use std::time::Instant;
 use tonic::transport::Endpoint;
 use tonic::transport::{Channel, ClientTlsConfig};
 
 use crate::prover::{Prover, ProverInput, ProverResult};
+use common::file;
 use ethers::signers::{LocalWallet, Signer};
 use tokio::time::sleep;
 use tokio::time::Duration;
@@ -98,9 +99,24 @@ impl Prover for NetworkProver {
             public_input_stream: input.public_inputstream.clone(),
             private_input_stream: input.private_inputstream.clone(),
             execute_only: input.execute_only,
-            args: input.args.clone(),
             ..Default::default()
         };
+        let mut block_data = Vec::new();
+        if input.block_no > 0 && !input.block_path.is_empty() {
+            let files = file::new(&input.block_path).read_dir().unwrap();
+            let block_path = std::path::Path::new(&input.block_path);
+            for file_name in files {
+                let block_file_item = BlockFileItem {
+                    file_name: file_name.to_string(),
+                    file_content: file::new(block_path.join(file_name.clone()).to_str().unwrap())
+                        .read()
+                        .unwrap(),
+                };
+                block_data.push(block_file_item);
+            }
+            request.block_no = Some(input.block_no);
+            request.block_data = block_data;
+        }
         self.sign_ecdsa(&mut request).await;
         let mut client = self.stage_client.clone();
         let response = client.generate_proof(request).await?.into_inner();

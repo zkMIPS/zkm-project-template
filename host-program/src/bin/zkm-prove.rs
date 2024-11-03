@@ -17,7 +17,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = env::args().collect();
     let helper = || {
         log::info!(
-            "Help: {} sha2-rust | sha2-go | mem-alloc-vec | revme",
+            "Help: {} sha2-rust | sha2-go | mem-alloc-vec | revme | minigeth",
             args[0]
         );
         std::process::exit(-1);
@@ -34,6 +34,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args_parameter = env::var("ARGS").unwrap_or("data-to-hash".to_string());
     let json_path = env::var("JSON_PATH").expect("JSON PATH is missing");
     let proof_results_path = env::var("PROOF_RESULTS_PATH").unwrap_or("../contracts".to_string());
+    let block_no = env::var("BLOCK_NO").unwrap_or("0".to_string());
+    let block_path = env::var("BLOCK_PATH").unwrap_or("".to_string());
 
     log::info!("new prover client.");
     let prover_client = ProverClient::new().await;
@@ -48,6 +50,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .expect("set mem-alloc-vec input error"),
         "revme" => set_revme_input(seg_size2, execute_only2, elf_path, json_path)
             .expect("set revme input error"),
+        "minigeth" => set_minigeth_input(seg_size2, execute_only2, elf_path, block_no, block_path)
+            .expect("set minigeth input error"),
         _ => {
             helper();
             ProverInput {
@@ -56,7 +60,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 private_inputstream: "".into(),
                 seg_size: 0,
                 execute_only: false,
-                args: "".into(),
+                block_no: 0,
+                block_path: "".into(),
             }
         }
     };
@@ -162,6 +167,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                     "mem-alloc-vec" => log::info!("Executing the guest program successfully."), //The guest program returns nothing.
                     "revme" => log::info!("Executing the guest program successfully."), //The guest program returns nothing.
+                    "minigeth" => log::info!("Executing the guest program successfully."), //The guest program returns nothing.
                     _ => log::info!("Do nothing."),
                 }
             }
@@ -209,7 +215,8 @@ fn set_sha2_rust_input(
         private_inputstream: pri_buf,
         seg_size: seg_size_u,
         execute_only: execute_only_b,
-        args: "".into(),
+        block_no: 0,
+        block_path: "".into(),
     };
     log::info!(
         "sha2_rust, bincode(pulic_input): {:?} ",
@@ -288,7 +295,8 @@ fn set_sha2_go_input(
         private_inputstream: "".into(), //the private input is empty
         seg_size: seg_size_u,
         execute_only: execute_only_b,
-        args: "".into(),
+        block_no: 0,
+        block_path: "".into(),
     };
     log::info!(
         "sha2_go, bincode(pulic_input): {:?} ",
@@ -308,7 +316,8 @@ fn set_mem_alloc_vec_input(
         private_inputstream: "".into(), //the private input is empty
         seg_size: seg_size_u,
         execute_only: execute_only_b,
-        args: "".into(),
+        block_no: 0,
+        block_path: "".into(),
     };
     log::info!(
         "set_mem_alloc_vec_input, bincode(pulic_input): {:?} ",
@@ -329,12 +338,33 @@ fn set_revme_input(
         private_inputstream: "".into(), //the private input is empty
         seg_size: seg_size_u,
         execute_only: execute_only_b,
-        args: "".into(),
+        block_no: 0,
+        block_path: "".into(),
     };
     log::info!(
         "revme, bincode(pulic_input): {:?} ",
         &input.public_inputstream
     );
+    Ok(input)
+}
+
+fn set_minigeth_input(
+    seg_size_u: u32,
+    execute_only_b: bool,
+    elf_path: String,
+    block_no: String,
+    block_path: String,
+) -> anyhow::Result<ProverInput> {
+    let block_no = block_no.parse::<u64>().unwrap();
+    let input = ProverInput {
+        elf: read(elf_path).unwrap(),
+        public_inputstream: "".into(),  //the public input is empty
+        private_inputstream: "".into(), //the private input is empty
+        seg_size: seg_size_u,
+        execute_only: execute_only_b,
+        block_no,
+        block_path,
+    };
     Ok(input)
 }
 

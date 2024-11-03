@@ -10,7 +10,9 @@ pub struct ProverInput {
     pub private_inputstream: Vec<u8>,
     pub seg_size: u32,
     pub execute_only: bool,
-    pub args: String,
+    // for minigeth
+    pub block_no: u64,
+    pub block_path: String,
 }
 
 #[derive(Debug, Default, Deserialize, Serialize, Clone)]
