@@ -26,7 +26,7 @@ pub fn prove_stark(
         let input_path = if block_path.ends_with('/') {
             format!("{}input", block_path)
         } else {
-            block_path.push_str("/");
+            block_path.push('/');
             format!("{}input", block_path)
         };
 
