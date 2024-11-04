@@ -34,6 +34,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args_parameter = env::var("ARGS").unwrap_or("data-to-hash".to_string());
     let json_path = env::var("JSON_PATH").expect("JSON PATH is missing");
     let proof_results_path = env::var("PROOF_RESULTS_PATH").unwrap_or("../contracts".to_string());
+    let zkm_prover = env::var("ZKM_PROVER").expect("ZKM PROVER is missing");
 
     log::info!("new prover client.");
     let prover_client = ProverClient::new().await;
@@ -67,11 +68,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Ok(Some(prover_result)) => {
             if !execute_only2 {
                 if prover_result.proof_with_public_inputs.is_empty() {
-                    log::info!(
-                        "Fail: snark_proof_with_public_inputs.len() is : {}.Please try setting SEG_SIZE={}",
-                        prover_result.proof_with_public_inputs.len(), seg_size2/2
-                    );
-                    return Err("SEG_SIZE is excessively large".into());
+                    if zkm_prover.to_lowercase() == *"local".to_string() {
+                        //local proving
+                        log::info!("Fail: please try setting SEG_SIZE={}", seg_size2 / 2);
+                        return Err("SEG_SIZE is excessively large".into());
+                    } else {
+                        //network proving
+                        log::info!(
+                            "Fail: the SEG_SIZE={} out of the range of the proof network's.",
+                            seg_size2
+                        );
+                        return Err("SEG_SIZE is out of the range of the proof network's".into());
+                    }
                 }
                 //1.snark proof
                 let output_dir = format!("{}/verifier", proof_results_path);
