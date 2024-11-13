@@ -379,8 +379,8 @@ fn update_public_inputs_with_bincode(
         public_inputs.userdata = public_inputstream;
     } else if public_inputstream.is_empty() {
         log::info!(" hash(bincode(pulic_input))2: {:?} ", &userdata);
-        //, update  userdata with bincode(host's  public_inputs).
-        public_inputs.userdata = userdata;
+        //2', here, the bincode() setting as vec![0u8; 32].
+        public_inputs.userdata = vec![0u8; 32];
     } else {
         log::info!(
             "public inputs's hash is different. the proof's is: {:?}, host's is :{:?} ",
