@@ -374,7 +374,13 @@ fn update_public_inputs_with_bincode(
     //1.check the userdata (from the proof) = hash(bincode(host's public_inputs)) ?
     let userdata = public_inputs.userdata;
     if userdata == output_hs {
-        log::info!(" hash(bincode(pulic_input)): {:?} ", &output_hs);
+        log::info!(" hash(bincode(pulic_input))1: {:?} ", &userdata);
+        //2, update  userdata with bincode(host's  public_inputs).
+        public_inputs.userdata = public_inputstream;
+    } else if public_inputstream.is_empty() {
+        log::info!(" hash(bincode(pulic_input))2: {:?} ", &userdata);
+        //, update  userdata with bincode(host's  public_inputs).
+        public_inputs.userdata = userdata;
     } else {
         log::info!(
             "public inputs's hash is different. the proof's is: {:?}, host's is :{:?} ",
@@ -386,7 +392,5 @@ fn update_public_inputs_with_bincode(
         ));
     }
 
-    //2, update  userdata with bincode(host's  public_inputs).
-    public_inputs.userdata = public_inputstream;
     Ok(Some(public_inputs))
 }
