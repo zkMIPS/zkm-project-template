@@ -376,10 +376,14 @@ fn update_public_inputs_with_bincode(
     if userdata == output_hs {
         log::info!(" hash(bincode(pulic_input))1: {:?} ", &userdata);
         //2, update  userdata with bincode(host's  public_inputs).
+        //the userdata is saved in the public_inputs.json.
+        //the test contract  validates the public inputs in the snark proof file using this userdata.
         public_inputs.userdata = public_inputstream;
     } else if public_inputstream.is_empty() {
         log::info!(" hash(bincode(pulic_input))2: {:?} ", &userdata);
-        //2', here, the bincode() setting as vec![0u8; 32].
+        //2', in this case, the bincode(public inputs) need setting to vec![0u8; 32].
+        //the userdata is saved in the public_inputs.json.
+        //the test contract  validates the public inputs in the snark proof file using this userdata.
         public_inputs.userdata = vec![0u8; 32];
     } else {
         log::info!(
