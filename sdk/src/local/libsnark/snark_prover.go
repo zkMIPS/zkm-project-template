@@ -39,8 +39,9 @@ func (obj *SnarkProver) init_circuit_keys(inputdir string) error {
 	pkPath := inputdir + "/proving.key"
 	vkPath := inputdir + "/verifying.key"
 	_, err := os.Stat(circuitPath)
-
+	fmt.Println("---------init_circuit_keys, circuitPath: %s \n", circuitPath)
 	if os.IsNotExist(err) {
+		fmt.Println("--------init_circuit_keys 111  \n")
 		commonCircuitData, _ := types.ReadCommonCircuitData(inputdir + "/common_circuit_data.json")
 		proofWithPisData, _ := types.ReadProofWithPublicInputs(inputdir + "/proof_with_public_inputs.json")
 		proofWithPis := variables.DeserializeProofWithPublicInputs(proofWithPisData)
@@ -62,6 +63,7 @@ func (obj *SnarkProver) init_circuit_keys(inputdir string) error {
 		obj.r1cs_circuit.WriteTo(fR1CS)
 		fR1CS.Close()
 	} else {
+		fmt.Println("---------init_circuit_keys 2222222  \n")
 		fCircuit, err := os.Open(circuitPath)
 		if err != nil {
 			fmt.Println(err)
@@ -75,6 +77,7 @@ func (obj *SnarkProver) init_circuit_keys(inputdir string) error {
 
 	_, err = os.Stat(pkPath)
 	if os.IsNotExist(err) {
+		fmt.Println("--------init_circuit_keys 3333  \n")
 		obj.pk, obj.vk, err = groth16.Setup(obj.r1cs_circuit)
 		if err != nil {
 			fmt.Println(err)
@@ -91,6 +94,7 @@ func (obj *SnarkProver) init_circuit_keys(inputdir string) error {
 			fVK.Close()
 		}
 	} else {
+		fmt.Println("--------init_circuit_keys 44444444  \n")
 		obj.pk = groth16.NewProvingKey(ecc.BN254)
 		obj.vk = groth16.NewVerifyingKey(ecc.BN254)
 		fPk, err := os.Open(pkPath)
