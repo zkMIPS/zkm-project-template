@@ -34,8 +34,8 @@ func (obj *SnarkProver) init_circuit_keys(inputdir string) error {
 	if obj.r1cs_circuit != nil {
 		return nil
 	}
-	//the defaul is different VK for different guest program.If the PRE_COMPUTED_CIRCUIT_PATH is setted,
-	//it indicates the user wants to share the same VK for different guest programs in the local proving. 
+	//the defaul is different VK for different guest program.If the PRE_COMPUTED_CIRCUIT_PATH is set,
+	//it indicates the user wants to share the same VK for different guest programs during the local proving. 
 	preComputedCircuitPath := os.Getenv("PRE_COMPUTED_CIRCUIT_PATH")
 	if preComputedCircuitPath == "" {
 		preComputedCircuitPath = inputdir  
