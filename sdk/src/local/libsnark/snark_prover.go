@@ -34,12 +34,17 @@ func (obj *SnarkProver) init_circuit_keys(inputdir string) error {
 	if obj.r1cs_circuit != nil {
 		return nil
 	}
+	//the defaul is different VK for different guest program.If the PRE_COMPUTED_CIRCUIT_PATH is setted,
+	//it indicates the user wants to share the same VK for different guest programs in the local proving. 
+	preComputedCircuitPath := os.Getenv("PRE_COMPUTED_CIRCUIT_PATH")
+	if preComputedCircuitPath == "" {
+		preComputedCircuitPath = inputdir  
+	}
 
-	circuitPath := inputdir + "/circuit"
-	pkPath := inputdir + "/proving.key"
-	vkPath := inputdir + "/verifying.key"
+	circuitPath := preComputedCircuitPath + "/circuit"
+	pkPath := preComputedCircuitPath + "/proving.key"
+	vkPath := preComputedCircuitPath + "/verifying.key"
 	_, err := os.Stat(circuitPath)
-
 	if os.IsNotExist(err) {
 		commonCircuitData, _ := types.ReadCommonCircuitData(inputdir + "/common_circuit_data.json")
 		proofWithPisData, _ := types.ReadProofWithPublicInputs(inputdir + "/proof_with_public_inputs.json")
@@ -62,6 +67,7 @@ func (obj *SnarkProver) init_circuit_keys(inputdir string) error {
 		obj.r1cs_circuit.WriteTo(fR1CS)
 		fR1CS.Close()
 	} else {
+		fmt.Println("---------init_circuit_keys 2222222  \n")
 		fCircuit, err := os.Open(circuitPath)
 		if err != nil {
 			fmt.Println(err)
@@ -80,7 +86,7 @@ func (obj *SnarkProver) init_circuit_keys(inputdir string) error {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-
+		fmt.Println("--------init_circuit_keys 3333-000  \n")
 		fPK, _ := os.Create(pkPath)
 		obj.pk.WriteTo(fPK)
 		fPK.Close()
