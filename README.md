@@ -118,7 +118,7 @@ generation of proofs on the local machine and over the proof network, respective
 
 > 4. If the environmental variable `PROOF_RESULTS_PATH` is not set, the proof results file will be saved in zkm-project-template/contracts/{src, verifier}; if the environmental variable `PROOF_RESULTS_PATH` is set, after the proof is completed, the proof results file needs to be copied from from 'PROOF_RESULTS_PATH'/{src, verifier} to the corresponding zkm-project-template/contracts/{src, verifier}.
 
-> 5. If the environmental variable `PRE_COMPUTED_CIRCUIT_PATH` is not set,  different guest programs will use different verifying keys during local proving; if the environmental variable `PRE_COMPUTED_CIRCUIT_PATH` is  set,  different guest programs will share the same verifying key during local proving.
+> 5. If the environmental variable `PRE_COMPUTED_CIRCUIT_PATH` is not set,  the verifying key is different in each local proving; if the environmental variable `PRE_COMPUTED_CIRCUIT_PATH` is  set,  the verifying key will be shared in each local proving.
 
 
 > [!WARNING]
