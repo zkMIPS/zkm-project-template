@@ -67,7 +67,6 @@ func (obj *SnarkProver) init_circuit_keys(inputdir string) error {
 		obj.r1cs_circuit.WriteTo(fR1CS)
 		fR1CS.Close()
 	} else {
-		fmt.Println("---------init_circuit_keys 2222222  \n")
 		fCircuit, err := os.Open(circuitPath)
 		if err != nil {
 			fmt.Println(err)
@@ -86,7 +85,7 @@ func (obj *SnarkProver) init_circuit_keys(inputdir string) error {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		fmt.Println("--------init_circuit_keys 3333-000  \n")
+
 		fPK, _ := os.Create(pkPath)
 		obj.pk.WriteTo(fPK)
 		fPK.Close()
