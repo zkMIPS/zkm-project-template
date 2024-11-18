@@ -13,12 +13,12 @@ pub struct ProverClient {
 impl ProverClient {
     pub async fn new(clientType: &ClientType) -> Self {
         #[allow(unreachable_code)]
-        match clientType.zkm_prover
+        match clientType.zkm_prover.as_str()
         {
-            "local".to_string() => Self {
+            "local" => Self {
                 prover: Box::new(LocalProver::new()),
             },
-            "network".to_string() => Self {
+            "network" => Self {
                 prover: Box::new(NetworkProver::new(clientType).await.unwrap()),
             },
             _ => panic!(

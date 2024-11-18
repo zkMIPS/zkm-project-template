@@ -41,21 +41,21 @@ impl NetworkProver {
         let ssl_config = if clientType.ca_cert_path.is_empty() {
             None
         } else {
-            Some(Config::new(clientType.ca_cert_path, clientType.cert_path, clientType.key_path).await?)
+            Some(Config::new(clientType.ca_cert_path.to_owned(), clientType.cert_path.to_owned(), clientType.key_path.to_owned()).await?)
         };
 
         let endpoint = match ssl_config {
             Some(config) => {
-                let mut tls_config = ClientTlsConfig::new().domain_name(clientType.domain_name);
+                let mut tls_config = ClientTlsConfig::new().domain_name(clientType.domain_name.to_owned());
                 if let Some(ca_cert) = config.ca_cert {
                     tls_config = tls_config.ca_certificate(ca_cert);
                 }
                 if let Some(identity) = config.identity {
                     tls_config = tls_config.identity(identity);
                 }
-                Endpoint::new(clientType.endpoint)?.tls_config(tls_config)?
+                Endpoint::new(clientType.endpoint.to_owned())?.tls_config(tls_config)?
             }
-            None => Endpoint::new(clientType.endpoint)?,
+            None => Endpoint::new(clientType.endpoint.to_owned())?,
         };
         let stage_client = StageServiceClient::connect(endpoint).await?;
         let wallet = clientType.private_key.parse::<LocalWallet>().unwrap();
