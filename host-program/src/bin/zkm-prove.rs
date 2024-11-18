@@ -48,7 +48,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let private_key = env::var("PRIVATE_KEY").unwrap_or("".to_string());
 
     let clientType: ClientType = ClientType {
-        zkm_prover: zkm_prover,
+        zkm_prover: zkm_prover.to_owned(),
         endpoint: endpoint,
         ca_cert_path: ca_cert_path,
         cert_path: cert_path,
