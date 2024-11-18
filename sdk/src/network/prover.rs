@@ -28,36 +28,37 @@ pub struct NetworkProver {
 }
 
 impl NetworkProver {
-    pub async fn new() -> anyhow::Result<NetworkProver> {
-        let endpoint = env::var("ENDPOINT").unwrap_or(DEFAULT_PROVER_NETWORK_RPC.to_string());
+    pub async fn new(clientType: &ClientType) -> anyhow::Result<NetworkProver> {
+        /*let endpoint = env::var("ENDPOINT").unwrap_or(DEFAULT_PROVER_NETWORK_RPC.to_string());
         let ca_cert_path = env::var("CA_CERT_PATH").unwrap_or("".to_string());
         let cert_path = env::var("CERT_PATH").unwrap_or("".to_string());
         let key_path = env::var("KEY_PATH").unwrap_or("".to_string());
         let domain_name =
             env::var("DOMAIN_NAME").unwrap_or(DEFALUT_PROVER_NETWORK_DOMAIN.to_string());
-        let private_key = env::var("PRIVATE_KEY").unwrap_or("".to_string());
+        let private_key = env::var("PRIVATE_KEY").unwrap_or("".to_string());*/
 
-        let ssl_config = if ca_cert_path.is_empty() {
+
+        let ssl_config = if clientType.ca_cert_path.is_empty() {
             None
         } else {
-            Some(Config::new(ca_cert_path, cert_path, key_path).await?)
+            Some(Config::new(clientType.ca_cert_path, clientType.cert_path, clientType.key_path).await?)
         };
 
         let endpoint = match ssl_config {
             Some(config) => {
-                let mut tls_config = ClientTlsConfig::new().domain_name(domain_name);
-                if let Some(ca_cert) = config.ca_cert {
-                    tls_config = tls_config.ca_certificate(ca_cert);
+                let mut tls_config = ClientTlsConfig::new().domain_name(clientType.domain_name);
+                if let Some(clientType.ca_cert) = config.ca_cert {
+                    tls_config = tls_config.ca_certificate(clientType.ca_cert);
                 }
                 if let Some(identity) = config.identity {
                     tls_config = tls_config.identity(identity);
                 }
                 Endpoint::new(endpoint)?.tls_config(tls_config)?
             }
-            None => Endpoint::new(endpoint)?,
+            None => Endpoint::new(clientType.endpoint)?,
         };
         let stage_client = StageServiceClient::connect(endpoint).await?;
-        let wallet = private_key.parse::<LocalWallet>().unwrap();
+        let wallet = clientType.private_key.parse::<LocalWallet>().unwrap();
         Ok(NetworkProver {
             stage_client,
             wallet,

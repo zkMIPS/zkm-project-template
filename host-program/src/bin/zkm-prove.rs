@@ -36,6 +36,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let proof_results_path = env::var("PROOF_RESULTS_PATH").unwrap_or("../contracts".to_string());
     let zkm_prover = env::var("ZKM_PROVER").expect("ZKM PROVER is missing");
 
+    let endpoint = env::var("ENDPOINT").unwrap_or(DEFAULT_PROVER_NETWORK_RPC.to_string());
+    let ca_cert_path = env::var("CA_CERT_PATH").unwrap_or("".to_string());
+    let cert_path = env::var("CERT_PATH").unwrap_or("".to_string());
+    let key_path = env::var("KEY_PATH").unwrap_or("".to_string());
+    let domain_name =
+        env::var("DOMAIN_NAME").unwrap_or(DEFALUT_PROVER_NETWORK_DOMAIN.to_string());
+    let private_key = env::var("PRIVATE_KEY").unwrap_or("".to_string());
+
+    let clientType: ClientType = ClientType {
+        zkm_prover: zkm_prover,
+        endpoint: endpoint,
+        ca_cert_path: ca_cert_path,
+        cert_path: cert_path,
+        key_path: key_path,
+        domain_name: domain_name,
+        private_key: private_key,
+    };
+
     log::info!("new prover client.");
     let prover_client = ProverClient::new().await;
     log::info!("new prover client,ok.");
