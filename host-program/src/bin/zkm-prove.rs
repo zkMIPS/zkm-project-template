@@ -47,7 +47,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         env::var("DOMAIN_NAME").unwrap_or(DEFALUT_PROVER_NETWORK_DOMAIN.to_string());
     let private_key = env::var("PRIVATE_KEY").unwrap_or("".to_string());
 
-    let clientType: ClientType = ClientType {
+    if zkm_prover.to_lowercase() == *"network".to_string() && private_key.is_empty() {
+        //network proving
+        log::info!("please set the PRIVATE_KEY=");
+        return Err("PRIVATE_KEY is not set".into());
+    }
+
+    let client_type: ClientType = ClientType {
         zkm_prover: zkm_prover.to_owned(),
         endpoint: endpoint,
         ca_cert_path: ca_cert_path,
@@ -58,7 +64,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     log::info!("new prover client.");
-    let prover_client = ProverClient::new(&clientType).await;
+    let prover_client = ProverClient::new(&client_type).await;
     log::info!("new prover client,ok.");
 
     let input: ProverInput = match args[1].as_str() {
