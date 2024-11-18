@@ -1,7 +1,7 @@
 use common::tls::Config;
 use stage_service::stage_service_client::StageServiceClient;
 use stage_service::{GenerateProofRequest, GetStatusRequest};
-use std::env;
+
 use std::time::Instant;
 use tonic::transport::Endpoint;
 use tonic::transport::{Channel, ClientTlsConfig};
@@ -48,7 +48,7 @@ impl NetworkProver {
             Some(config) => {
                 let mut tls_config = ClientTlsConfig::new().domain_name(clientType.domain_name);
                 if let Some(ca_cert) = config.ca_cert {
-                    tls_config = tls_config.ca_certificate(clientType.ca_cert);
+                    tls_config = tls_config.ca_certificate(ca_cert);
                 }
                 if let Some(identity) = config.identity {
                     tls_config = tls_config.identity(identity);

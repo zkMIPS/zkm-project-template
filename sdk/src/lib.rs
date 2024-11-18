@@ -5,8 +5,6 @@ pub mod prover;
 use local::prover::LocalProver;
 use network::prover::NetworkProver;
 use prover::{Prover, ClientType};
-use std::env;
-
 
 pub struct ProverClient {
     pub prover: Box<dyn Prover>,
@@ -17,10 +15,10 @@ impl ProverClient {
         #[allow(unreachable_code)]
         match clientType.zkm_prover
         {
-            "local" => Self {
+            "local".to_string() => Self {
                 prover: Box::new(LocalProver::new()),
             },
-            "network" => Self {
+            "network".to_string() => Self {
                 prover: Box::new(NetworkProver::new(clientType).await.unwrap()),
             },
             _ => panic!(
