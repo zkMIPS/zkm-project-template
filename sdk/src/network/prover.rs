@@ -6,7 +6,7 @@ use std::time::Instant;
 use tonic::transport::Endpoint;
 use tonic::transport::{Channel, ClientTlsConfig};
 
-use crate::prover::{Prover, ProverInput, ProverResult};
+use crate::prover::{Prover, ProverInput, ProverResult,ClientType};
 use ethers::signers::{LocalWallet, Signer};
 use tokio::time::sleep;
 use tokio::time::Duration;

@@ -3,6 +3,17 @@ use serde::Deserialize;
 use serde::Serialize;
 use tokio::time::Duration;
 
+#[derive(Debug, Default, Clone)]
+pub struct ClientType {
+    pub zkm_prover: String,
+    pub endpoint: String,
+    pub ca_cert_path: String,
+    pub cert_path: String,
+    pub key_path: String,
+    pub domain_name: String,
+    pub private_key: String,
+}
+
 #[derive(Debug, Default, Deserialize, Serialize, Clone)]
 pub struct ProverInput {
     pub elf: Vec<u8>,

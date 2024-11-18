@@ -4,19 +4,9 @@ pub mod prover;
 
 use local::prover::LocalProver;
 use network::prover::NetworkProver;
-use prover::Prover;
+use prover::{Prover, ClientType};
 use std::env;
 
-#[derive(Debug, Default, Clone)]
-pub struct ClientType {
-    pub zkm_prover: String,
-    pub endpoint: String,
-    pub ca_cert_path: String,
-    pub cert_path: String,
-    pub key_path: String,
-    pub domain_name: String,
-    pub private_key: String,
-}
 
 pub struct ProverClient {
     pub prover: Box<dyn Prover>,
