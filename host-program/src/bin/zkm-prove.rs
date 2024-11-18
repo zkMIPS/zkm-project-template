@@ -9,7 +9,10 @@ use std::fs::read;
 use std::fs::File;
 use std::path::Path;
 use std::time::Instant;
-use zkm_sdk::{prover::ProverInput, ProverClient};
+use zkm_sdk::{prover::ProverInput, prover::ClientType, ProverClient};
+
+pub const DEFAULT_PROVER_NETWORK_RPC: &str = "https://152.32.186.45:20002";
+pub const DEFALUT_PROVER_NETWORK_DOMAIN: &str = "stage";
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -55,7 +58,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     log::info!("new prover client.");
-    let prover_client = ProverClient::new().await;
+    let prover_client = ProverClient::new(clientType).await;
     log::info!("new prover client,ok.");
 
     let input: ProverInput = match args[1].as_str() {

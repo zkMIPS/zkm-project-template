@@ -19,9 +19,6 @@ pub mod stage_service {
 
 use crate::network::prover::stage_service::Status;
 
-pub const DEFAULT_PROVER_NETWORK_RPC: &str = "https://152.32.186.45:20002";
-pub const DEFALUT_PROVER_NETWORK_DOMAIN: &str = "stage";
-
 pub struct NetworkProver {
     pub stage_client: StageServiceClient<Channel>,
     pub wallet: LocalWallet,
