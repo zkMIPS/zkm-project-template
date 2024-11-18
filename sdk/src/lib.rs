@@ -45,9 +45,9 @@ impl ProverClient {
         }
     }
 
-    pub async fn network() -> Self {
+    pub async fn network(clientType: &ClientType) -> Self {
         Self {
-            prover: Box::new(NetworkProver::new().await.unwrap()),
+            prover: Box::new(NetworkProver::new(clientType).await.unwrap()),
         }
     }
 }

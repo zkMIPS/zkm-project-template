@@ -47,13 +47,13 @@ impl NetworkProver {
         let endpoint = match ssl_config {
             Some(config) => {
                 let mut tls_config = ClientTlsConfig::new().domain_name(clientType.domain_name);
-                if let Some(clientType.ca_cert) = config.ca_cert {
+                if let Some(ca_cert) = config.ca_cert {
                     tls_config = tls_config.ca_certificate(clientType.ca_cert);
                 }
                 if let Some(identity) = config.identity {
                     tls_config = tls_config.identity(identity);
                 }
-                Endpoint::new(endpoint)?.tls_config(tls_config)?
+                Endpoint::new(clientType.endpoint)?.tls_config(tls_config)?
             }
             None => Endpoint::new(clientType.endpoint)?,
         };
