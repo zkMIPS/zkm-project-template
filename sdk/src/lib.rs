@@ -13,7 +13,7 @@ pub struct ProverClient {
 impl ProverClient {
     pub async fn new(client_type: &ClientType) -> Self {
         #[allow(unreachable_code)]
-        match clientType.zkm_prover.as_str()
+        match client_type.zkm_prover.as_str()
         {
             "local" => Self {
                 prover: Box::new(LocalProver::new()),
