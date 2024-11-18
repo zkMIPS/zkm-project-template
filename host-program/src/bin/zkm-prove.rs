@@ -58,7 +58,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     log::info!("new prover client.");
-    let prover_client = ProverClient::new(clientType).await;
+    let prover_client = ProverClient::new(&clientType).await;
     log::info!("new prover client,ok.");
 
     let input: ProverInput = match args[1].as_str() {
