@@ -38,7 +38,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let json_path = env::var("JSON_PATH").expect("JSON PATH is missing");
     let proof_results_path = env::var("PROOF_RESULTS_PATH").unwrap_or("../contracts".to_string());
     let zkm_prover = env::var("ZKM_PROVER").expect("ZKM PROVER is missing");
+    let vk_path = env::var("VERIFYING_KEY_PATH").expect("VERIFYING KEY PATH is missing");
 
+    //network proving
     let endpoint = env::var("ENDPOINT").unwrap_or(DEFAULT_PROVER_NETWORK_RPC.to_string());
     let ca_cert_path = env::var("CA_CERT_PATH").unwrap_or("".to_string());
     let cert_path = env::var("CERT_PATH").unwrap_or("".to_string());
@@ -51,7 +53,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         //network proving
         log::info!("please set the PRIVATE_KEY=");
         return Err("PRIVATE_KEY is not set".into());
-    }
+    } 
 
     let client_type: ClientType = ClientType {
         zkm_prover: zkm_prover.to_owned(),
@@ -66,6 +68,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     log::info!("new prover client.");
     let prover_client = ProverClient::new(&client_type).await;
     log::info!("new prover client,ok.");
+
+    if zkm_prover.to_lowercase() == *"local".to_string() {
+        let pk_file = format!("{}/proving.key", vk_path);
+        let vk_file = format!("{}/verifying.key", vk_path);
+
+        let pathp = Path::new(pk_file);
+        let pathv = Path::new(vk_file);
+
+        if pathp.exists() && pathp.exists() {
+            log::info!("The vk and pk all exist and don't need to setup.");
+        } else {
+            prover_client.prover.setup(&vk_path, &input, None).await;
+            Ok(())
+        }
+    }
 
     let input: ProverInput = match args[1].as_str() {
         "sha2-rust" => set_sha2_rust_input(seg_size2, execute_only2, elf_path)

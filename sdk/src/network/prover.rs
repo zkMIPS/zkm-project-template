@@ -180,6 +180,17 @@ impl Prover for NetworkProver {
         }
     }
 
+    async fn setup<'a>(
+        &self,
+        vk_path: &'a  String,
+        input: &'a ProverInput,
+        timeout: Option<Duration>,
+    ) -> anyhow::Result<Option<ProverResult>> {
+        log::info!("The proof network does not support the method.");
+        return Err(anyhow::anyhow!(
+            "The proof network does not support the method!"));
+    }
+
     async fn prove<'a>(
         &self,
         input: &'a ProverInput,

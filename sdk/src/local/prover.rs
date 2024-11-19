@@ -119,6 +119,31 @@ impl Prover for LocalProver {
         }
     }
 
+    async fn setup<'a>(
+        &self,
+        vk_path: &'a  String,
+        input: &'a ProverInput,
+        timeout: Option<Duration>,
+    ) -> anyhow::Result<Option<ProverResult>> {
+        let mut result = ProverResult::default();
+        //let inputdir = format!("{}/input", vk_path);
+        fs::create_dir_all(&vk_path).unwrap();
+        let should_agg =
+            crate::local::stark::prove_stark(&input, &vk_path, &mut result).unwrap();
+        if !should_agg {
+            log::info!("Setup: generating the stark proof false, please check the SEG_SIZE or other parameters.");
+            return Err(anyhow::anyhow!(
+                "Setup: generating the stark proof false, please check the SEG_SIZE or other parameters!"));
+        }
+
+        if crate::local::snark::setup(&vk_path) {
+            log::info!("setup successful, the verify key  is in the {}", vk_path);
+            return Ok();
+        }else {
+            return Err(anyhow::anyhow!("snark setup false!"));
+        }
+    }
+
     async fn prove<'a>(
         &self,
         input: &'a ProverInput,

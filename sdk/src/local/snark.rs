@@ -4,6 +4,7 @@ use std::os::raw::c_char;
 
 extern "C" {
     fn Stark2Snark(inputdir: *const c_char, outputdir: *const c_char) -> c_int;
+    fn Setup(inputdir: *const c_char) -> c_int;
 }
 
 #[cfg(feature = "snark")]
@@ -17,5 +18,18 @@ pub fn prove_snark(inputdir: &str, outputdir: &str) -> bool {
 
 #[cfg(not(feature = "snark"))]
 pub fn prove_snark(inputdir: &str, outputdir: &str) -> bool {
+    return false;
+}
+
+#[cfg(feature = "snark")]
+pub fn setup(inputdir: &str) -> bool {
+    let inputdir = std::ffi::CString::new(inputdir).unwrap();
+ 
+    let ret = unsafe { Setup(inputdir.as_ptr()) };
+    ret == 0
+}
+
+#[cfg(not(feature = "snark"))]
+pub fn setup(inputdir: &str) -> bool {
     return false;
 }

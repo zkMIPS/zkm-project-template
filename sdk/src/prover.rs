@@ -41,6 +41,12 @@ pub trait Prover {
         proof_id: &'a str,
         timeout: Option<Duration>,
     ) -> anyhow::Result<Option<ProverResult>>;
+    async fn setup<'a>(
+        &self,
+        vk_path: &'a  String,
+        input: &'a ProverInput,
+        timeout: Option<Duration>,
+    ) -> anyhow::Result<Option<ProverResult>>;
     async fn prove<'a>(
         &self,
         input: &'a ProverInput,

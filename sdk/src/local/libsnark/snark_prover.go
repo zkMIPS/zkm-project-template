@@ -261,6 +261,58 @@ func (obj *SnarkProver) combineToBigInt(data []uint64, idx int) *big.Int {
 
 	return result
 }
+//the client first calls Setup, then calls Prove.
+func (obj *SnarkProver) Setup(inputdir string) error {
+	circuitPath := inputdir + "/circuit"
+	pkPath := inputdir + "/proving.key"
+	vkPath := inputdir + "/verifying.key"
+	_, err := os.Stat(circuitPath)
+
+	if os.IsNotExist(err) {
+		commonCircuitData, _ := types.ReadCommonCircuitData(inputdir + "/common_circuit_data.json")
+		proofWithPisData, _ := types.ReadProofWithPublicInputs(inputdir + "/proof_with_public_inputs.json")
+		proofWithPis := variables.DeserializeProofWithPublicInputs(proofWithPisData)
+
+		verifierOnlyCircuitRawData, _ := types.ReadVerifierOnlyCircuitData(inputdir + "/verifier_only_circuit_data.json")
+		verifierOnlyCircuitData := variables.DeserializeVerifierOnlyCircuitData(verifierOnlyCircuitRawData)
+
+		circuit := verifier.ExampleVerifierCircuit{
+			PublicInputsHash:        proofWithPis.PublicInputsHash,
+			Proof:                   proofWithPis.Proof,
+			PublicInputs:            proofWithPis.PublicInputs,
+			VerifierOnlyCircuitData: verifierOnlyCircuitData,
+			CommonCircuitData:       commonCircuitData,
+		}
+
+		var builder frontend.NewBuilder = r1cs.NewBuilder
+		obj.r1cs_circuit, _ = frontend.Compile(ecc.BN254.ScalarField(), builder, &circuit)
+		fR1CS, _ := os.Create(circuitPath)
+		obj.r1cs_circuit.WriteTo(fR1CS)
+		fR1CS.Close()
+	}
+
+	_, err = os.Stat(pkPath)
+	if os.IsNotExist(err) {
+		obj.pk, obj.vk, err = groth16.Setup(obj.r1cs_circuit)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		fPK, _ := os.Create(pkPath)
+		obj.pk.WriteTo(fPK)
+		fPK.Close()
+
+		if obj.vk != nil {
+			fVK, _ := os.Create(vkPath)
+			obj.vk.WriteTo(fVK)
+			fVK.Close()
+		}
+	}
+	
+	return nil
+}
+
 
 func (obj *SnarkProver) Prove(inputdir string, outputdir string) error {
 	if err := obj.init_circuit_keys(inputdir); err != nil {
