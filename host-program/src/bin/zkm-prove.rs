@@ -100,9 +100,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let pathp = Path::new(&pk_file);
         let pathv = Path::new(&vk_file);
 
-        if pathp.exists() && pathp.exists() {
+        if pathp.exists() && pathv.exists() {
             log::info!("The vk and pk all exist and don't need to setup.");
         } else {//setup the vk and pk for the first running local proving.
+            log::info!("excuting the setup.");
             let _ = prover_client.prover.setup(&vk_path, &input, None).await;
             return Ok(());
         }

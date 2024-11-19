@@ -182,9 +182,9 @@ impl Prover for NetworkProver {
 
     async fn setup<'a>(
         &self,
-        vk_path: &'a  String,
-        input: &'a ProverInput,
-        timeout: Option<Duration>,
+        _vk_path: &'a  String,
+        _input: &'a ProverInput,
+        _timeout: Option<Duration>,
     ) -> anyhow::Result<()> {
         log::info!("The proof network does not support the method.");
         return Err(anyhow::anyhow!(

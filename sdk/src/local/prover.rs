@@ -123,7 +123,7 @@ impl Prover for LocalProver {
         &self,
         vk_path: &'a  String,
         input: &'a ProverInput,
-        timeout: Option<Duration>,
+        _timeout: Option<Duration>,
     ) -> anyhow::Result<()> {
         let mut result = ProverResult::default();
         //let inputdir = format!("{}/input", vk_path);
