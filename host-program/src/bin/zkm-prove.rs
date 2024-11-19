@@ -69,20 +69,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let prover_client = ProverClient::new(&client_type).await;
     log::info!("new prover client,ok.");
 
-    if zkm_prover.to_lowercase() == *"local".to_string() {
-        let pk_file = format!("{}/proving.key", vk_path);
-        let vk_file = format!("{}/verifying.key", vk_path);
-
-        let pathp = Path::new(pk_file);
-        let pathv = Path::new(vk_file);
-
-        if pathp.exists() && pathp.exists() {
-            log::info!("The vk and pk all exist and don't need to setup.");
-        } else {//setup the vk and pk for the first running local proving.
-            prover_client.prover.setup(&vk_path, &input, None).await;
-            return Ok(());
-        }
-    }
 
     let input: ProverInput = match args[1].as_str() {
         "sha2-rust" => set_sha2_rust_input(seg_size2, execute_only2, elf_path)
@@ -105,6 +91,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
     };
+
+    //If the vk or pk doesn't exist, it will run setup().
+    if zkm_prover.to_lowercase() == *"local".to_string() {
+        let pk_file = format!("{}/proving.key", vk_path);
+        let vk_file = format!("{}/verifying.key", vk_path);
+
+        let pathp = Path::new(&pk_file);
+        let pathv = Path::new(&vk_file);
+
+        if pathp.exists() && pathp.exists() {
+            log::info!("The vk and pk all exist and don't need to setup.");
+        } else {//setup the vk and pk for the first running local proving.
+            prover_client.prover.setup(&vk_path, &input, None).await;
+            return Ok(());
+        }
+    }
 
     let start = Instant::now();
     let proving_result = prover_client.prover.prove(&input, None).await;
