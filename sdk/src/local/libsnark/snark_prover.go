@@ -35,9 +35,14 @@ func (obj *SnarkProver) init_circuit_keys(inputdir string) error {
 		return nil
 	}
 
-	circuitPath := inputdir + "/circuit"
-	pkPath := inputdir + "/proving.key"
-	vkPath := inputdir + "/verifying.key"
+	setupKeyPath := os.Getenv("VERIFYING_KEY_PATH")
+	if setupKeyPath == "" {
+		setupKeyPath = inputdir  
+	}
+
+	circuitPath := setupKeyPath + "/circuit"
+	pkPath := setupKeyPath + "/proving.key"
+	vkPath := setupKeyPath + "/verifying.key"
 	_, err := os.Stat(circuitPath)
 
 	if os.IsNotExist(err) {
