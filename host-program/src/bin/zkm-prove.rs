@@ -78,9 +78,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         if pathp.exists() && pathp.exists() {
             log::info!("The vk and pk all exist and don't need to setup.");
-        } else {
+        } else {//setup the vk and pk for the first running local proving.
             prover_client.prover.setup(&vk_path, &input, None).await;
-            Ok(())
+            return Ok(());
         }
     }
 
