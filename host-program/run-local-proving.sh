@@ -15,6 +15,7 @@ export ELF_PATH=${BASEDIR}/../guest-program/$program/target/mips-unknown-linux-m
 export JSON_PATH=${BASEDIR}/test-vectors/test.json
 export PROOF_RESULTS_PATH=${BASEDIR}/../contracts
 export EXECUTE_ONLY=false
+export VERIFYING_KEY_PATH=${BASEDIR}/test-vectors/input
 
 echo "Compile guest-program ${program}"
 if [[ "$program" =~ .*go$ ]];then
