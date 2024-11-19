@@ -124,7 +124,7 @@ impl Prover for LocalProver {
         vk_path: &'a  String,
         input: &'a ProverInput,
         timeout: Option<Duration>,
-    ) -> anyhow::Result<Option<ProverResult>> {
+    ) -> anyhow::Result<()> {
         let mut result = ProverResult::default();
         //let inputdir = format!("{}/input", vk_path);
         fs::create_dir_all(&vk_path).unwrap();
@@ -138,7 +138,7 @@ impl Prover for LocalProver {
 
         if crate::local::snark::setup(&vk_path) {
             log::info!("setup successful, the verify key  is in the {}", vk_path);
-            return Ok();
+            return Ok(());
         }else {
             return Err(anyhow::anyhow!("snark setup false!"));
         }
