@@ -19,7 +19,7 @@ func Stark2Snark(inputdir *C.char, outputdir *C.char) C.int {
 	return 0
 }
 
-//export  setup
+//export  Setup
 func Setup(inputdir *C.char) C.int {
 	// Convert C strings to Go strings
 	inputDir := C.GoString(inputdir)
