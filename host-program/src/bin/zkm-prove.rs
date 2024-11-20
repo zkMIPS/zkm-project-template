@@ -147,10 +147,8 @@ fn create_guest_input(guest_program: &String) -> Box<dyn InputProcessor> {
         "sha2-go" => Box::new(Sha2GoInput),
         "mem-alloc-vec" => Box::new(MemAllocVecInput),
         "revme" => Box::new(RevmeInput),
-        _ => panic!(
-            "invalid guest program."
-        ),
-    };
+        _ => panic!("invalid guest program."),
+    }
 }
 
 impl InputProcessor for Sha2RustInput {
@@ -246,7 +244,7 @@ impl InputProcessor for Sha2GoInput {
 }
 
 impl InputProcessor for MemAllocVecInput {
-    fn process(&self, input: &mut ProverInput, args: String) {
+    fn process(&self, input: &mut ProverInput, args: String, json: String) {
         //do nothing
         //Because the guest program has no public inputs or private inputs. 
     }
