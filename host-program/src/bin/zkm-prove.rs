@@ -152,7 +152,7 @@ fn create_guest_input(guest_program: &String) -> Box<dyn InputProcessor> {
 }
 
 impl InputProcessor for Sha2RustInput {
-    fn process(&self, input: &mut ProverInput, args: String, json: String) {
+    fn process(&self, input: &mut ProverInput, _args: String, _json: String) {
         //input.public_inputstream.push(1); 
         let num_bytes: usize = 1024; //Notice! : if this value is small, it will not generate the  proof.
         let pri_input = vec![5u8; num_bytes];
@@ -226,7 +226,7 @@ impl Data {
 }
 
 impl InputProcessor for Sha2GoInput {
-    fn process(&self, input: &mut ProverInput, args: String, json: String) {
+    fn process(&self, input: &mut ProverInput, args: String, _json: String) {
         // assume the  arg[0] is the hash(input)(which is a public input), and the arg[1] is the input.
         let args: Vec<&str> = args.split_whitespace().collect();
         assert_eq!(args.len(), 2);
@@ -244,7 +244,7 @@ impl InputProcessor for Sha2GoInput {
 }
 
 impl InputProcessor for MemAllocVecInput {
-    fn process(&self, input: &mut ProverInput, args: String, json: String) {
+    fn process(&self, _input: &mut ProverInput, _args: String, _json: String) {
         //do nothing
         //Because the guest program has no public inputs or private inputs. 
     }
@@ -252,7 +252,7 @@ impl InputProcessor for MemAllocVecInput {
 
 
 impl InputProcessor for RevmeInput {
-    fn process(&self, input: &mut ProverInput, args: String, json: String) {
+    fn process(&self, input: &mut ProverInput, _args: String, json: String) {
         //json file 
         input.public_inputstream = read(json).unwrap();
        // input.private_inputstream = pri_buf;        
