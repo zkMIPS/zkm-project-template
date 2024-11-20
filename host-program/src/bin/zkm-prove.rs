@@ -10,7 +10,10 @@ use std::fs::read;
 use std::fs::File;
 use std::path::Path;
 use std::time::Instant;
-use zkm_sdk::{prover::ClientType, prover::ProverInput, prover::ProverResult, ProverClient, prover::InputProcessor};
+use zkm_sdk::{
+    prover::ClientType, prover::InputProcessor, prover::ProverInput, prover::ProverResult,
+    ProverClient,
+};
 
 pub const DEFAULT_PROVER_NETWORK_RPC: &str = "https://152.32.186.45:20002";
 pub const DEFALUT_PROVER_NETWORK_DOMAIN: &str = "stage";
@@ -20,7 +23,6 @@ pub struct Sha2RustInput;
 pub struct Sha2GoInput;
 pub struct RevmeInput;
 pub struct MemAllocVecInput;
-
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -89,9 +91,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     guest_input.process(&mut prover_input, args_parameter, json_path);
     log::info!(
         "guest program: {}, bincode(pulic_input): {:?} ",
-        &args[1], &prover_input.public_inputstream
+        &args[1],
+        &prover_input.public_inputstream
     );
-
 
     //If the vk or pk doesn't exist, it will run setup().
     if zkm_prover.to_lowercase() == *"local".to_string() {
@@ -106,7 +108,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         } else {
             //setup the vk and pk for the first running local proving.
             log::info!("excuting the setup.");
-            let _ = prover_client.prover.setup(&vk_path, &prover_input, None).await;
+            let _ = prover_client
+                .prover
+                .setup(&vk_path, &prover_input, None)
+                .await;
             return Ok(());
         }
     }
@@ -117,8 +122,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Ok(Some(prover_result)) => {
             if !execute_only2 {
                 //excute the guest program and generate the proof
-                process_proof_results(&prover_result, &prover_input, &proof_results_path, &zkm_prover)
-                    .expect("process proof results error");
+                process_proof_results(
+                    &prover_result,
+                    &prover_input,
+                    &proof_results_path,
+                    &zkm_prover,
+                )
+                .expect("process proof results error");
             } else {
                 //only excute the guest program without proof
                 print_guest_excution_output(&args[1], &prover_result)
@@ -153,26 +163,26 @@ fn create_guest_input(guest_program: &String) -> Box<dyn InputProcessor> {
 
 impl InputProcessor for Sha2RustInput {
     fn process(&self, input: &mut ProverInput, _args: String, _json: String) {
-        //input.public_inputstream.push(1); 
+        //input.public_inputstream.push(1);
         let num_bytes: usize = 1024; //Notice! : if this value is small, it will not generate the  proof.
         let pri_input = vec![5u8; num_bytes];
         let mut hasher = Sha256::new();
         hasher.update(&pri_input);
         let result = hasher.finalize();
         let output: [u8; 32] = result.into();
-    
+
         // assume the  arg[0] = hash(public input), and the arg[1] = public input.
         let public_input = output.to_vec();
         let mut pub_buf = Vec::new();
         bincode::serialize_into(&mut pub_buf, &public_input)
             .expect("public_input serialization failed");
-    
+
         let mut pri_buf = Vec::new();
-        bincode::serialize_into(&mut pri_buf, &pri_input).expect("private_input serialization failed");
-    
+        bincode::serialize_into(&mut pri_buf, &pri_input)
+            .expect("private_input serialization failed");
+
         input.public_inputstream = pub_buf;
         input.private_inputstream = pri_buf;
-         
     }
 }
 
@@ -236,26 +246,24 @@ impl InputProcessor for Sha2GoInput {
         data.input12 = args[1].to_string();
         let mut buf = Vec::new();
         bincode::serialize_into(&mut buf, &data).expect("serialization failed");
-    
+
         input.public_inputstream = buf;
-       // input.private_inputstream = pri_buf;
-         
+        // input.private_inputstream = pri_buf;
     }
 }
 
 impl InputProcessor for MemAllocVecInput {
     fn process(&self, _input: &mut ProverInput, _args: String, _json: String) {
         //do nothing
-        //Because the guest program has no public inputs or private inputs. 
+        //Because the guest program has no public inputs or private inputs.
     }
 }
 
-
 impl InputProcessor for RevmeInput {
     fn process(&self, input: &mut ProverInput, _args: String, json: String) {
-        //json file 
+        //json file
         input.public_inputstream = read(json).unwrap();
-       // input.private_inputstream = pri_buf;        
+        // input.private_inputstream = pri_buf;
     }
 }
 
@@ -377,13 +385,12 @@ fn print_guest_excution_output(
         "mem-alloc-vec" => {
             log::info!("Executing the guest program successfully without output messages.")
         } //The guest program outputs nothing.
-        "revme" => log::info!("Executing the guest program successfully without output messages."), 
+        "revme" => log::info!("Executing the guest program successfully without output messages."),
         _ => log::info!("Do nothing."),
     }
 
     return Ok(());
 }
-
 
 #[derive(Serialize, Deserialize, Debug)]
 struct PublicInputs {

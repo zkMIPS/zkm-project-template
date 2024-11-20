@@ -6,7 +6,7 @@ use std::time::Instant;
 use tonic::transport::Endpoint;
 use tonic::transport::{Channel, ClientTlsConfig};
 
-use crate::prover::{Prover, ProverInput, ProverResult,ClientType};
+use crate::prover::{ClientType, Prover, ProverInput, ProverResult};
 use ethers::signers::{LocalWallet, Signer};
 use tokio::time::sleep;
 use tokio::time::Duration;
@@ -26,24 +26,23 @@ pub struct NetworkProver {
 
 impl NetworkProver {
     pub async fn new(client_type: &ClientType) -> anyhow::Result<NetworkProver> {
-        /*let endpoint = env::var("ENDPOINT").unwrap_or(DEFAULT_PROVER_NETWORK_RPC.to_string());
-        let ca_cert_path = env::var("CA_CERT_PATH").unwrap_or("".to_string());
-        let cert_path = env::var("CERT_PATH").unwrap_or("".to_string());
-        let key_path = env::var("KEY_PATH").unwrap_or("".to_string());
-        let domain_name =
-            env::var("DOMAIN_NAME").unwrap_or(DEFALUT_PROVER_NETWORK_DOMAIN.to_string());
-        let private_key = env::var("PRIVATE_KEY").unwrap_or("".to_string());*/
-
-
         let ssl_config = if client_type.ca_cert_path.is_empty() {
             None
         } else {
-            Some(Config::new(client_type.ca_cert_path.to_owned(), client_type.cert_path.to_owned(), client_type.key_path.to_owned()).await?)
+            Some(
+                Config::new(
+                    client_type.ca_cert_path.to_owned(),
+                    client_type.cert_path.to_owned(),
+                    client_type.key_path.to_owned(),
+                )
+                .await?,
+            )
         };
 
         let endpoint = match ssl_config {
             Some(config) => {
-                let mut tls_config = ClientTlsConfig::new().domain_name(client_type.domain_name.to_owned());
+                let mut tls_config =
+                    ClientTlsConfig::new().domain_name(client_type.domain_name.to_owned());
                 if let Some(ca_cert) = config.ca_cert {
                     tls_config = tls_config.ca_certificate(ca_cert);
                 }
@@ -182,13 +181,14 @@ impl Prover for NetworkProver {
 
     async fn setup<'a>(
         &self,
-        _vk_path: &'a  String,
+        _vk_path: &'a String,
         _input: &'a ProverInput,
         _timeout: Option<Duration>,
     ) -> anyhow::Result<()> {
         log::info!("The proof network does not support the method.");
         return Err(anyhow::anyhow!(
-            "The proof network does not support the method!"));
+            "The proof network does not support the method!"
+        ));
     }
 
     async fn prove<'a>(

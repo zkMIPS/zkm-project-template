@@ -24,7 +24,7 @@ pub fn prove_snark(inputdir: &str, outputdir: &str) -> bool {
 #[cfg(feature = "snark")]
 pub fn setup(inputdir: &str) -> bool {
     let inputdir = std::ffi::CString::new(inputdir).unwrap();
- 
+
     let ret = unsafe { Setup(inputdir.as_ptr()) };
     ret == 0
 }
