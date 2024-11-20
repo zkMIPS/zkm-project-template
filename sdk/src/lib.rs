@@ -4,7 +4,7 @@ pub mod prover;
 
 use local::prover::LocalProver;
 use network::prover::NetworkProver;
-use prover::{Prover, ClientType};
+use prover::{ClientType, Prover};
 
 pub struct ProverClient {
     pub prover: Box<dyn Prover>,
@@ -13,8 +13,7 @@ pub struct ProverClient {
 impl ProverClient {
     pub async fn new(client_type: &ClientType) -> Self {
         #[allow(unreachable_code)]
-        match client_type.zkm_prover.as_str()
-        {
+        match client_type.zkm_prover.as_str() {
             "local" => Self {
                 prover: Box::new(LocalProver::new()),
             },
