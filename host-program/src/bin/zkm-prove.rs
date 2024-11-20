@@ -10,7 +10,7 @@ use std::fs::read;
 use std::fs::File;
 use std::path::Path;
 use std::time::Instant;
-use zkm_sdk::{prover::ClientType, prover::ProverInput, prover::ProverResult, ProverClient, InputProcessor};
+use zkm_sdk::{prover::ClientType, prover::ProverInput, prover::ProverResult, ProverClient, prover::InputProcessor};
 
 pub const DEFAULT_PROVER_NETWORK_RPC: &str = "https://152.32.186.45:20002";
 pub const DEFALUT_PROVER_NETWORK_DOMAIN: &str = "stage";
@@ -239,7 +239,7 @@ impl InputProcessor for Sha2GoInput {
         let mut buf = Vec::new();
         bincode::serialize_into(&mut buf, &data).expect("serialization failed");
     
-        input.public_inputstream = pub_buf;
+        input.public_inputstream = buf;
        // input.private_inputstream = pri_buf;
          
     }
