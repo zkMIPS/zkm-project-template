@@ -97,7 +97,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     //the first executing the host will generate the pk and vk through setup().
     //if you want to generate the new vk , you should delete the files in the vk_path, then run the host program.
-    setup(zkm_prover, &vk_path, &prover_client);
+    setup(&zkm_prover, &vk_path, &prover_client, &prover_input);
     
     let start = Instant::now();
     let proving_result = prover_client.prover.prove(&prover_input, None).await;
@@ -135,7 +135,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 //If the vk or pk doesn't exist, it will run setup().
-fn setup(zkm_prover: &str, vk_path: &str, prover_client: &ProverClient) {
+async fn setup(zkm_prover: &str, vk_path: &str, prover_client: &ProverClient, input: &ProverInput) {
     if zkm_prover.to_lowercase() == *"local".to_string() {
         let pk_file = format!("{}/proving.key", vk_path);
         let vk_file = format!("{}/verifying.key", vk_path);
