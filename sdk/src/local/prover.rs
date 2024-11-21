@@ -72,8 +72,8 @@ pub struct LocalProver {
 }
 
 impl Default for LocalProver {
-    fn default() -> Self {
-        Self::new(vk_path: &str)
+    fn default(vk_path: &str) -> Self {
+        Self::new(vk_path)
     }
 }
 
