@@ -48,7 +48,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let json_path = env::var("JSON_PATH").expect("JSON PATH is missing");
     let proof_results_path = env::var("PROOF_RESULTS_PATH").unwrap_or("../contracts".to_string());
     let zkm_prover = env::var("ZKM_PROVER").expect("ZKM PROVER is missing");
-    let vk_path = env::var("VERIFYING_KEY_PATH").expect("VERIFYING KEY PATH is missing");
+    let vk_path1 = env::var("VERIFYING_KEY_PATH").expect("VERIFYING KEY PATH is missing");
 
     //network proving
     let endpoint1 = env::var("ENDPOINT").unwrap_or(DEFAULT_PROVER_NETWORK_RPC.to_string());
@@ -72,6 +72,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         key_path: key_path1,
         domain_name: domain_name1,
         private_key: private_key1,
+        vk_path: vk_path1,
     };
 
     log::info!("new prover client.");
@@ -97,7 +98,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     //the first executing the host will generate the pk and vk through setup().
     //if you want to generate the new vk , you should delete the files in the vk_path, then run the host program.
-    setup(&zkm_prover, &vk_path, &prover_client, &prover_input).await;
+    setup(&zkm_prover, &vk_path1, &prover_client, &prover_input).await;
 
     let start = Instant::now();
     let proving_result = prover_client.prover.prove(&prover_input, None).await;
@@ -155,7 +156,7 @@ async fn setup(
             log::info!("excuting the setup.");
             let _ = prover_client
                 .prover
-                .setup(&vk_path, &prover_input, None)
+                .setup(vk_path, prover_input, None)
                 .await;
         }
     }

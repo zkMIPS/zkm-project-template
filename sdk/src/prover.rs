@@ -12,6 +12,7 @@ pub struct ClientType {
     pub key_path: String,
     pub domain_name: String,
     pub private_key: String,
+    pub vk_path: String,
 }
 
 #[derive(Debug, Default, Deserialize, Serialize, Clone)]
