@@ -51,12 +51,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let vk_path = env::var("VERIFYING_KEY_PATH").expect("VERIFYING KEY PATH is missing");
 
     //network proving
-    let endpoint = env::var("ENDPOINT").unwrap_or(DEFAULT_PROVER_NETWORK_RPC.to_string());
-    let ca_cert_path = env::var("CA_CERT_PATH").unwrap_or("".to_string());
-    let cert_path = env::var("CERT_PATH").unwrap_or("".to_string());
-    let key_path = env::var("KEY_PATH").unwrap_or("".to_string());
-    let domain_name = env::var("DOMAIN_NAME").unwrap_or(DEFALUT_PROVER_NETWORK_DOMAIN.to_string());
-    let private_key = env::var("PRIVATE_KEY").unwrap_or("".to_string());
+    let endpoint1 = env::var("ENDPOINT").unwrap_or(DEFAULT_PROVER_NETWORK_RPC.to_string());
+    let ca_cert_path1 = env::var("CA_CERT_PATH").unwrap_or("".to_string());
+    let cert_path1 = env::var("CERT_PATH").unwrap_or("".to_string());
+    let key_path1 = env::var("KEY_PATH").unwrap_or("".to_string());
+    let domain_name1 = env::var("DOMAIN_NAME").unwrap_or(DEFALUT_PROVER_NETWORK_DOMAIN.to_string());
+    let private_key1 = env::var("PRIVATE_KEY").unwrap_or("".to_string());
 
     if zkm_prover.to_lowercase() == *"network".to_string() && private_key.is_empty() {
         //network proving
@@ -66,12 +66,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let client_type: ClientType = ClientType {
         zkm_prover: zkm_prover.to_owned(),
-        endpoint: endpoint,
-        ca_cert_path: ca_cert_path,
-        cert_path: cert_path,
-        key_path: key_path,
-        domain_name: domain_name,
-        private_key: private_key,
+        endpoint: endpoint1,
+        ca_cert_path: ca_cert_path1,
+        cert_path: cert_path1,
+        key_path: key_path1,
+        domain_name: domain_name1,
+        private_key: private_key1,
     };
 
     log::info!("new prover client.");
@@ -151,7 +151,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn create_guest_input(guest_program: &String) -> Box<dyn InputProcessor> {
+fn create_guest_input(guest_program: &str) -> Box<dyn InputProcessor> {
     match guest_program.as_str() {
         "sha2-rust" => Box::new(Sha2RustInput),
         "sha2-go" => Box::new(Sha2GoInput),
@@ -271,7 +271,7 @@ fn process_proof_results(
     prover_result: &ProverResult,
     input: &ProverInput,
     proof_results_path: &String,
-    zkm_prover: &String,
+    zkm_prover: &str,
 ) -> anyhow::Result<()> {
     if prover_result.proof_with_public_inputs.is_empty() {
         if zkm_prover.to_lowercase() == *"local".to_string() {
@@ -347,11 +347,11 @@ fn process_proof_results(
     }
     log::info!("Generating proof successfully .The proof file and verifier contract are in the the path {}/{{verifier,src}} .", proof_results_path);
 
-    return Ok(());
+    Ok(())
 }
 
 fn print_guest_excution_output(
-    guest_program: &String,
+    guest_program: &str,
     prover_result: &ProverResult,
 ) -> anyhow::Result<()> {
     match guest_program.as_str() {
@@ -389,7 +389,7 @@ fn print_guest_excution_output(
         _ => log::info!("Do nothing."),
     }
 
-    return Ok(());
+    Ok(())
 }
 
 #[derive(Serialize, Deserialize, Debug)]
