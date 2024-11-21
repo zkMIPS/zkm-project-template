@@ -95,27 +95,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         &prover_input.public_inputstream
     );
 
-    //If the vk or pk doesn't exist, it will run setup().
-    if zkm_prover.to_lowercase() == *"local".to_string() {
-        let pk_file = format!("{}/proving.key", vk_path);
-        let vk_file = format!("{}/verifying.key", vk_path);
-
-        let pathp = Path::new(&pk_file);
-        let pathv = Path::new(&vk_file);
-
-        if pathp.exists() && pathv.exists() {
-            log::info!("The vk and pk all exist and don't need to setup.");
-        } else {
-            //setup the vk and pk for the first running local proving.
-            log::info!("excuting the setup.");
-            let _ = prover_client
-                .prover
-                .setup(&vk_path, &prover_input, None)
-                .await;
-            return Ok(());
-        }
-    }
-
+    //the first executing the host will generate the pk and vk through setup().
+    //if you want to generate the new vk , you should delete the files in the vk_path, then run the host program.
+    setup(zkm_prover, &vk_path, &prover_client);
+    
     let start = Instant::now();
     let proving_result = prover_client.prover.prove(&prover_input, None).await;
     match proving_result {
@@ -151,8 +134,30 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+//If the vk or pk doesn't exist, it will run setup().
+fn setup(zkm_prover: &str, vk_path: &str, prover_client: &ProverClient) {
+    if zkm_prover.to_lowercase() == *"local".to_string() {
+        let pk_file = format!("{}/proving.key", vk_path);
+        let vk_file = format!("{}/verifying.key", vk_path);
+
+        let pathp = Path::new(&pk_file);
+        let pathv = Path::new(&vk_file);
+
+        if pathp.exists() && pathv.exists() {
+            log::info!("The vk and pk all exist and don't need to setup.");
+        } else {
+            //setup the vk and pk for the first running local proving.
+            log::info!("excuting the setup.");
+            let _ = prover_client
+                .prover
+                .setup(&vk_path, &prover_input, None)
+                .await;
+        }
+    }
+}
+
 fn create_guest_input(guest_program: &str) -> Box<dyn InputProcessor> {
-    match guest_program{
+    match guest_program {
         "sha2-rust" => Box::new(Sha2RustInput),
         "sha2-go" => Box::new(Sha2GoInput),
         "mem-alloc-vec" => Box::new(MemAllocVecInput),
