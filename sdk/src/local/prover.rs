@@ -73,7 +73,7 @@ pub struct LocalProver {
 
 impl Default for LocalProver {
     fn default() -> Self {
-        Self::new()
+        Self::new("")
     }
 }
 
@@ -85,12 +85,6 @@ impl LocalProver {
         }
     }
 
-    pub fn new() -> LocalProver {
-        LocalProver {
-            tasks: Arc::new(Mutex::new(HashMap::new())),
-            vk_path: "".to_string(),
-        }
-    }
 }
 
 #[async_trait]
