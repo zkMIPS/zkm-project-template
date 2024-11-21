@@ -181,7 +181,7 @@ impl Prover for NetworkProver {
 
     async fn setup<'a>(
         &self,
-        _vk_path: &'a String,
+        _vk_path: &'a str,
         _input: &'a ProverInput,
         _timeout: Option<Duration>,
     ) -> anyhow::Result<()> {

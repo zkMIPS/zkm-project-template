@@ -121,7 +121,7 @@ impl Prover for LocalProver {
 
     async fn setup<'a>(
         &self,
-        vk_path: &'a String,
+        vk_path: &'a str,
         input: &'a ProverInput,
         _timeout: Option<Duration>,
     ) -> anyhow::Result<()> {
