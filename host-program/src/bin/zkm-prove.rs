@@ -135,7 +135,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 //If the vk or pk doesn't exist, it will run setup().
-async fn setup(zkm_prover: &str, vk_path: &str, prover_client: &ProverClient, input: &ProverInput) {
+async fn setup(zkm_prover: &str, vk_path: &str, prover_client: &ProverClient, prover_input: &ProverInput) {
     if zkm_prover.to_lowercase() == *"local".to_string() {
         let pk_file = format!("{}/proving.key", vk_path);
         let vk_file = format!("{}/verifying.key", vk_path);
