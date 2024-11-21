@@ -72,7 +72,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         key_path: key_path1,
         domain_name: domain_name1,
         private_key: private_key1,
-        vk_path: vk_path1,
+        vk_path: vk_path1.to_owned(),
     };
 
     log::info!("new prover client.");
