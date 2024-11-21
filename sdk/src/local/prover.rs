@@ -13,7 +13,7 @@ pub struct ProverTask {
     input: ProverInput,
     result: Option<ProverResult>,
     is_done: bool,
-    vk_path, String,
+    vk_path: String,
 }
 
 impl ProverTask {
@@ -73,7 +73,7 @@ pub struct LocalProver {
 
 impl Default for LocalProver {
     fn default() -> Self {
-        Self::new()
+        Self::new(vk_path: &str)
     }
 }
 
