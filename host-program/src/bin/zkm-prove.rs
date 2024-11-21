@@ -58,7 +58,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let domain_name1 = env::var("DOMAIN_NAME").unwrap_or(DEFALUT_PROVER_NETWORK_DOMAIN.to_string());
     let private_key1 = env::var("PRIVATE_KEY").unwrap_or("".to_string());
 
-    if zkm_prover.to_lowercase() == *"network".to_string() && private_key.is_empty() {
+    if zkm_prover.to_lowercase() == *"network".to_string() && private_key1.is_empty() {
         //network proving
         log::info!("Please set the PRIVATE_KEY=");
         return Err("PRIVATE_KEY is not set".into());
@@ -152,7 +152,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn create_guest_input(guest_program: &str) -> Box<dyn InputProcessor> {
-    match guest_program.as_str() {
+    match guest_program{
         "sha2-rust" => Box::new(Sha2RustInput),
         "sha2-go" => Box::new(Sha2GoInput),
         "mem-alloc-vec" => Box::new(MemAllocVecInput),
@@ -354,7 +354,7 @@ fn print_guest_excution_output(
     guest_program: &str,
     prover_result: &ProverResult,
 ) -> anyhow::Result<()> {
-    match guest_program.as_str() {
+    match guest_program {
         "sha2-rust" => {
             //The guest program outputs the basic type
             if prover_result.output_stream.is_empty() {
