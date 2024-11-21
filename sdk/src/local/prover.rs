@@ -72,8 +72,8 @@ pub struct LocalProver {
 }
 
 impl Default for LocalProver {
-    fn default(vk_path: &str) -> Self {
-        Self::new(vk_path)
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -82,6 +82,13 @@ impl LocalProver {
         LocalProver {
             tasks: Arc::new(Mutex::new(HashMap::new())),
             vk_path: vk_path.to_string(),
+        }
+    }
+
+    pub fn new() -> LocalProver {
+        LocalProver {
+            tasks: Arc::new(Mutex::new(HashMap::new())),
+            vk_path: "".to_string(),
         }
     }
 }
