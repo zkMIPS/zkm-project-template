@@ -29,7 +29,7 @@ impl ProverTask {
 
     fn run(&mut self) {
         let mut result = ProverResult::default();
-        let inputdir = format!("{}", self.vk_path);
+        let inputdir = self.vk_path.clone();
         let outputdir = format!("/tmp/{}/output", self.proof_id);
         fs::create_dir_all(&inputdir).unwrap();
         fs::create_dir_all(&outputdir).unwrap();
@@ -84,14 +84,14 @@ impl LocalProver {
             vk_path: vk_path.to_string(),
         }
     }
-
 }
 
 #[async_trait]
 impl Prover for LocalProver {
     async fn request_proof<'a>(&self, input: &'a ProverInput) -> anyhow::Result<String> {
         let proof_id: String = uuid::Uuid::new_v4().to_string();
-        let task: Arc<Mutex<ProverTask>> = Arc::new(Mutex::new(ProverTask::new(&proof_id, &self.vk_path, input)));
+        let task: Arc<Mutex<ProverTask>> =
+            Arc::new(Mutex::new(ProverTask::new(&proof_id, &self.vk_path, input)));
         self.tasks
             .lock()
             .unwrap()
