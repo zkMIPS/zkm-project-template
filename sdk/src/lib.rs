@@ -4,11 +4,15 @@ pub mod prover;
 
 use local::prover::LocalProver;
 use network::prover::NetworkProver;
-use prover::{ClientType, Prover};
+use prover::{ClientType, Prover, ProverResult};
+use std::path::Path;
 
 pub struct ProverClient {
     pub prover: Box<dyn Prover>,
 }
+
+pub const LOCAL_PROVER: &str = "local";
+pub const NETWORK_PROVER: &str = "network";
 
 impl ProverClient {
     pub async fn new(client_type: &ClientType) -> Self {
@@ -43,7 +47,6 @@ impl ProverClient {
         &self,
         zkm_prover: &str,
         vk_path: &str,
-        prover_client: &ProverClient,
         prover_input: &ProverInput,
     ) {
         if zkm_prover.to_lowercase() == LOCAL_PROVER.to_string() {

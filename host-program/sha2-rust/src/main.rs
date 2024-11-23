@@ -12,13 +12,12 @@ use std::path::Path;
 use std::time::Instant;
 use zkm_sdk::{
     prover::ClientType, prover::InputProcessor, prover::ProverInput, prover::ProverResult,
-    ProverClient,
+    ProverClient, LOCAL_PROVER, NETWORK_PROVER,
 };
 
 pub const DEFAULT_PROVER_NETWORK_RPC: &str = "https://152.32.186.45:20002";
 pub const DEFALUT_PROVER_NETWORK_DOMAIN: &str = "stage";
-pub const LOCAL_PROVER: &str = "local";
-pub const NETWORK_PROVER: &str = "network";
+
 
 
 #[tokio::main]
