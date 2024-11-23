@@ -17,6 +17,8 @@ use zkm_sdk::{
 
 pub const DEFAULT_PROVER_NETWORK_RPC: &str = "https://152.32.186.45:20002";
 pub const DEFALUT_PROVER_NETWORK_DOMAIN: &str = "stage";
+pub const LOCAL_PROVER: &str = "local";
+pub const NETWORK_PROVER: &str = "network";
 
 //Each guest progam has its input struct.
 pub struct Sha2RustInput;
@@ -39,16 +41,26 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         helper();
     }
 
-    let seg_size = env::var("SEG_SIZE").unwrap_or("8192".to_string());
-    let seg_size2 = seg_size.parse::<_>().unwrap_or(65536);
-    let execute_only = env::var("EXECUTE_ONLY").unwrap_or("false".to_string());
-    let execute_only2 = execute_only.parse::<bool>().unwrap_or(false);
+    //let seg_size = env::var("SEG_SIZE").unwrap_or("8192".to_string());
+    //let seg_size2 = seg_size.parse::<_>().unwrap_or(65536);
+    let seg_size = env::var("SEG_SIZE")
+        .ok()
+        .and_then(|seg| seg.parse::<u64>().ok())
+        .unwrap_or(65536);
+
+    //let execute_only = env::var("EXECUTE_ONLY").unwrap_or("false".to_string());
+    //let execute_only2 = execute_only.parse::<bool>().unwrap_or(false);
+    let execute_only = env::var("EXECUTE_ONLY")
+        .ok()
+        .and_then(|seg| seg.parse::<bool>().ok())
+        .unwrap_or(false);
+
     let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
     let args_parameter = env::var("ARGS").unwrap_or("data-to-hash".to_string());
     let json_path = env::var("JSON_PATH").expect("JSON PATH is missing");
     let proof_results_path = env::var("PROOF_RESULTS_PATH").unwrap_or("../contracts".to_string());
     let zkm_prover = env::var("ZKM_PROVER").expect("ZKM PROVER is missing");
-    let vk_path1 = env::var("VERIFYING_KEY_PATH").expect("VERIFYING KEY PATH is missing");
+    let vk_path1 = env::var("VERIFYING_KEY_PATH").unwrap_or("/tmp/input".to_string());
 
     //network proving
     let endpoint1 = env::var("ENDPOINT").unwrap_or(DEFAULT_PROVER_NETWORK_RPC.to_string());
@@ -58,7 +70,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let domain_name1 = env::var("DOMAIN_NAME").unwrap_or(DEFALUT_PROVER_NETWORK_DOMAIN.to_string());
     let private_key1 = env::var("PRIVATE_KEY").unwrap_or("".to_string());
 
-    if zkm_prover.to_lowercase() == *"network".to_string() && private_key1.is_empty() {
+    if zkm_prover.to_lowercase() == NETWORK_PROVER.to_string() && private_key1.is_empty() {
         //network proving
         log::info!("Please set the PRIVATE_KEY=");
         return Err("PRIVATE_KEY is not set".into());
@@ -83,8 +95,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         elf: read(elf_path).unwrap(),
         public_inputstream: vec![],
         private_inputstream: vec![],
-        seg_size: seg_size2,
-        execute_only: execute_only2,
+        seg_size: seg_size,
+        execute_only: execute_only,
         args: "".into(),
     };
 
@@ -150,14 +162,15 @@ async fn setup(
         let pathv = Path::new(&vk_file);
 
         if pathp.exists() && pathv.exists() {
-            log::info!("The vk and pk all exist and don't need to setup.");
+            log::info!("The vk and pk all exist in the path:{} and don't need to setup.", vk_path);
         } else {
             //setup the vk and pk for the first running local proving.
             log::info!("excuting the setup.");
             let _ = prover_client
                 .prover
                 .setup(vk_path, prover_input, None)
-                .await;
+                .await?;
+            log::info!("setup successfully, the vk and pk all exist in the path:{}.", vk_path);
         }
     }
 }
@@ -285,7 +298,7 @@ fn process_proof_results(
     zkm_prover: &str,
 ) -> anyhow::Result<()> {
     if prover_result.proof_with_public_inputs.is_empty() {
-        if zkm_prover.to_lowercase() == *"local".to_string() {
+        if zkm_prover.to_lowercase() == LOCAL_PROVER.to_string() {
             //local proving
             log::info!("Fail: please try setting SEG_SIZE={}", input.seg_size / 2);
             return Err(anyhow::anyhow!("SEG_SIZE is excessively large."));
