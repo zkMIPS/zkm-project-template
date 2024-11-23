@@ -119,7 +119,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .expect("process proof results error");
             } else {
                 //only excute the guest program without proof
-                print_guest_excution_output(&args[1], &prover_result)
+                print_guest_excution_output(&args[0], &prover_result)
                     .expect("print guest program excution's output.");
             }
         }
