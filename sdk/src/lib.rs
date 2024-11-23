@@ -4,7 +4,7 @@ pub mod prover;
 
 use local::prover::LocalProver;
 use network::prover::NetworkProver;
-use prover::{ClientType, Prover, ProverResult};
+use prover::{ClientType, Prover, ProverInput,};
 use std::path::Path;
 
 pub struct ProverClient {
