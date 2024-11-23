@@ -1,4 +1,3 @@
-
 use sha2::{Digest, Sha256};
 use std::env;
 
@@ -6,24 +5,18 @@ use std::fs::read;
 
 use std::time::Instant;
 use zkm_sdk::{
-    prover::ClientType, prover::ProverInput, prover::ProverResult,
-    ProverClient, NETWORK_PROVER,
+    prover::ClientType, prover::ProverInput, ProverClient, NETWORK_PROVER,
 };
 
 pub const DEFAULT_PROVER_NETWORK_RPC: &str = "https://152.32.186.45:20002";
 pub const DEFALUT_PROVER_NETWORK_DOMAIN: &str = "stage";
-
-
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::try_init().unwrap_or_default();
     let args: Vec<String> = env::args().collect();
     let helper = || {
-        log::info!(
-            "Help: {} local or network",
-            args[0]
-        );
+        log::info!("Help: {} local or network", args[0]);
         std::process::exit(-1);
     };
     if args.len() < 2 {
@@ -87,10 +80,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     //If the guest program does't have inputs, it does't need the setting.
     set_guest_input(&mut prover_input, None);
-    
+
     //the first executing the host will generate the pk and vk through setup().
     //if you want to generate the new vk , you should delete the files in the vk_path, then run the host program.
-    prover_client.setup(&zkm_prover_type, &vk_path1, &prover_input).await;
+    prover_client
+        .setup(&zkm_prover_type, &vk_path1, &prover_input)
+        .await;
 
     let start = Instant::now();
     let proving_result = prover_client.prover.prove(&prover_input, None).await;
@@ -98,17 +93,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Ok(Some(prover_result)) => {
             if !execute_only {
                 //excute the guest program and generate the proof
-                prover_client.process_proof_results(
-                    &prover_result,
-                    &prover_input,
-                    &proof_results_path,
-                    &zkm_prover_type,
-                )
-                .expect("process proof results error");
+                prover_client
+                    .process_proof_results(
+                        &prover_result,
+                        &prover_input,
+                        &proof_results_path,
+                        &zkm_prover_type,
+                    )
+                    .expect("process proof results error");
             } else {
                 //only excute the guest program without generating the proof.
                 //the sha2-rust guest program has outputs messages, which are basic type.
-                prover_client.print_guest_execution_output::<u8>(true, &prover_result).expect("print guest program excution's output.");
+                prover_client
+                    .print_guest_execution_output::<u8>(true, &prover_result)
+                    .expect("print guest program excution's output.");
             }
         }
         Ok(None) => {
@@ -128,25 +126,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn set_guest_input(input: &mut ProverInput, param: Option<&str>) {
-        //input.public_inputstream.push(1);
-        let num_bytes: usize = 1024; //Notice! : if this value is small, it will not generate the  proof.
-        let pri_input = vec![5u8; num_bytes];
-        let mut hasher = Sha256::new();
-        hasher.update(&pri_input);
-        let result = hasher.finalize();
-        let output: [u8; 32] = result.into();
+    //input.public_inputstream.push(1);
+    let num_bytes: usize = 1024; //Notice! : if this value is small, it will not generate the  proof.
+    let pri_input = vec![5u8; num_bytes];
+    let mut hasher = Sha256::new();
+    hasher.update(&pri_input);
+    let result = hasher.finalize();
+    let output: [u8; 32] = result.into();
 
-        // assume the  arg[0] = hash(public input), and the arg[1] = public input.
-        let public_input = output.to_vec();
-        let mut pub_buf = Vec::new();
-        bincode::serialize_into(&mut pub_buf, &public_input)
-            .expect("public_input serialization failed");
+    // assume the  arg[0] = hash(public input), and the arg[1] = public input.
+    let public_input = output.to_vec();
+    let mut pub_buf = Vec::new();
+    bincode::serialize_into(&mut pub_buf, &public_input)
+        .expect("public_input serialization failed");
 
-        let mut pri_buf = Vec::new();
-        bincode::serialize_into(&mut pri_buf, &pri_input)
-            .expect("private_input serialization failed");
+    let mut pri_buf = Vec::new();
+    bincode::serialize_into(&mut pri_buf, &pri_input).expect("private_input serialization failed");
 
-        input.public_inputstream = pub_buf;
-        input.private_inputstream = pri_buf;
-
+    input.public_inputstream = pub_buf;
+    input.private_inputstream = pri_buf;
 }

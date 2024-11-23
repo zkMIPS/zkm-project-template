@@ -1,6 +1,6 @@
 [workspace]
 members = [
-
+    "host-program/sha2-go",
    "host-program/sha2-rust",
 
    "sdk"

@@ -2,14 +2,14 @@ pub mod local;
 pub mod network;
 pub mod prover;
 
+use common::file;
 use local::prover::LocalProver;
 use network::prover::NetworkProver;
-use prover::{ClientType, Prover, ProverInput, ProverResult,};
-use std::path::Path;
-use common::file;
+use prover::{ClientType, Prover, ProverInput, ProverResult};
+use serde::{Deserialize, Serialize};
 use std::fs;
 use std::fs::File;
-use serde::{Deserialize, Serialize};
+use std::path::Path;
 
 use serde_json::to_writer;
 use sha2::{Digest, Sha256};
@@ -17,7 +17,6 @@ use sha2::{Digest, Sha256};
 use anyhow::{Context, Result};
 use bincode;
 use std::io::Read;
-
 
 pub struct ProverClient {
     pub prover: Box<dyn Prover>,
@@ -40,7 +39,6 @@ trait IsBasicType: Copy {}
 
 // Implement IsBasicType for all types that implement Copy
 impl<T: Copy> IsBasicType for T {}
-
 
 pub const LOCAL_PROVER: &str = "local";
 pub const NETWORK_PROVER: &str = "network";
@@ -74,12 +72,7 @@ impl ProverClient {
     }
 
     //If the vk or pk doesn't exist, it will run setup().
-    pub async fn setup(
-        &self,
-        zkm_prover: &str,
-        vk_path: &str,
-        prover_input: &ProverInput,
-    ) {
+    pub async fn setup(&self, zkm_prover: &str, vk_path: &str, prover_input: &ProverInput) {
         if zkm_prover.to_lowercase() == LOCAL_PROVER.to_string() {
             let pk_file = format!("{}/proving.key", vk_path);
             let vk_file = format!("{}/verifying.key", vk_path);
@@ -88,15 +81,18 @@ impl ProverClient {
             let pathv = Path::new(&vk_file);
 
             if pathp.exists() && pathv.exists() {
-                log::info!("The vk and pk all exist in the path:{} and don't need to setup.", vk_path);
+                log::info!(
+                    "The vk and pk all exist in the path:{} and don't need to setup.",
+                    vk_path
+                );
             } else {
                 //setup the vk and pk for the first running local proving.
                 log::info!("excuting the setup.");
-                let _ = self
-                    .prover
-                    .setup(vk_path, prover_input, None)
-                    .await;
-                log::info!("setup successfully, the vk and pk all exist in the path:{}.", vk_path);
+                let _ = self.prover.setup(vk_path, prover_input, None).await;
+                log::info!(
+                    "setup successfully, the vk and pk all exist in the path:{}.",
+                    vk_path
+                );
             }
         }
     }
@@ -139,7 +135,7 @@ impl ProverClient {
                 return Err(anyhow::anyhow!("Proof: failed to write to file."));
             }
         }
-    
+
         //2.handle the public inputs
         let public_inputs = Self::update_public_inputs_with_bincode(
             input.public_inputstream.to_owned(),
@@ -164,7 +160,7 @@ impl ProverClient {
                 return Err(anyhow::anyhow!("Failed to update the public inputs."));
             }
         }
-    
+
         //3.contract
         let output_dir = format!("{}/src", proof_results_path);
         fs::create_dir_all(&output_dir)?;
@@ -181,7 +177,7 @@ impl ProverClient {
             }
         }
         log::info!("Generating proof successfully .The proof file and verifier contract are in the the path {}/{{verifier,src}} .", proof_results_path);
-    
+
         Ok(())
     }
 
@@ -193,11 +189,11 @@ impl ProverClient {
         hasher.update(&public_inputstream);
         let result_hs = hasher.finalize();
         let output_hs: [u8; 32] = result_hs.into();
-    
+
         let slice_bt: &[u8] = proof_public_inputs;
         let mut public_inputs: PublicInputs =
             serde_json::from_slice(slice_bt).expect("Failed to parse JSON");
-    
+
         //1.check the userdata (from the proof) = hash(bincode(host's public_inputs)) ?
         let userdata = public_inputs.userdata;
         if userdata == output_hs {
@@ -222,7 +218,7 @@ impl ProverClient {
                 "Public inputs's hash does not match the proof's userdata."
             ));
         }
-    
+
         Ok(Some(public_inputs))
     }
 
@@ -231,7 +227,7 @@ impl ProverClient {
         &self,
         has_output: bool,
         prover_result: &ProverResult,
-        ) -> anyhow::Result<()>
+    ) -> anyhow::Result<()>
     where
         T: IsBasicType, // Here we restrict T to be a basic type
     {
@@ -245,10 +241,10 @@ impl ProverClient {
             }
             log::info!("Executing the guest program  successfully.");
             log::info!("ret_data: {:?}", prover_result.output_stream);
-        }else {
+        } else {
             log::info!("Executing the guest program successfully without output any messages.")
         }
-        
+
         Ok(())
     }
 
@@ -256,9 +252,9 @@ impl ProverClient {
     fn print_guest_execution_output_struct<T>(
         &self,
         prover_result: &ProverResult,
-        ) -> anyhow::Result<()>
+    ) -> anyhow::Result<()>
     where
-        T: serde::de::DeserializeOwned  + std::fmt::Debug, // Here we restrict T to be deserializable
+        T: serde::de::DeserializeOwned + std::fmt::Debug, // Here we restrict T to be deserializable
     {
         if prover_result.output_stream.is_empty() {
             log::info!(
@@ -275,6 +271,4 @@ impl ProverClient {
         log::info!("ret_data: {:?}", ret_data);
         Ok(())
     }
-    
 }
-
