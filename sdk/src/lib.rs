@@ -4,8 +4,9 @@ pub mod prover;
 
 use local::prover::LocalProver;
 use network::prover::NetworkProver;
-use prover::{ClientType, Prover, ProverInput,};
+use prover::{ClientType, Prover, ProverInput, ProverResult,};
 use std::path::Path;
+use common::file;
 use std::fs;
 use std::fs::File;
 use serde::{Deserialize, Serialize};
@@ -128,8 +129,8 @@ impl ProverClient {
         }
     
         //2.handle the public inputs
-        let public_inputs = update_public_inputs_with_bincode(
-            input.public_inputstream.clone(),
+        let public_inputs = Self::update_public_inputs_with_bincode(
+            input.public_inputstream.to_owned(),
             &prover_result.public_values,
         );
         match public_inputs {
