@@ -277,7 +277,7 @@ fn process_proof_results(
 }
 
 fn print_guest_excution_output(
- //   guest_program: &str,
+    guest_program: &str,
     prover_result: &ProverResult,
 ) -> anyhow::Result<()> {
     //The guest program outputs the basic type
