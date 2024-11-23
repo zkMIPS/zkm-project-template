@@ -226,7 +226,7 @@ impl ProverClient {
         &self,
         has_output: bool,
         prover_result: &ProverResult,
-        ) -> Result<()>
+        ) -> anyhow::Result<()>
     where
         T: IsBasicType, // Here we restrict T to be a basic type
     {
@@ -239,7 +239,7 @@ impl ProverClient {
                 return Err(anyhow::anyhow!("output_stream.len() is too short."));
             }
             log::info!("Executing the guest program  successfully.");
-            info!("ret_data: {:?}", prover_result.output_stream);
+            log::info!("ret_data: {:?}", prover_result.output_stream);
         }else {
             log::info!("Executing the guest program successfully without output any messages.")
         }
@@ -251,9 +251,9 @@ impl ProverClient {
     fn print_guest_execution_output_struct<T>(
         &self,
         prover_result: &ProverResult,
-        ) -> Result<()>
+        ) -> anyhow::Result<()>
     where
-        T: serde::DeserializeOwned, // Here we restrict T to be deserializable
+        T: Deserialize, // Here we restrict T to be deserializable
     {
         if prover_result.output_stream.is_empty() {
             log::info!(
@@ -267,7 +267,7 @@ impl ProverClient {
         let ret_data: T = bincode::deserialize_from(prover_result.output_stream.as_slice())
             .context("deserialization failed")?;
 
-        info!("ret_data: {:?}", ret_data);
+        log::info!("ret_data: {:?}", ret_data);
         Ok(())
     }
     
