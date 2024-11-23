@@ -38,15 +38,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let zkm_prover = &args[1];
 
-    //let seg_size = env::var("SEG_SIZE").unwrap_or("8192".to_string());
-    //let seg_size2 = seg_size.parse::<_>().unwrap_or(65536);
     let seg_size = env::var("SEG_SIZE")
         .ok()
         .and_then(|seg| seg.parse::<u32>().ok())
         .unwrap_or(65536);
 
-    //let execute_only = env::var("EXECUTE_ONLY").unwrap_or("false".to_string());
-    //let execute_only2 = execute_only.parse::<bool>().unwrap_or(false);
     let execute_only = env::var("EXECUTE_ONLY")
         .ok()
         .and_then(|seg| seg.parse::<bool>().ok())
@@ -56,7 +52,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args_parameter = env::var("ARGS").unwrap_or("data-to-hash".to_string());
     let json_path = env::var("JSON_PATH").expect("JSON PATH is missing");
     let proof_results_path = env::var("PROOF_RESULTS_PATH").unwrap_or("../contracts".to_string());
-    //let zkm_prover = env::var("ZKM_PROVER").expect("ZKM PROVER is missing");
     let vk_path1 = env::var("VERIFYING_KEY_PATH").unwrap_or("/tmp/input".to_string());
 
     //network proving
@@ -84,7 +79,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         vk_path: vk_path1.to_owned(),
     };
 
-    log::info!("new prover client.");
     let prover_client = ProverClient::new(&client_type).await;
     log::info!("new prover client,ok.");
 
@@ -102,7 +96,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     //the first executing the host will generate the pk and vk through setup().
     //if you want to generate the new vk , you should delete the files in the vk_path, then run the host program.
-    setup(&zkm_prover, &vk_path1, &prover_client, &prover_input).await;
+    prover_client.setup(&zkm_prover, &vk_path1, &prover_input).await;
 
     let start = Instant::now();
     let proving_result = prover_client.prover.prove(&prover_input, None).await;
