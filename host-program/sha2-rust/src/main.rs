@@ -1,18 +1,13 @@
-use common::file;
-//use hex;
-use serde::{Deserialize, Serialize};
-//use serde_json;
-use serde_json::to_writer;
+
 use sha2::{Digest, Sha256};
 use std::env;
-use std::fs;
+
 use std::fs::read;
-use std::fs::File;
-use std::path::Path;
+
 use std::time::Instant;
 use zkm_sdk::{
     prover::ClientType, prover::ProverInput, prover::ProverResult,
-    ProverClient, LOCAL_PROVER, NETWORK_PROVER,
+    ProverClient, NETWORK_PROVER,
 };
 
 pub const DEFAULT_PROVER_NETWORK_RPC: &str = "https://152.32.186.45:20002";

@@ -19,14 +19,14 @@ pub struct ProverClient {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct PublicInputs {
+pub struct PublicInputs {
     roots_before: Roots,
     roots_after: Roots,
     userdata: Vec<u8>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct Roots {
+pub struct Roots {
     root: Vec<u64>,
 }
 
