@@ -8,16 +8,16 @@ program="sha2-rust"
 BASEDIR=$(cd $(dirname $0); pwd)
 export LD_LIBRARY_PATH=$BASEDIR/../../sdk/src/local/libsnark:$LD_LIBRARY_PATH  ##Modify it according your template
 export RUST_LOG=info
-export SEG_SIZE=262144
+export SEG_SIZE=65536
 export ARGS="711e9609339e92b03ddc0a211827dba421f38f9ed8b9d806e1ffdd8c15ffa03d world!"
 export ELF_PATH=${BASEDIR}/../../guest-program/$program/target/mips-unknown-linux-musl/release/$program
 export JSON_PATH=${BASEDIR}/test-vectors/test.json
 export PROOF_RESULTS_PATH=${BASEDIR}/../../contracts
 export EXECUTE_ONLY=false
-export VERIFYING_KEY_PATH=${BASEDIR}/test-vectors/input
+export VERIFYING_KEY_PATH=${BASEDIR}/../test-vectors/input
 
 ##network proving
-export CA_CERT_PATH=tool/ca.pem
+export CA_CERT_PATH=${BASEDIR}/../tool/ca.pem
 export PRIVATE_KEY=   ##The private key corresponding to the public key when registering in the https://www.zkm.io/apply
 export ENDPOINT=https://152.32.186.45:20002    ##the test entry of zkm proof network
 
@@ -32,13 +32,9 @@ else
 fi
 cd -
 
-if [ "$program" == "sha2-rust" ];then
-    export SEG_SIZE=65536
-elif [ "$program" == "mem-alloc-vec" ];then
-     export SEG_SIZE=65536
-fi
+
 echo "SEG_SIZE:$SEG_SIZE"
 echo "BASEDIR:$BASEDIR"
 
-nohup $BASEDIR/../../target/release/$program >./$program-$1-proving.log 2>&1 &
+nohup $BASEDIR/../../target/release/$program $1 >./$program-$1-proving.log 2>&1 &
 echo "Check out the log by tail -f $program-$1-proving.log"
