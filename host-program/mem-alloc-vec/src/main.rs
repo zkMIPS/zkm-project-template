@@ -374,10 +374,7 @@ fn process_proof_results(
     Ok(())
 }
 
-fn print_guest_excution_output(
-    guest_program: &str,
-    prover_result: &ProverResult,
-) -> anyhow::Result<()> {
+fn print_guest_excution_output(prover_result: &ProverResult,) -> anyhow::Result<()> {
     match guest_program {
         "sha2-rust" => {
             //The guest program outputs the basic type

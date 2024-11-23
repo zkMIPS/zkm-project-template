@@ -106,9 +106,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 )
                 .expect("process proof results error");
             } else {
-                //only excute the guest program without proof
-                print_guest_excution_output(&prover_result)
-                    .expect("print guest program excution's output.");
+                //only excute the guest program without generating the proof.
+                //the sha2-rust guest program has outputs messages, which are basic type.
+                prover_client.print_guest_execution_output::<u8>(true, &prover_result).expect("print guest program excution's output.");
             }
         }
         Ok(None) => {
@@ -149,21 +149,4 @@ fn set_guest_input(input: &mut ProverInput, param: Option<&str>) {
         input.public_inputstream = pub_buf;
         input.private_inputstream = pri_buf;
 
-}
-
-fn print_guest_excution_output(
-    prover_result: &ProverResult,
-) -> anyhow::Result<()> {
-    //The guest program outputs the basic type
-    if prover_result.output_stream.is_empty() {
-        log::info!(
-            "output_stream.len() is too short: {}",
-                    prover_result.output_stream.len()
-            );
-        return Err(anyhow::anyhow!("output_stream.len() is too short."));
-    }
-    log::info!("Executing the guest program  successfully.");
-    log::info!("ret_data: {:?}", prover_result.output_stream);
-
-    Ok(())
 }

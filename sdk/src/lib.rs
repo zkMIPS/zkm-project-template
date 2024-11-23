@@ -30,6 +30,12 @@ pub struct Roots {
     root: Vec<u64>,
 }
 
+// Trait to check if T implements the Copy trait
+trait IsBasicType: Copy {}
+
+// Implement IsBasicType for all types that implement Copy
+impl<T: Copy> IsBasicType for T {}
+
 
 pub const LOCAL_PROVER: &str = "local";
 pub const NETWORK_PROVER: &str = "network";
@@ -213,6 +219,56 @@ impl ProverClient {
         }
     
         Ok(Some(public_inputs))
+    }
+
+    // Generic function that automatically determines and prints based on the type T
+    pub fn print_guest_execution_output<T>(
+        &self,
+        has_output: bool,
+        prover_result: &ProverResult,
+        ) -> Result<()>
+    where
+        T: IsBasicType, // Here we restrict T to be a basic type
+    {
+        if has_output {
+            if prover_result.output_stream.is_empty() {
+                log::info!(
+                    "output_stream.len() is too short: {}",
+                    prover_result.output_stream.len()
+                );
+                return Err(anyhow::anyhow!("output_stream.len() is too short."));
+            }
+            log::info!("Executing the guest program  successfully.");
+            info!("ret_data: {:?}", prover_result.output_stream);
+        }else {
+            log::info!("Executing the guest program successfully without output any messages.")
+        }
+        
+        Ok(())
+    }
+
+    // For handling struct types, we need another function
+    fn print_guest_execution_output_struct<T>(
+        &self,
+        prover_result: &ProverResult,
+        ) -> Result<()>
+    where
+        T: serde::DeserializeOwned, // Here we restrict T to be deserializable
+    {
+        if prover_result.output_stream.is_empty() {
+            log::info!(
+                "output_stream.len() is too short: {}",
+                prover_result.output_stream.len()
+            );
+            return Err(anyhow::anyhow!("output_stream.len() is too short."));
+        }
+        log::info!("Executing the guest program  successfully.");
+        // Deserialize the struct
+        let ret_data: T = bincode::deserialize_from(prover_result.output_stream.as_slice())
+            .context("deserialization failed")?;
+
+        info!("ret_data: {:?}", ret_data);
+        Ok(())
     }
     
 }

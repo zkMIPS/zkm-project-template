@@ -375,12 +375,9 @@ fn process_proof_results(
 }
 
 fn print_guest_excution_output(
-    guest_program: &str,
     prover_result: &ProverResult,
 ) -> anyhow::Result<()> {
-    match guest_program {
-        "sha2-rust" => {
-            //The guest program outputs the basic type
+   
             if prover_result.output_stream.is_empty() {
                 log::info!(
                     "output_stream.len() is too short: {}",
@@ -389,29 +386,10 @@ fn print_guest_excution_output(
                 return Err(anyhow::anyhow!("output_stream.len() is too short."));
             }
             log::info!("Executing the guest program  successfully.");
-            log::info!("ret_data: {:?}", prover_result.output_stream);
-        }
-        "sha2-go" => {
-            //If the guest program outputs the structure, the result need the bincode::deserialize !
-            if prover_result.output_stream.is_empty() {
-                log::info!(
-                    "output_stream.len() is too short: {}",
-                    prover_result.output_stream.len()
-                );
-                return Err(anyhow::anyhow!("output_stream.len() is too short."));
-            }
-            log::info!("Executing the guest program  successfully.");
-            let ret_data: Data = bincode::deserialize_from(prover_result.output_stream.as_slice())
+            let ret_data: T = bincode::deserialize_from(prover_result.output_stream.as_slice())
                 .expect("deserialization failed");
             log::info!("ret_data: {:?}", ret_data);
-        }
-        //The guest program outputs nothing.
-        "mem-alloc-vec" => {
-            log::info!("Executing the guest program successfully without output messages.")
-        } //The guest program outputs nothing.
-        "revme" => log::info!("Executing the guest program successfully without output messages."),
-        _ => log::info!("Do nothing."),
-    }
+       
 
     Ok(())
 }

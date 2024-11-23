@@ -55,6 +55,4 @@ pub trait Prover {
     ) -> anyhow::Result<Option<ProverResult>>;
 }
 
-pub trait InputProcessor {
-    fn process(&self, input: &mut ProverInput, args: String, json: String);
-}
+
