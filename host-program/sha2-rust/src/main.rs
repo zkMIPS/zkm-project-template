@@ -125,7 +125,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn set_guest_input(input: &mut ProverInput, param: Option<&str>) {
+fn set_guest_input(input: &mut ProverInput, _param: Option<&str>) {
     //input.public_inputstream.push(1);
     let num_bytes: usize = 1024; //Notice! : if this value is small, it will not generate the  proof.
     let pri_input = vec![5u8; num_bytes];

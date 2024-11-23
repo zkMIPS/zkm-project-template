@@ -1,4 +1,3 @@
-use sha2::{Digest, Sha256};
 use std::env;
 use serde::{Deserialize, Serialize};
 use std::fs::read;
