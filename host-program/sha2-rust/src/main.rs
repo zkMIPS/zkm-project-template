@@ -11,7 +11,7 @@ use std::fs::File;
 use std::path::Path;
 use std::time::Instant;
 use zkm_sdk::{
-    prover::ClientType, prover::InputProcessor, prover::ProverInput, prover::ProverResult,
+    prover::ClientType, prover::ProverInput, prover::ProverResult,
     ProverClient, LOCAL_PROVER, NETWORK_PROVER,
 };
 
@@ -35,7 +35,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         helper();
     }
 
-    let zkm_prover = &args[1];
+    let zkm_prover_type = &args[1];
 
     let seg_size = env::var("SEG_SIZE")
         .ok()
@@ -48,8 +48,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .unwrap_or(false);
 
     let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
-    let args_parameter = env::var("ARGS").unwrap_or("data-to-hash".to_string());
-    let json_path = env::var("JSON_PATH").expect("JSON PATH is missing");
+    //let args_parameter = env::var("ARGS").unwrap_or("data-to-hash".to_string());
+    //let json_path = env::var("JSON_PATH").expect("JSON PATH is missing");
     let proof_results_path = env::var("PROOF_RESULTS_PATH").unwrap_or("../contracts".to_string());
     let vk_path1 = env::var("VERIFYING_KEY_PATH").unwrap_or("/tmp/input".to_string());
 
@@ -61,14 +61,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let domain_name1 = env::var("DOMAIN_NAME").unwrap_or(DEFALUT_PROVER_NETWORK_DOMAIN.to_string());
     let private_key1 = env::var("PRIVATE_KEY").unwrap_or("".to_string());
 
-    if zkm_prover.to_lowercase() == NETWORK_PROVER.to_string() && private_key1.is_empty() {
+    if zkm_prover_type.to_lowercase() == NETWORK_PROVER.to_string() && private_key1.is_empty() {
         //network proving
         log::info!("Please set the PRIVATE_KEY=");
         return Err("PRIVATE_KEY is not set".into());
     }
 
     let client_type: ClientType = ClientType {
-        zkm_prover: zkm_prover.to_owned(),
+        zkm_prover: zkm_prover_type.to_owned(),
         endpoint: endpoint1,
         ca_cert_path: ca_cert_path1,
         cert_path: cert_path1,
@@ -90,12 +90,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         args: "".into(),
     };
 
-    //the guest program has inputs
+    //If the guest program does't have inputs, it does't need the setting.
     set_guest_input(&mut prover_input, None);
     
     //the first executing the host will generate the pk and vk through setup().
     //if you want to generate the new vk , you should delete the files in the vk_path, then run the host program.
-    prover_client.setup(&zkm_prover, &vk_path1, &prover_input).await;
+    prover_client.setup(&zkm_prover_type, &vk_path1, &prover_input).await;
 
     let start = Instant::now();
     let proving_result = prover_client.prover.prove(&prover_input, None).await;
@@ -103,16 +103,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Ok(Some(prover_result)) => {
             if !execute_only {
                 //excute the guest program and generate the proof
-                process_proof_results(
+                prover_client.process_proof_results(
                     &prover_result,
                     &prover_input,
                     &proof_results_path,
-                    &zkm_prover,
+                    &zkm_prover_type,
                 )
                 .expect("process proof results error");
             } else {
                 //only excute the guest program without proof
-                print_guest_excution_output(&args[0], &prover_result)
+                print_guest_excution_output(&prover_result)
                     .expect("print guest program excution's output.");
             }
         }
@@ -131,35 +131,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     log::info!("Elapsed time: {:?} secs", elapsed.as_secs());
     Ok(())
 }
-
-//If the vk or pk doesn't exist, it will run setup().
-async fn setup(
-    zkm_prover: &str,
-    vk_path: &str,
-    prover_client: &ProverClient,
-    prover_input: &ProverInput,
-) {
-    if zkm_prover.to_lowercase() == LOCAL_PROVER.to_string() {
-        let pk_file = format!("{}/proving.key", vk_path);
-        let vk_file = format!("{}/verifying.key", vk_path);
-
-        let pathp = Path::new(&pk_file);
-        let pathv = Path::new(&vk_file);
-
-        if pathp.exists() && pathv.exists() {
-            log::info!("The vk and pk all exist in the path:{} and don't need to setup.", vk_path);
-        } else {
-            //setup the vk and pk for the first running local proving.
-            log::info!("excuting the setup.");
-            let _ = prover_client
-                .prover
-                .setup(vk_path, prover_input, None)
-                .await;
-            log::info!("setup successfully, the vk and pk all exist in the path:{}.", vk_path);
-        }
-    }
-}
-
 
 fn set_guest_input(input: &mut ProverInput, param: Option<&str>) {
         //input.public_inputstream.push(1);
@@ -185,92 +156,7 @@ fn set_guest_input(input: &mut ProverInput, param: Option<&str>) {
 
 }
 
-
-fn process_proof_results(
-    prover_result: &ProverResult,
-    input: &ProverInput,
-    proof_results_path: &String,
-    zkm_prover: &str,
-) -> anyhow::Result<()> {
-    if prover_result.proof_with_public_inputs.is_empty() {
-        if zkm_prover.to_lowercase() == LOCAL_PROVER.to_string() {
-            //local proving
-            log::info!("Fail: please try setting SEG_SIZE={}", input.seg_size / 2);
-            return Err(anyhow::anyhow!("SEG_SIZE is excessively large."));
-        } else {
-            //network proving
-            log::info!(
-                "Fail: the SEG_SIZE={} out of the range of the proof network's.",
-                input.seg_size
-            );
-            return Err(anyhow::anyhow!(
-                "SEG_SIZE is out of the range of the proof network's."
-            ));
-        }
-    }
-    //1.snark proof
-    let output_dir = format!("{}/verifier", proof_results_path);
-    fs::create_dir_all(&output_dir)?;
-    let output_path = Path::new(&output_dir);
-    let proof_result_path = output_path.join("snark_proof_with_public_inputs.json");
-    let mut f = file::new(&proof_result_path.to_string_lossy());
-    match f.write(prover_result.proof_with_public_inputs.as_slice()) {
-        Ok(bytes_written) => {
-            log::info!("Proof: successfully written {} bytes.", bytes_written);
-        }
-        Err(e) => {
-            log::info!("Proof: failed to write to file: {}", e);
-            return Err(anyhow::anyhow!("Proof: failed to write to file."));
-        }
-    }
-
-    //2.handle the public inputs
-    let public_inputs = update_public_inputs_with_bincode(
-        input.public_inputstream.clone(),
-        &prover_result.public_values,
-    );
-    match public_inputs {
-        Ok(Some(inputs)) => {
-            let output_dir = format!("{}/verifier", proof_results_path);
-            fs::create_dir_all(&output_dir)?;
-            let output_path = Path::new(&output_dir);
-            let public_inputs_path = output_path.join("public_inputs.json");
-            let mut fp = File::create(public_inputs_path).expect("Unable to create file");
-            //save the json file
-            to_writer(&mut fp, &inputs).expect("Unable to write to public input file");
-        }
-        Ok(None) => {
-            log::info!("Failed to update the public inputs.");
-            return Err(anyhow::anyhow!("Failed to update the public inputs."));
-        }
-        Err(e) => {
-            log::info!("Failed to update the public inputs. error: {}", e);
-            return Err(anyhow::anyhow!("Failed to update the public inputs."));
-        }
-    }
-
-    //3.contract
-    let output_dir = format!("{}/src", proof_results_path);
-    fs::create_dir_all(&output_dir)?;
-    let output_path = Path::new(&output_dir);
-    let contract_path = output_path.join("verifier.sol");
-    let mut f = file::new(&contract_path.to_string_lossy());
-    match f.write(prover_result.solidity_verifier.as_slice()) {
-        Ok(bytes_written) => {
-            log::info!("Contract: successfully written {} bytes.", bytes_written);
-        }
-        Err(e) => {
-            log::info!("Contract: failed to write to file: {}", e);
-            return Err(anyhow::anyhow!("Contract: failed to write to file."));
-        }
-    }
-    log::info!("Generating proof successfully .The proof file and verifier contract are in the the path {}/{{verifier,src}} .", proof_results_path);
-
-    Ok(())
-}
-
 fn print_guest_excution_output(
-    guest_program: &str,
     prover_result: &ProverResult,
 ) -> anyhow::Result<()> {
     //The guest program outputs the basic type
@@ -285,57 +171,4 @@ fn print_guest_excution_output(
     log::info!("ret_data: {:?}", prover_result.output_stream);
 
     Ok(())
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct PublicInputs {
-    roots_before: Roots,
-    roots_after: Roots,
-    userdata: Vec<u8>,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct Roots {
-    root: Vec<u64>,
-}
-
-fn update_public_inputs_with_bincode(
-    public_inputstream: Vec<u8>,
-    proof_public_inputs: &[u8],
-) -> anyhow::Result<Option<PublicInputs>> {
-    let mut hasher = Sha256::new();
-    hasher.update(&public_inputstream);
-    let result_hs = hasher.finalize();
-    let output_hs: [u8; 32] = result_hs.into();
-
-    let slice_bt: &[u8] = proof_public_inputs;
-    let mut public_inputs: PublicInputs =
-        serde_json::from_slice(slice_bt).expect("Failed to parse JSON");
-
-    //1.check the userdata (from the proof) = hash(bincode(host's public_inputs)) ?
-    let userdata = public_inputs.userdata;
-    if userdata == output_hs {
-        log::info!(" hash(bincode(pulic_input))1: {:?} ", &userdata);
-        //2, update  userdata with bincode(host's  public_inputs).
-        //the userdata is saved in the public_inputs.json.
-        //the test contract  validates the public inputs in the snark proof file using this userdata.
-        public_inputs.userdata = public_inputstream;
-    } else if public_inputstream.is_empty() {
-        log::info!(" hash(bincode(pulic_input))2: {:?} ", &userdata);
-        //2', in this case, the bincode(public inputs) need setting to vec![0u8; 32].
-        //the userdata is saved in the public_inputs.json.
-        //the test contract  validates the public inputs in the snark proof file using this userdata.
-        public_inputs.userdata = vec![0u8; 32];
-    } else {
-        log::info!(
-            "public inputs's hash is different. the proof's is: {:?}, host's is :{:?} ",
-            userdata,
-            output_hs
-        );
-        return Err(anyhow::anyhow!(
-            "Public inputs's hash does not match the proof's userdata."
-        ));
-    }
-
-    Ok(Some(public_inputs))
 }
