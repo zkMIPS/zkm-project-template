@@ -253,12 +253,12 @@ impl ProverClient {
     }
 
     // For handling struct types, we need another function
-    fn print_guest_execution_output_struct<'a, T>(
+    fn print_guest_execution_output_struct<T>(
         &self,
         prover_result: &ProverResult,
         ) -> anyhow::Result<()>
     where
-        T: serde::de::DeserializeOwned<'a>, // Here we restrict T to be deserializable
+        T: serde::de::DeserializeOwned  + std::fmt::Debug, // Here we restrict T to be deserializable
     {
         if prover_result.output_stream.is_empty() {
             log::info!(
