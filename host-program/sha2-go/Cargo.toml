@@ -1,3 +1,8 @@
+[package]
+name = "sha2-go"
+version = "0.1.0"
+edition = "2021"
+
 [[bin]]
 name = "sha2-go"
 path = "src/main.rs"
