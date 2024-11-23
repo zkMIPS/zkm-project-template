@@ -14,7 +14,9 @@ use serde::{Deserialize, Serialize};
 use serde_json::to_writer;
 use sha2::{Digest, Sha256};
 
-use anyhow::Context;
+use anyhow::{Context, Result};
+use bincode;
+use std::io::Read;
 
 
 pub struct ProverClient {
@@ -256,7 +258,7 @@ impl ProverClient {
         prover_result: &ProverResult,
         ) -> anyhow::Result<()>
     where
-        T: Deserialize<'a>, // Here we restrict T to be deserializable
+        T: serde::de::DeserializeOwned<'a>, // Here we restrict T to be deserializable
     {
         if prover_result.output_stream.is_empty() {
             log::info!(
