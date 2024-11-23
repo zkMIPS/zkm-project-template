@@ -91,6 +91,7 @@ impl ProverClient {
     }
 
     pub fn process_proof_results(
+        &self,
         prover_result: &ProverResult,
         input: &ProverInput,
         proof_results_path: &String,
