@@ -23,7 +23,7 @@ export ENDPOINT=https://152.32.186.45:20002    ##the test entry of zkm proof net
 
 echo "Compile guest-program ${program}"
 if [[ "$program" =~ .*go$ ]];then
-    cd $BASEDIR/../guest-program/$program
+    cd $BASEDIR/../../guest-program/$program
     GOOS=linux GOARCH=mips GOMIPS=softfloat go build -o $program
     export ELF_PATH=${BASEDIR}/../../guest-program/$program/$program
 else
