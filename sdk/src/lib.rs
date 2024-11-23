@@ -248,12 +248,12 @@ impl ProverClient {
     }
 
     // For handling struct types, we need another function
-    fn print_guest_execution_output_struct<T>(
+    fn print_guest_execution_output_struct<'a, T>(
         &self,
         prover_result: &ProverResult,
         ) -> anyhow::Result<()>
     where
-        T: Deserialize, // Here we restrict T to be deserializable
+        T: Deserialize<'a>, // Here we restrict T to be deserializable
     {
         if prover_result.output_stream.is_empty() {
             log::info!(
