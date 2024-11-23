@@ -1,6 +1,6 @@
 use sha2::{Digest, Sha256};
 use std::env;
-
+use serde::{Deserialize, Serialize};
 use std::fs::read;
 
 use std::time::Instant;
@@ -79,7 +79,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     //If the guest program does't have inputs, it does't need the setting.
-    set_guest_input(&mut prover_input, &args_parameter);
+    set_guest_input(&mut prover_input, Some(&args_parameter));
 
     //the first executing the host will generate the pk and vk through setup().
     //if you want to generate the new vk , you should delete the files in the vk_path, then run the host program.
@@ -176,14 +176,14 @@ impl Data {
 
 fn set_guest_input(input: &mut ProverInput, args: Option<&str>) {
     // assume the  arg[0] is the hash(input)(which is a public input), and the arg[1] is the input.
-    let args: Vec<&str> = args.split_whitespace().collect();
+    let args: Vec<&str> = args.expect("args false").split_whitespace().collect();
     assert_eq!(args.len(), 2);
     let mut data = Data::new();
     // Fill in the input data
     data.input10 = hex::decode(args[0]).unwrap();
     data.input12 = args[1].to_string();
-    let mut buf = Vec::new();
-    bincode::serialize_into(&mut buf, &data).expect("serialization failed");
+    let mut pub_buf = Vec::new();
+    bincode::serialize_into(&mut pub_buf, &data).expect("serialization failed");
 
     input.public_inputstream = pub_buf;
    // input.private_inputstream = pri_buf;

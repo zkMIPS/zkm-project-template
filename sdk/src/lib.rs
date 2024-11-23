@@ -14,9 +14,8 @@ use std::path::Path;
 use serde_json::to_writer;
 use sha2::{Digest, Sha256};
 
-use anyhow::{Context, Result};
+use anyhow::Context;
 use bincode;
-use std::io::Read;
 
 pub struct ProverClient {
     pub prover: Box<dyn Prover>,
@@ -35,7 +34,7 @@ pub struct Roots {
 }
 
 // Trait to check if T implements the Copy trait
-trait IsBasicType: Copy {}
+pub trait IsBasicType: Copy {}
 
 // Implement IsBasicType for all types that implement Copy
 impl<T: Copy> IsBasicType for T {}
@@ -249,7 +248,7 @@ impl ProverClient {
     }
 
     // For handling struct types, we need another function
-    fn print_guest_execution_output_struct<T>(
+    pub fn print_guest_execution_output_struct<T>(
         &self,
         prover_result: &ProverResult,
     ) -> anyhow::Result<()>
