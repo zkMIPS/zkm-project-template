@@ -36,7 +36,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         helper();
     }
 
-    let zkm_prover = args[1];
+    let zkm_prover = &args[1];
 
     //let seg_size = env::var("SEG_SIZE").unwrap_or("8192".to_string());
     //let seg_size2 = seg_size.parse::<_>().unwrap_or(65536);
