@@ -42,7 +42,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //let seg_size2 = seg_size.parse::<_>().unwrap_or(65536);
     let seg_size = env::var("SEG_SIZE")
         .ok()
-        .and_then(|seg| seg.parse::<u64>().ok())
+        .and_then(|seg| seg.parse::<u32>().ok())
         .unwrap_or(65536);
 
     //let execute_only = env::var("EXECUTE_ONLY").unwrap_or("false".to_string());
@@ -98,7 +98,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     //the guest program has inputs
-    set_guest_input(&mut prover_inpu, None)?;
+    set_guest_input(&mut prover_input, None);
     
     //the first executing the host will generate the pk and vk through setup().
     //if you want to generate the new vk , you should delete the files in the vk_path, then run the host program.
@@ -108,7 +108,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let proving_result = prover_client.prover.prove(&prover_input, None).await;
     match proving_result {
         Ok(Some(prover_result)) => {
-            if !execute_only2 {
+            if !execute_only {
                 //excute the guest program and generate the proof
                 process_proof_results(
                     &prover_result,
@@ -161,7 +161,7 @@ async fn setup(
             let _ = prover_client
                 .prover
                 .setup(vk_path, prover_input, None)
-                .await?;
+                .await;
             log::info!("setup successfully, the vk and pk all exist in the path:{}.", vk_path);
         }
     }
@@ -277,7 +277,7 @@ fn process_proof_results(
 }
 
 fn print_guest_excution_output(
-    guest_program: &str,
+ //   guest_program: &str,
     prover_result: &ProverResult,
 ) -> anyhow::Result<()> {
     //The guest program outputs the basic type
