@@ -15,9 +15,7 @@ use serde_json::to_writer;
 use sha2::{Digest, Sha256};
 
 use anyhow::Context;
-use eyre::ContextCompat;
-use eyre::WrapErr;
-use winnow::parser::Parser;
+
 
 pub struct ProverClient {
     pub prover: Box<dyn Prover>,
