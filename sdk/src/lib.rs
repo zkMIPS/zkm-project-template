@@ -171,6 +171,7 @@ impl ProverClient {
             data: D,
         ) -> anyhow::Result<()> {
             // Create the output directory
+            let output_dir = output_dir.as_ref();
             fs::create_dir_all(&output_dir).context("Failed to create output directory")?;
     
             // Build the full file path
@@ -181,7 +182,6 @@ impl ProverClient {
             file.write_all(data.as_ref())
                 .context("Failed to write to file")?;
     
-            // Log the number of bytes written
             let bytes_written = data.as_ref().len();
             log::info!("Successfully written {} bytes.", bytes_written);
     
