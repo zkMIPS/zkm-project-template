@@ -9,8 +9,8 @@ use prover::{ClientType, Prover, ProverInput, ProverResult};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::fs::File;
-use std::path::Path;
 use std::io::Write;
+use std::path::Path;
 
 use serde_json::to_writer;
 use sha2::{Digest, Sha256};
@@ -123,20 +123,11 @@ impl ProverClient {
         //1.snark proof
         let output_dir = format!("{}/verifier", proof_results_path);
         log::info!("save the snark proof:  ");
-        Self::save_data_to_file(&output_dir, "snark_proof_with_public_inputs.json", &prover_result.proof_with_public_inputs)?;
-        /*fs::create_dir_all(&output_dir)?;
-        let output_path = Path::new(&output_dir);
-        let proof_result_path = output_path.join("snark_proof_with_public_inputs.json");
-        let mut f = file::new(&proof_result_path.to_string_lossy());
-        match f.write(prover_result.proof_with_public_inputs.as_slice()) {
-            Ok(bytes_written) => {
-                log::info!("Proof: successfully written {} bytes.", bytes_written);
-            }
-            Err(e) => {
-                log::info!("Proof: failed to write to file: {}", e);
-                return Err(anyhow::anyhow!("Proof: failed to write to file."));
-            }
-        }*/
+        Self::save_data_to_file(
+            &output_dir,
+            "snark_proof_with_public_inputs.json",
+            &prover_result.proof_with_public_inputs,
+        )?;
 
         //2.handle the public inputs
         let public_inputs = Self::update_public_inputs_with_bincode(
@@ -148,12 +139,6 @@ impl ProverClient {
                 let output_dir = format!("{}/verifier", proof_results_path);
                 log::info!("save the public inputs:  ");
                 Self::save_data_as_json(&output_dir, "public_inputs.json", &inputs)?;
-                /*fs::create_dir_all(&output_dir)?;
-                let output_path = Path::new(&output_dir);
-                let public_inputs_path = output_path.join("public_inputs.json");
-                let mut fp = File::create(public_inputs_path).expect("Unable to create file");
-                //save the json file
-                to_writer(&mut fp, &inputs).expect("Unable to write to public input file");*/
             }
             Ok(None) => {
                 log::info!("Failed to update the public inputs.");
@@ -168,24 +153,60 @@ impl ProverClient {
         //3.contract
         let output_dir = format!("{}/src", proof_results_path);
         log::info!("save the verifier contract:  ");
-        Self::save_data_to_file(&output_dir, "verifier.sol", &prover_result.solidity_verifier)?;
-        /*fs::create_dir_all(&output_dir)?;
-        let output_path = Path::new(&output_dir);
-        let contract_path = output_path.join("verifier.sol");
-        let mut f = file::new(&contract_path.to_string_lossy());
-        match f.write(prover_result.solidity_verifier.as_slice()) {
-            Ok(bytes_written) => {
-                log::info!("Contract: successfully written {} bytes.", bytes_written);
-            }
-            Err(e) => {
-                log::info!("Contract: failed to write to file: {}", e);
-                return Err(anyhow::anyhow!("Contract: failed to write to file."));
-            }
-        }*/
+        Self::save_data_to_file(
+            &output_dir,
+            "verifier.sol",
+            &prover_result.solidity_verifier,
+        )?;
+ 
         log::info!("Generating proof successfully .The proof file and verifier contract are in the the path {}/{{verifier,src}} .", proof_results_path);
 
         Ok(())
     }
+
+        // Generic function to save data to a file
+        pub fn save_data_to_file<P: AsRef<Path>, D: AsRef<[u8]>>(
+            output_dir: P,
+            file_name: &str,
+            data: D,
+        ) -> anyhow::Result<()> {
+            // Create the output directory
+            fs::create_dir_all(&output_dir).context("Failed to create output directory")?;
+    
+            // Build the full file path
+            let output_path = output_dir.join(file_name);
+    
+            // Open the file and write the data
+            let mut file = File::create(&output_path).context("Unable to create file")?;
+            file.write_all(data.as_ref())
+                .context("Failed to write to file")?;
+    
+            // Log the number of bytes written
+            let bytes_written = data.as_ref().len();
+            log::info!("Successfully written {} bytes.", bytes_written);
+    
+            Ok(())
+        }
+    
+        // Generic function to save serialized data to a JSON file
+        pub fn save_data_as_json<T: Serialize>(
+            output_dir: &str,
+            file_name: &str,
+            data: &T,
+        ) -> anyhow::Result<()> {
+            // Create the output directory
+            fs::create_dir_all(&output_dir).context("Failed to create output directory")?;
+    
+            // Build the full file path
+            let output_path = Path::new(&output_dir).join(file_name);
+    
+            // Open the file and write the data
+            let mut file = File::create(&output_path).context("Unable to create file")?;
+            to_writer(&mut file, data).context("Failed to write to file")?;
+    
+            log::info!("Data successfully written to file.");
+            Ok(())
+        }
 
     pub fn update_public_inputs_with_bincode(
         public_inputstream: Vec<u8>,
@@ -275,52 +296,6 @@ impl ProverClient {
             .context("deserialization failed")?;
 
         log::info!("ret_data: {:?}", ret_data);
-        Ok(())
-    }
-
-    // Generic function to save data to a file
-    pub fn save_data_to_file<P: AsRef<Path>, D: AsRef<[u8]>>(
-        base_path: P,
-        file_name: &str,
-        data: D,
-    ) -> anyhow::Result<()> {
-        // Create the output directory
-        let output_dir = base_path.as_ref().join(file_name.split('.').next().unwrap_or(""));
-        fs::create_dir_all(&output_dir).context("Failed to create output directory")?;
-
-        // Build the full file path
-        let output_path = output_dir.join(file_name);
-
-        // Open the file and write the data
-        let mut file = File::create(&output_path).context("Unable to create file")?;
-        file.write_all(data.as_ref())
-            .context("Failed to write to file")?;
-
-        // Log the number of bytes written
-        let bytes_written = data.as_ref().len();
-        log::info!("Successfully written {} bytes.", bytes_written);
-
-        Ok(())
-    }
-
-    // Generic function to save serialized data to a JSON file
-    pub fn save_data_as_json<T: Serialize>(
-        output_dir: &str,
-        file_name: &str,
-        data: &T,
-    ) -> anyhow::Result<()> {
-        // Create the output directory
-        //let output_dir = format!("{}/verifier", base_path);
-        fs::create_dir_all(&output_dir).context("Failed to create output directory")?;
-
-        // Build the full file path
-        let output_path = Path::new(&output_dir).join(file_name);
-
-        // Open the file and write the data
-        let mut file = File::create(&output_path).context("Unable to create file")?;
-        to_writer(&mut file, data).context("Failed to write to file")?;
-
-        log::info!("Data successfully written to file.");
         Ok(())
     }
 
