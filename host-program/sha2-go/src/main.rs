@@ -1,11 +1,9 @@
-use std::env;
 use serde::{Deserialize, Serialize};
+use std::env;
 use std::fs::read;
 
 use std::time::Instant;
-use zkm_sdk::{
-    prover::ClientType, prover::ProverInput, ProverClient, NETWORK_PROVER,
-};
+use zkm_sdk::{prover::ClientType, prover::ProverInput, ProverClient, NETWORK_PROVER};
 
 pub const DEFAULT_PROVER_NETWORK_RPC: &str = "https://152.32.186.45:20002";
 pub const DEFALUT_PROVER_NETWORK_DOMAIN: &str = "stage";
@@ -185,5 +183,5 @@ fn set_guest_input(input: &mut ProverInput, args: Option<&str>) {
     bincode::serialize_into(&mut pub_buf, &data).expect("serialization failed");
 
     input.public_inputstream = pub_buf;
-   // input.private_inputstream = pri_buf;
+    // input.private_inputstream = pri_buf;
 }

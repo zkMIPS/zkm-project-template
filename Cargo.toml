@@ -1,8 +1,9 @@
 [workspace]
 members = [
-    "host-program/sha2-go",
+   "host-program/sha2-go",
    "host-program/sha2-rust",
-
+   "host-program/revme",
+   "host-program/mem-alloc-vec",
    "sdk"
   ]
 resolver = "2"

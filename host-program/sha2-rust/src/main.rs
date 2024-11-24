@@ -4,9 +4,7 @@ use std::env;
 use std::fs::read;
 
 use std::time::Instant;
-use zkm_sdk::{
-    prover::ClientType, prover::ProverInput, ProverClient, NETWORK_PROVER,
-};
+use zkm_sdk::{prover::ClientType, prover::ProverInput, ProverClient, NETWORK_PROVER};
 
 pub const DEFAULT_PROVER_NETWORK_RPC: &str = "https://152.32.186.45:20002";
 pub const DEFALUT_PROVER_NETWORK_DOMAIN: &str = "stage";
