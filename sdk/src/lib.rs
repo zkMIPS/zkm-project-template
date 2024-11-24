@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use std::fs::File;
 use std::path::Path;
+use std::io::Write;
 
 use serde_json::to_writer;
 use sha2::{Digest, Sha256};
@@ -122,7 +123,7 @@ impl ProverClient {
         //1.snark proof
         let output_dir = format!("{}/verifier", proof_results_path);
         log::info!("save the snark proof:  ");
-        Self::save_data_to_file(output_dir, "snark_proof_with_public_inputs.json", &prover_result.proof_with_public_inputs)?;
+        Self::save_data_to_file(&output_dir, "snark_proof_with_public_inputs.json", &prover_result.proof_with_public_inputs)?;
         /*fs::create_dir_all(&output_dir)?;
         let output_path = Path::new(&output_dir);
         let proof_result_path = output_path.join("snark_proof_with_public_inputs.json");
@@ -146,7 +147,7 @@ impl ProverClient {
             Ok(Some(inputs)) => {
                 let output_dir = format!("{}/verifier", proof_results_path);
                 log::info!("save the public inputs:  ");
-                Self::save_data_as_json(output_dir, "public_inputs.json", &inputs)?;
+                Self::save_data_as_json(&output_dir, "public_inputs.json", &inputs)?;
                 /*fs::create_dir_all(&output_dir)?;
                 let output_path = Path::new(&output_dir);
                 let public_inputs_path = output_path.join("public_inputs.json");
@@ -167,7 +168,7 @@ impl ProverClient {
         //3.contract
         let output_dir = format!("{}/src", proof_results_path);
         log::info!("save the verifier contract:  ");
-        Self::save_data_to_file(output_dir, "verifier.sol", &prover_result.solidity_verifier)?;
+        Self::save_data_to_file(&output_dir, "verifier.sol", &prover_result.solidity_verifier)?;
         /*fs::create_dir_all(&output_dir)?;
         let output_path = Path::new(&output_dir);
         let contract_path = output_path.join("verifier.sol");
@@ -282,10 +283,10 @@ impl ProverClient {
         base_path: P,
         file_name: &str,
         data: D,
-    ) -> Result<()> {
+    ) -> anyhow::Result<()> {
         // Create the output directory
         let output_dir = base_path.as_ref().join(file_name.split('.').next().unwrap_or(""));
-        create_dir_all(&output_dir).context("Failed to create output directory")?;
+        fs::create_dir_all(&output_dir).context("Failed to create output directory")?;
 
         // Build the full file path
         let output_path = output_dir.join(file_name);
@@ -297,7 +298,7 @@ impl ProverClient {
 
         // Log the number of bytes written
         let bytes_written = data.as_ref().len();
-        info!("Successfully written {} bytes.", bytes_written);
+        log::info!("Successfully written {} bytes.", bytes_written);
 
         Ok(())
     }
@@ -307,10 +308,10 @@ impl ProverClient {
         output_dir: &str,
         file_name: &str,
         data: &T,
-    ) -> Result<()> {
+    ) -> anyhow::Result<()> {
         // Create the output directory
         //let output_dir = format!("{}/verifier", base_path);
-        create_dir_all(&output_dir).context("Failed to create output directory")?;
+        fs::create_dir_all(&output_dir).context("Failed to create output directory")?;
 
         // Build the full file path
         let output_path = Path::new(&output_dir).join(file_name);
@@ -319,7 +320,7 @@ impl ProverClient {
         let mut file = File::create(&output_path).context("Unable to create file")?;
         to_writer(&mut file, data).context("Failed to write to file")?;
 
-        info!("Data successfully written to file.");
+        log::info!("Data successfully written to file.");
         Ok(())
     }
 
