@@ -1,4 +1,4 @@
-use sha2::{Digest, Sha256};
+
 use std::env;
 
 use std::fs::read;
@@ -65,7 +65,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let prover_client = ProverClient::new(&client_type).await;
     log::info!("new prover client,ok.");
 
-    let mut prover_input = ProverInput {
+    let prover_input = ProverInput {
         elf: read(elf_path).unwrap(),
         public_inputstream: vec![],
         private_inputstream: vec![],

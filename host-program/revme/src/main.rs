@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+
 use std::env;
 use std::fs::read;
 
@@ -101,7 +101,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 //only excute the guest program without generating the proof.
                 //the revme guest program doesn't have outputs messages.
                 prover_client
-                    .print_guest_execution_output_struct::<u8>(false, &prover_result)
+                    .print_guest_execution_output::<u8>(false, &prover_result)
                     .expect("print guest program excution's output.");
             }
         }
