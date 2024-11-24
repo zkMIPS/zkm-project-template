@@ -2,7 +2,6 @@ pub mod local;
 pub mod network;
 pub mod prover;
 
-use common::file;
 use local::prover::LocalProver;
 use network::prover::NetworkProver;
 use prover::{ClientType, Prover, ProverInput, ProverResult};
