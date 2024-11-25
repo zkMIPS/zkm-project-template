@@ -45,7 +45,7 @@ impl NetworkProver {
         let endpoint = match ssl_config {
             Some(config) => {
                 let mut tls_config =
-                    ClientTlsConfig::new().domain_name(client_type.domain_name.expect("DOMAIN_NAME must be set"));
+                    ClientTlsConfig::new().domain_name(client_type.domain_name.to_owned().expect("DOMAIN_NAME must be set"));
                 if let Some(ca_cert) = config.ca_cert {
                     tls_config = tls_config.ca_certificate(ca_cert);
                 }
