@@ -54,5 +54,3 @@ pub trait Prover {
         timeout: Option<Duration>,
     ) -> anyhow::Result<Option<ProverResult>>;
 }
-
-

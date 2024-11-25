@@ -1,4 +1,3 @@
-
 use std::env;
 use std::fs::read;
 
@@ -120,7 +119,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     log::info!("Elapsed time: {:?} secs", elapsed.as_secs());
     Ok(())
 }
-
 
 fn set_guest_input(input: &mut ProverInput, args: Option<&str>) {
     input.public_inputstream = read(args.expect("args false")).unwrap(); //the json file has been bincoded.

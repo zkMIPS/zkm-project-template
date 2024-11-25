@@ -1,4 +1,3 @@
-
 use std::env;
 
 use std::fs::read;
@@ -120,4 +119,3 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     log::info!("Elapsed time: {:?} secs", elapsed.as_secs());
     Ok(())
 }
-
