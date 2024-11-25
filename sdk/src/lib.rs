@@ -33,12 +33,6 @@ pub struct Roots {
     root: Vec<u64>,
 }
 
-// Trait to check if T implements the Copy trait
-pub trait IsBasicType: Copy {}
-
-// Implement IsBasicType for all types that implement Copy
-impl<T: Copy> IsBasicType for T {}
-
 pub const LOCAL_PROVER: &str = "local";
 pub const NETWORK_PROVER: &str = "network";
 
@@ -157,55 +151,55 @@ impl ProverClient {
             "verifier.sol",
             &prover_result.solidity_verifier,
         )?;
- 
+
         log::info!("Generating proof successfully .The proof file and verifier contract are in the the path {}/{{verifier,src}} .", proof_results_path);
 
         Ok(())
     }
 
-        // Generic function to save data to a file
-        pub fn save_data_to_file<P: AsRef<Path>, D: AsRef<[u8]>>(
-            output_dir: P,
-            file_name: &str,
-            data: D,
-        ) -> anyhow::Result<()> {
-            // Create the output directory
-            let output_dir = output_dir.as_ref();
-            fs::create_dir_all(&output_dir).context("Failed to create output directory")?;
-    
-            // Build the full file path
-            let output_path = output_dir.join(file_name);
-    
-            // Open the file and write the data
-            let mut file = File::create(&output_path).context("Unable to create file")?;
-            file.write_all(data.as_ref())
-                .context("Failed to write to file")?;
-    
-            let bytes_written = data.as_ref().len();
-            log::info!("Successfully written {} bytes.", bytes_written);
-    
-            Ok(())
-        }
-    
-        // Generic function to save serialized data to a JSON file
-        pub fn save_data_as_json<T: Serialize>(
-            output_dir: &str,
-            file_name: &str,
-            data: &T,
-        ) -> anyhow::Result<()> {
-            // Create the output directory
-            fs::create_dir_all(&output_dir).context("Failed to create output directory")?;
-    
-            // Build the full file path
-            let output_path = Path::new(&output_dir).join(file_name);
-    
-            // Open the file and write the data
-            let mut file = File::create(&output_path).context("Unable to create file")?;
-            to_writer(&mut file, data).context("Failed to write to file")?;
-    
-            log::info!("Data successfully written to file.");
-            Ok(())
-        }
+    // Generic function to save data to a file
+    pub fn save_data_to_file<P: AsRef<Path>, D: AsRef<[u8]>>(
+        output_dir: P,
+        file_name: &str,
+        data: D,
+    ) -> anyhow::Result<()> {
+        // Create the output directory
+        let output_dir = output_dir.as_ref();
+        fs::create_dir_all(&output_dir).context("Failed to create output directory")?;
+
+        // Build the full file path
+        let output_path = output_dir.join(file_name);
+
+        // Open the file and write the data
+        let mut file = File::create(&output_path).context("Unable to create file")?;
+        file.write_all(data.as_ref())
+            .context("Failed to write to file")?;
+
+        let bytes_written = data.as_ref().len();
+        log::info!("Successfully written {} bytes.", bytes_written);
+
+        Ok(())
+    }
+
+    // Generic function to save serialized data to a JSON file
+    pub fn save_data_as_json<T: Serialize>(
+        output_dir: &str,
+        file_name: &str,
+        data: &T,
+    ) -> anyhow::Result<()> {
+        // Create the output directory
+        fs::create_dir_all(&output_dir).context("Failed to create output directory")?;
+
+        // Build the full file path
+        let output_path = Path::new(&output_dir).join(file_name);
+
+        // Open the file and write the data
+        let mut file = File::create(&output_path).context("Unable to create file")?;
+        to_writer(&mut file, data).context("Failed to write to file")?;
+
+        log::info!("Data successfully written to file.");
+        Ok(())
+    }
 
     pub fn update_public_inputs_with_bincode(
         public_inputstream: Vec<u8>,
@@ -253,10 +247,7 @@ impl ProverClient {
         &self,
         has_output: bool,
         prover_result: &ProverResult,
-    ) -> anyhow::Result<()>
-    where
-        T: IsBasicType, // Here we restrict T to be a basic type
-    {
+    ) -> anyhow::Result<()> {
         if has_output {
             if prover_result.output_stream.is_empty() {
                 log::info!(
@@ -297,5 +288,4 @@ impl ProverClient {
         log::info!("ret_data: {:?}", ret_data);
         Ok(())
     }
-
 }

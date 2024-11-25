@@ -97,7 +97,7 @@ sdk/src/local/libsnark/compile.sh  # compile snark library
 cargo build --release              # build host programs
 ```
 
-If successfully, it will generate one binary files in `target/release`/{`sha2-rust` ,`sha2-go` ,`revme`, `mem-alloc-vec`}
+If successfully, it will generate the binary files in `target/release`/{`sha2-rust` ,`sha2-go` ,`revme`, `mem-alloc-vec`}
 
 > [!NOTE]
 > You can run the guest program without generating a proof by setting the environmental variable `EXECUTE_ONLY` to "true".https://github.com/zkMIPS/zkm/issues/152
@@ -105,14 +105,13 @@ If successfully, it will generate one binary files in `target/release`/{`sha2-ru
 ### 3. Generate groth16 proof and verifier contract
 
 > [!NOTE]
-> 1. The host program executes local proving when the environmental variable `ZKM_PROVER` is set to "local" and performs network proving when `ZKM_PROVER` is set to "network"
+> 1. There is  a script program available: run_proving.sh. The script facilitate the generation of proofs on the local machine and over the proof network.
 
-> 2. There is  a script program available: run_proving.sh. The script facilitate the generation of proofs on the local machine and over the proof network.
+> 2. There are four guest programs(sha2-rust, sha2-go, mem-alloc-vec,revme). The following will use sha2-rust and revme as an example to demonstrate local and network proofs.
 
-> 3. There are four guest programs(sha2-rust, sha2-go, mem-alloc-vec,revme). The following will use sha2-rust and revme as an example to demonstrate local and network proofs.
+> 3. If the environmental variable `PROOF_RESULTS_PATH` is not set, the proof results file will be saved in zkm-project-template/contracts/{src, verifier}; if the environmental variable `PROOF_RESULTS_PATH` is set, after the proof is completed, the proof results file needs to be copied from from 'PROOF_RESULTS_PATH'/{src, verifier} to the corresponding zkm-project-template/contracts/{src, verifier}. 
 
-> 4. If the environmental variable `PROOF_RESULTS_PATH` is not set, the proof results file will be saved in zkm-project-template/contracts/{src, verifier}; if the environmental variable `PROOF_RESULTS_PATH` is set, after the proof is completed, the proof results file needs to be copied from from 'PROOF_RESULTS_PATH'/{src, verifier} to the corresponding zkm-project-template/contracts/{src, verifier}.
-
+> 4. The environment variable `VERIFYING_KEY_PATH` specifies the location of the verification key (vk). When the host is executed for the first time, it will generate both the public key (pk) and the verification key (vk) and store them at the path indicated by `VERIFYING_KEY_PATH`.
 
 > [!WARNING]
 >  The environmental variable `SEG_SIZE` in the run-xxx_proving.sh affects the final proof generation. 

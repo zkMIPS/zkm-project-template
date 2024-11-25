@@ -103,7 +103,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 //only excute the guest program without generating the proof.
                 //the sha2-rust guest program has outputs messages, which are basic type.
                 prover_client
-                    .print_guest_execution_output::<u8>(true, &prover_result)
+                    .print_guest_execution_output(true, &prover_result)
                     .expect("print guest program excution's output.");
             }
         }
