@@ -122,5 +122,4 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 fn set_guest_input(input: &mut ProverInput, args: Option<&str>) {
     input.public_inputstream = read(args.expect("args false")).unwrap(); //the json file has been bincoded.
-
 }
