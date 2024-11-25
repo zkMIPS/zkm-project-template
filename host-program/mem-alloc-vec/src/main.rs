@@ -44,11 +44,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let domain_name1 = env::var("DOMAIN_NAME").unwrap_or(DEFALUT_PROVER_NETWORK_DOMAIN.to_string());
     let private_key1 = env::var("PRIVATE_KEY").unwrap_or("".to_string());
 
-    if zkm_prover_type.to_lowercase() == *NETWORK_PROVER && private_key1.is_empty() {
+    /*if zkm_prover_type.to_lowercase() == *NETWORK_PROVER && private_key1.is_empty() {
         //network proving
         log::info!("Please set the PRIVATE_KEY=");
         return Err("PRIVATE_KEY is not set".into());
-    }
+    }*/
 
     let client_type: ClientType = ClientType {
         zkm_prover: zkm_prover_type.to_owned(),
