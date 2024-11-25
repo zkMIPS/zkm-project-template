@@ -243,7 +243,7 @@ impl ProverClient {
     }
 
     // Generic function that automatically determines and prints based on the type T
-    pub fn print_guest_execution_output<T>(
+    pub fn print_guest_execution_output(
         &self,
         has_output: bool,
         prover_result: &ProverResult,
