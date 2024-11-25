@@ -22,12 +22,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let zkm_prover_type = &args[1];
 
-    let seg_size = env::var("SEG_SIZE")
+    let seg_size1 = env::var("SEG_SIZE")
         .ok()
         .and_then(|seg| seg.parse::<u32>().ok())
         .unwrap_or(65536);
 
-    let execute_only = env::var("EXECUTE_ONLY")
+    let execute_only1 = env::var("EXECUTE_ONLY")
         .ok()
         .and_then(|seg| seg.parse::<bool>().ok())
         .unwrap_or(false);
@@ -46,7 +46,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let domain_name1 = env::var("DOMAIN_NAME").unwrap_or(DEFALUT_PROVER_NETWORK_DOMAIN.to_string());
     let private_key1 = env::var("PRIVATE_KEY").unwrap_or("".to_string());
 
-    if zkm_prover_type.to_lowercase() == NETWORK_PROVER.to_string() && private_key1.is_empty() {
+    if zkm_prover_type.to_lowercase() == *NETWORK_PROVER && private_key1.is_empty() {
         //network proving
         log::info!("Please set the PRIVATE_KEY=");
         return Err("PRIVATE_KEY is not set".into());
@@ -70,8 +70,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         elf: read(elf_path).unwrap(),
         public_inputstream: vec![],
         private_inputstream: vec![],
-        seg_size: seg_size,
-        execute_only: execute_only,
+        seg_size: seg_size1,
+        execute_only: execute_only1,
         args: "".into(),
     };
 
@@ -81,7 +81,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //the first executing the host will generate the pk and vk through setup().
     //if you want to generate the new vk , you should delete the files in the vk_path, then run the host program.
     prover_client
-        .setup(&zkm_prover_type, &vk_path1, &prover_input)
+        .setup(zkm_prover_type, &vk_path1, &prover_input)
         .await;
 
     let start = Instant::now();
@@ -95,7 +95,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         &prover_result,
                         &prover_input,
                         &proof_results_path,
-                        &zkm_prover_type,
+                        zkm_prover_type,
                     )
                     .expect("process proof results error");
             } else {
