@@ -6,13 +6,13 @@ use tokio::time::Duration;
 #[derive(Debug, Default, Clone)]
 pub struct ClientType {
     pub zkm_prover: String,
+    pub vk_path: String,
     pub endpoint: Option<String>,
     pub ca_cert_path: Option<String>,
     pub cert_path: Option<String>,
     pub key_path: Option<String>,
     pub domain_name: Option<String>,
     pub private_key: Option<String>,
-    pub vk_path: Option<String>,
 }
 
 #[derive(Debug, Default, Deserialize, Serialize, Clone)]
