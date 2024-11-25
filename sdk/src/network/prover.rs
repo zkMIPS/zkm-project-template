@@ -26,26 +26,35 @@ pub struct NetworkProver {
 
 impl NetworkProver {
     pub async fn new(client_type: &ClientType) -> anyhow::Result<NetworkProver> {
-        let ca_cert_path = client_type.ca_cert_path.to_owned().expect("CA_CERT_PATH must be set");
-        let cert_path = client_type.cert_path.to_owned().expect("CERT_PATH must be set");
-        let key_path = client_type.key_path.to_owned().expect("KEY_PATH must be set");
+        let ca_cert_path = client_type
+            .ca_cert_path
+            .to_owned()
+            .expect("CA_CERT_PATH must be set");
+        let cert_path = client_type
+            .cert_path
+            .to_owned()
+            .expect("CERT_PATH must be set");
+        let key_path = client_type
+            .key_path
+            .to_owned()
+            .expect("KEY_PATH must be set");
         let ssl_config = if ca_cert_path.is_empty() {
             None
         } else {
-            Some(
-                Config::new(
-                    ca_cert_path,
-                    cert_path,
-                    key_path,
-                )
-                .await?,
-            )
+            Some(Config::new(ca_cert_path, cert_path, key_path).await?)
         };
-        let endpoint_para = client_type.endpoint.to_owned().expect("ENDPOINT must be set");
+        let endpoint_para = client_type
+            .endpoint
+            .to_owned()
+            .expect("ENDPOINT must be set");
         let endpoint = match ssl_config {
             Some(config) => {
-                let mut tls_config =
-                    ClientTlsConfig::new().domain_name(client_type.domain_name.to_owned().expect("DOMAIN_NAME must be set"));
+                let mut tls_config = ClientTlsConfig::new().domain_name(
+                    client_type
+                        .domain_name
+                        .to_owned()
+                        .expect("DOMAIN_NAME must be set"),
+                );
                 if let Some(ca_cert) = config.ca_cert {
                     tls_config = tls_config.ca_certificate(ca_cert);
                 }
@@ -56,7 +65,10 @@ impl NetworkProver {
             }
             None => Endpoint::new(endpoint_para.to_owned())?,
         };
-        let private_key =  client_type.private_key.to_owned().expect("PRIVATE_KEY must be set");
+        let private_key = client_type
+            .private_key
+            .to_owned()
+            .expect("PRIVATE_KEY must be set");
         if private_key.is_empty() {
             panic!("Please set the PRIVATE_KEY");
         }

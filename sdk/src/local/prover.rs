@@ -144,10 +144,8 @@ impl Prover for LocalProver {
             true => {
                 log::info!("setup successful, the verify key is in the {}", vk_path);
                 Ok(())
-            },
-            false => {
-                Err(anyhow::anyhow!("snark setup failed!"))
-            },
+            }
+            false => Err(anyhow::anyhow!("snark setup failed!")),
         }
     }
 
