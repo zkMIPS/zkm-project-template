@@ -111,7 +111,7 @@ If successfully, it will generate the binary files in `target/release`/{`sha2-ru
 
 > 3. If the environmental variable `PROOF_RESULTS_PATH` is not set, the proof results file will be saved in zkm-project-template/contracts/{src, verifier}; if the environmental variable `PROOF_RESULTS_PATH` is set, after the proof is completed, the proof results file needs to be copied from from 'PROOF_RESULTS_PATH'/{src, verifier} to the corresponding zkm-project-template/contracts/{src, verifier}. 
 
-> 4. The environment variable `VERIFYING_KEY_PATH` specifies the location of the verification key (vk). When the host is executed for the first time, it will generate both the public key (pk) and the verification key (vk) and store them at the path indicated by `VERIFYING_KEY_PATH`.
+> 4. The environment variable `VERIFYING_KEY_PATH` specifies the location of the verification key (vk). When the host is executed for the first time, it will generate both the proof key (pk) and the verification key (vk) and store them at the path indicated by `VERIFYING_KEY_PATH`.
 
 > [!WARNING]
 >  The environmental variable `SEG_SIZE` in the run-xxx_proving.sh affects the final proof generation. 

@@ -71,11 +71,11 @@ pub struct LocalProver {
     vk_path: String,
 }
 
-impl Default for LocalProver {
+/*impl Default for LocalProver {
     fn default() -> Self {
         Self::new("")
     }
-}
+}*/
 
 impl LocalProver {
     pub fn new(vk_path: &str) -> LocalProver {
@@ -140,11 +140,14 @@ impl Prover for LocalProver {
                 "Setup: generating the stark proof false, please check the SEG_SIZE or other parameters!"));
         }
 
-        if crate::local::snark::setup(vk_path) {
-            log::info!("setup successful, the verify key  is in the {}", vk_path);
-            return Ok(());
-        } else {
-            return Err(anyhow::anyhow!("snark setup false!"));
+        match crate::local::snark::setup(vk_path) {
+            true => {
+                log::info!("setup successful, the verify key is in the {}", vk_path);
+                Ok(())
+            },
+            false => {
+                Err(anyhow::anyhow!("snark setup failed!"))
+            },
         }
     }
 

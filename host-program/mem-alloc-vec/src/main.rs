@@ -3,7 +3,7 @@ use std::env;
 use std::fs::read;
 
 use std::time::Instant;
-use zkm_sdk::{prover::ClientType, prover::ProverInput, ProverClient, NETWORK_PROVER};
+use zkm_sdk::{prover::ClientType, prover::ProverInput, ProverClient};
 
 pub const DEFAULT_PROVER_NETWORK_RPC: &str = "https://152.32.186.45:20002";
 pub const DEFALUT_PROVER_NETWORK_DOMAIN: &str = "stage";
@@ -44,11 +44,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let domain_name1 = env::var("DOMAIN_NAME").unwrap_or(DEFALUT_PROVER_NETWORK_DOMAIN.to_string());
     let private_key1 = env::var("PRIVATE_KEY").unwrap_or("".to_string());
 
-    /*if zkm_prover_type.to_lowercase() == *NETWORK_PROVER && private_key1.is_empty() {
-        //network proving
-        log::info!("Please set the PRIVATE_KEY=");
-        return Err("PRIVATE_KEY is not set".into());
-    }*/
 
     let client_type: ClientType = ClientType {
         zkm_prover: zkm_prover_type.to_owned(),
@@ -76,7 +71,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //If the guest program does't have inputs, it does't need the set_guest_input().
     //set_guest_input(&mut prover_input, None);
 
-    //the first executing the host will generate the pk and vk through setup().
+    //When the host is executed for the first time, it will generate both the proof key (pk) and the verification key (vk) through setup().
     //if you want to generate the new vk , you should delete the files in the vk_path, then run the host program.
     prover_client
         .setup(zkm_prover_type, &vk_path1, &prover_input)

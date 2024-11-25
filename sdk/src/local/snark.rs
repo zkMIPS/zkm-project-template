@@ -18,7 +18,7 @@ pub fn prove_snark(inputdir: &str, outputdir: &str) -> bool {
 
 #[cfg(not(feature = "snark"))]
 pub fn prove_snark(inputdir: &str, outputdir: &str) -> bool {
-    return false;
+    panic!("not support snark");
 }
 
 #[cfg(feature = "snark")]
@@ -31,5 +31,5 @@ pub fn setup(inputdir: &str) -> bool {
 
 #[cfg(not(feature = "snark"))]
 pub fn setup(inputdir: &str) -> bool {
-    return false;
+    panic!("not support setup");
 }
