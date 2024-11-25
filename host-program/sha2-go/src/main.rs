@@ -88,7 +88,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let proving_result = prover_client.prover.prove(&prover_input, None).await;
     match proving_result {
         Ok(Some(prover_result)) => {
-            if !execute_only {
+            if !execute_only1 {
                 //excute the guest program and generate the proof
                 prover_client
                     .process_proof_results(
