@@ -56,7 +56,7 @@ impl NetworkProver {
             }
             None => Endpoint::new(endpoint_para.to_owned())?,
         };
-        let private_key =  client_type.private_key..expect("PRIVATE_KEY must be set");
+        let private_key =  client_type.private_key.expect("PRIVATE_KEY must be set");
         let stage_client = StageServiceClient::connect(endpoint).await?;
         let wallet = private_key.parse::<LocalWallet>().unwrap();
         Ok(NetworkProver {
