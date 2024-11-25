@@ -26,35 +26,39 @@ pub struct NetworkProver {
 
 impl NetworkProver {
     pub async fn new(client_type: &ClientType) -> anyhow::Result<NetworkProver> {
-        let ssl_config = if client_type.ca_cert_path.is_empty() {
+        let ca_cert_path = client_type.ca_cert_path.expect("CA_CERT_PATH must be set");
+        let cert_path = client_type.cert_path.expect("CERT_PATH must be set");
+        let key_path = client_type.key_path.expect("KEY_PATH must be set");
+        let ssl_config = if ca_cert_path.is_empty() {
             None
         } else {
             Some(
                 Config::new(
-                    client_type.ca_cert_path.to_owned(),
-                    client_type.cert_path.to_owned(),
-                    client_type.key_path.to_owned(),
+                    ca_cert_path,
+                    cert_path,
+                    key_path,
                 )
                 .await?,
             )
         };
-
+        let endpoint_para = client_type.endpoint.expect("ENDPOINT must be set");
         let endpoint = match ssl_config {
             Some(config) => {
                 let mut tls_config =
-                    ClientTlsConfig::new().domain_name(client_type.domain_name.to_owned());
+                    ClientTlsConfig::new().domain_name(client_type.domain_name.expect("DOMAIN_NAME must be set"));
                 if let Some(ca_cert) = config.ca_cert {
                     tls_config = tls_config.ca_certificate(ca_cert);
                 }
                 if let Some(identity) = config.identity {
                     tls_config = tls_config.identity(identity);
                 }
-                Endpoint::new(client_type.endpoint.to_owned())?.tls_config(tls_config)?
+                Endpoint::new(endpoint_para.to_owned())?.tls_config(tls_config)?
             }
-            None => Endpoint::new(client_type.endpoint.to_owned())?,
+            None => Endpoint::new(endpoint_para.to_owned())?,
         };
+        let private_key =  client_type.private_key..expect("PRIVATE_KEY must be set");
         let stage_client = StageServiceClient::connect(endpoint).await?;
-        let wallet = client_type.private_key.parse::<LocalWallet>().unwrap();
+        let wallet = private_key.parse::<LocalWallet>().unwrap();
         Ok(NetworkProver {
             stage_client,
             wallet,

@@ -52,12 +52,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let client_type: ClientType = ClientType {
         zkm_prover: zkm_prover_type.to_owned(),
-        endpoint: endpoint1,
-        ca_cert_path: ca_cert_path1,
-        cert_path: cert_path1,
-        key_path: key_path1,
-        domain_name: domain_name1,
-        private_key: private_key1,
+        endpoint: Some(endpoint1),
+        ca_cert_path: Some(ca_cert_path1),
+        cert_path: Some(cert_path1),
+        key_path: Some(key_path1),
+        domain_name: Some(domain_name1),
+        private_key: Some(private_key1),
         vk_path: vk_path1.to_owned(),
     };
 
@@ -73,7 +73,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         args: "".into(),
     };
 
-    //If the guest program does't have inputs, it does't need the setting.
+    //If the guest program does't have inputs, it does't need the set_guest_input().
     //set_guest_input(&mut prover_input, None);
 
     //the first executing the host will generate the pk and vk through setup().
