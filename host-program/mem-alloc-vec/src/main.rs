@@ -83,7 +83,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .await;
 
         log::info!("Finish setup and snark proof will use the key in {}.", vk_path1);
-        Ok(())
+        return Ok(());
     }
     
 
