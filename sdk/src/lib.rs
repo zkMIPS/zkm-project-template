@@ -2,6 +2,7 @@ pub mod local;
 pub mod network;
 pub mod prover;
 
+use anyhow::bail;
 use local::prover::LocalProver;
 use network::prover::NetworkProver;
 use prover::{ClientType, Prover, ProverInput, ProverResult};
@@ -10,7 +11,6 @@ use std::fs;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
-use anyhow::bail;
 
 use serde_json::to_writer;
 use sha2::{Digest, Sha256};
@@ -68,7 +68,7 @@ impl ProverClient {
     pub fn is_local_prover(zkm_prover: &str) -> bool {
         if zkm_prover.to_lowercase() == *LOCAL_PROVER {
             true
-        }else {
+        } else {
             false
         }
     }
@@ -77,7 +77,7 @@ impl ProverClient {
     pub async fn setup(&self, zkm_prover: &str, vk_path: &str, prover_input: &ProverInput) {
         if Self::is_local_prover(zkm_prover) {
             //let pk_file = format!("{}/proving.key", vk_path);
-            //let vk_file = format!("{}/verifying.key", vk_path); 
+            //let vk_file = format!("{}/verifying.key", vk_path);
             let path = Path::new(vk_path);
 
             let pk_file = path.with_file_name("proving.key");

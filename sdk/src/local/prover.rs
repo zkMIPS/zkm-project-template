@@ -1,4 +1,5 @@
 use crate::prover::{Prover, ProverInput, ProverResult};
+use anyhow::Context;
 use async_trait::async_trait;
 use std::collections::HashMap;
 use std::fs;
@@ -8,7 +9,6 @@ use std::thread;
 use std::time::Duration;
 use std::time::Instant;
 use tokio::time::sleep;
-use anyhow::Context;
 
 pub struct ProverTask {
     proof_id: String,
@@ -79,13 +79,12 @@ pub struct LocalProver {
     //setup_flag: bool,
 }
 
-
 impl LocalProver {
     pub fn new(vk_path: &str) -> LocalProver {
         LocalProver {
             tasks: Arc::new(Mutex::new(HashMap::new())),
             vk_path: vk_path.to_string(),
-           // setup_flag: flag,
+            // setup_flag: flag,
         }
     }
 }

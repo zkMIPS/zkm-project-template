@@ -76,11 +76,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //If the guest program does't have inputs, it does't need the set_guest_input().
     //set_guest_input(&mut prover_input, None);
 
-    //excuting the setup 
+    //excuting the setup
     if setup_flag1 {
         prover_client
-        .setup(zkm_prover_type, &vk_path1, &prover_input)
-        .await;
+            .setup(zkm_prover_type, &vk_path1, &prover_input)
+            .await;
 
         return Ok(());
     }

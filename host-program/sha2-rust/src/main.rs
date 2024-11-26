@@ -79,15 +79,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //If the guest program does't have inputs, it does't need the setting.
     set_guest_input(&mut prover_input, None);
 
-    //excuting the setup 
+    //excuting the setup
     if setup_flag1 {
         prover_client
-        .setup(zkm_prover_type, &vk_path1, &prover_input)
-        .await;
+            .setup(zkm_prover_type, &vk_path1, &prover_input)
+            .await;
 
         return Ok(());
     }
-
 
     let start = Instant::now();
     let proving_result = prover_client.prover.prove(&prover_input, None).await;
