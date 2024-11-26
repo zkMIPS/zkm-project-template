@@ -7,6 +7,7 @@ use tokio::time::Duration;
 pub struct ClientType {
     pub zkm_prover: String,
     pub vk_path: String,
+    //pub setup_flag: bool,
     pub endpoint: Option<String>,
     pub ca_cert_path: Option<String>,
     pub cert_path: Option<String>,

@@ -8,28 +8,36 @@ extern "C" {
 }
 
 #[cfg(feature = "snark")]
-pub fn prove_snark(inputdir: &str, outputdir: &str) -> bool {
+pub fn prove_snark(inputdir: &str, outputdir: &str) -> anyhow::Result<bool> {
     let inputdir = std::ffi::CString::new(inputdir).unwrap();
     let outputdir = std::ffi::CString::new(outputdir).unwrap();
 
     let ret = unsafe { Stark2Snark(inputdir.as_ptr(), outputdir.as_ptr()) };
-    ret == 0
+    if ret == 0 {
+        Ok(true)
+    } else {
+        Ok(false)
+    }
 }
 
 #[cfg(not(feature = "snark"))]
-pub fn prove_snark(inputdir: &str, outputdir: &str) -> bool {
+pub fn prove_snark(inputdir: &str, outputdir: &str) -> anyhow::Result<bool> {
     panic!("not support snark");
 }
 
 #[cfg(feature = "snark")]
-pub fn setup(inputdir: &str) -> bool {
+pub fn setup(inputdir: &str) -> anyhow::Result<bool> {
     let inputdir = std::ffi::CString::new(inputdir).unwrap();
 
     let ret = unsafe { Setup(inputdir.as_ptr()) };
-    ret == 0
+    if ret == 0 {
+        Ok(true)
+    } else {
+        Ok(false)
+    }
 }
 
 #[cfg(not(feature = "snark"))]
-pub fn setup(inputdir: &str) -> bool {
+pub fn setup(inputdir: &str) -> anyhow::Result<bool> {
     panic!("not support setup");
 }

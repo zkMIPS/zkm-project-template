@@ -10,6 +10,7 @@ use std::fs;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
+use anyhow::bail;
 
 use serde_json::to_writer;
 use sha2::{Digest, Sha256};
@@ -64,16 +65,25 @@ impl ProverClient {
         }
     }
 
+    pub fn is_local_prover(zkm_prover: &str) -> bool {
+        if zkm_prover.to_lowercase() == *LOCAL_PROVER {
+            true
+        }else {
+            false
+        }
+    }
+
     //If the vk or pk doesn't exist, it will run setup().
     pub async fn setup(&self, zkm_prover: &str, vk_path: &str, prover_input: &ProverInput) {
-        if zkm_prover.to_lowercase() == *LOCAL_PROVER {
-            let pk_file = format!("{}/proving.key", vk_path);
-            let vk_file = format!("{}/verifying.key", vk_path);
+        if Self::is_local_prover(zkm_prover) {
+            //let pk_file = format!("{}/proving.key", vk_path);
+            //let vk_file = format!("{}/verifying.key", vk_path); 
+            let path = Path::new(vk_path);
 
-            let pathp = Path::new(&pk_file);
-            let pathv = Path::new(&vk_file);
+            let pk_file = path.with_file_name("proving.key");
+            let vk_file = path.with_file_name("proving.key");
 
-            if pathp.exists() && pathv.exists() {
+            if pk_file.exists() && vk_file.exists() {
                 log::info!(
                     "The vk and pk all exist in the path:{} and don't need to setup.",
                     vk_path
@@ -98,19 +108,21 @@ impl ProverClient {
         zkm_prover_type: &str,
     ) -> anyhow::Result<()> {
         if prover_result.proof_with_public_inputs.is_empty() {
-            if zkm_prover_type.to_lowercase() == *LOCAL_PROVER {
+            if Self::is_local_prover(zkm_prover_type) {
                 //local proving
                 log::info!("Fail: please try setting SEG_SIZE={}", input.seg_size / 2);
-                return Err(anyhow::anyhow!("SEG_SIZE is excessively large."));
+                //return Err(anyhow::anyhow!("SEG_SIZE is excessively large."));
+                bail!("SEG_SIZE is excessively large.");
             } else {
                 //network proving
                 log::info!(
                     "Fail: the SEG_SIZE={} out of the range of the proof network's.",
                     input.seg_size
                 );
-                return Err(anyhow::anyhow!(
-                    "SEG_SIZE is out of the range of the proof network's."
-                ));
+                //return Err(anyhow::anyhow!(
+                //    "SEG_SIZE is out of the range of the proof network's."
+                //));
+                bail!("SEG_SIZE is out of the range of the proof network's");
             }
         }
         //1.snark proof
@@ -135,11 +147,13 @@ impl ProverClient {
             }
             Ok(None) => {
                 log::info!("Failed to update the public inputs.");
-                return Err(anyhow::anyhow!("Failed to update the public inputs."));
+                //return Err(anyhow::anyhow!("Failed to update the public inputs."));
+                bail!("Failed to update the public inputs.");
             }
             Err(e) => {
                 log::info!("Failed to update the public inputs. error: {}", e);
-                return Err(anyhow::anyhow!("Failed to update the public inputs."));
+                //return Err(anyhow::anyhow!("Failed to update the public inputs."));
+                bail!("Failed to update the public inputs.");
             }
         }
 
@@ -234,9 +248,10 @@ impl ProverClient {
                 userdata,
                 output_hs
             );
-            return Err(anyhow::anyhow!(
-                "Public inputs's hash does not match the proof's userdata."
-            ));
+            //return Err(anyhow::anyhow!(
+            //    "Public inputs's hash does not match the proof's userdata."
+            //));
+            bail!("Public inputs's hash does not match the proof's userdata.");
         }
 
         Ok(Some(public_inputs))
@@ -254,7 +269,8 @@ impl ProverClient {
                     "output_stream.len() is too short: {}",
                     prover_result.output_stream.len()
                 );
-                return Err(anyhow::anyhow!("output_stream.len() is too short."));
+                //return Err(anyhow::anyhow!("output_stream.len() is too short."));
+                bail!("output_stream.len() is too short.");
             }
             log::info!("Executing the guest program  successfully.");
             log::info!("ret_data: {:?}", prover_result.output_stream);
@@ -278,7 +294,8 @@ impl ProverClient {
                 "output_stream.len() is too short: {}",
                 prover_result.output_stream.len()
             );
-            return Err(anyhow::anyhow!("output_stream.len() is too short."));
+            //return Err(anyhow::anyhow!("output_stream.len() is too short."));
+            bail!("output_stream.len() is too short.");
         }
         log::info!("Executing the guest program  successfully.");
         // Deserialize the struct

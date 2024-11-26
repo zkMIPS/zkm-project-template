@@ -32,6 +32,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .and_then(|seg| seg.parse::<bool>().ok())
         .unwrap_or(false);
 
+    let setup_flag1 = env::var("SETUP_FLAG")
+        .ok()
+        .and_then(|seg| seg.parse::<bool>().ok())
+        .unwrap_or(false);
+
     let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
     let proof_results_path = env::var("PROOF_RESULTS_PATH").unwrap_or("../contracts".to_string());
     let vk_path1 = env::var("VERIFYING_KEY_PATH").unwrap_or("/tmp/input".to_string());
@@ -53,6 +58,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         domain_name: Some(domain_name1),
         private_key: Some(private_key1),
         vk_path: vk_path1.to_owned(),
+        //setup_flag: setup_flag1,
     };
 
     let prover_client = ProverClient::new(&client_type).await;
@@ -70,11 +76,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //If the guest program does't have inputs, it does't need the set_guest_input().
     //set_guest_input(&mut prover_input, None);
 
-    //When the host is executed for the first time, it will generate both the proof key (pk) and the verification key (vk) through setup().
-    //if you want to generate the new vk , you should delete the files in the vk_path, then run the host program.
-    prover_client
+    //excuting the setup 
+    if setup_flag1 {
+        prover_client
         .setup(zkm_prover_type, &vk_path1, &prover_input)
         .await;
+
+        return Ok(());
+    }
 
     let start = Instant::now();
     let proving_result = prover_client.prover.prove(&prover_input, None).await;

@@ -3,7 +3,7 @@ package main
 import (
 	"C"
 )
-import "fmt"
+//import "fmt"
 
 //export Stark2Snark
 func Stark2Snark(inputdir *C.char, outputdir *C.char) C.int {
@@ -13,7 +13,7 @@ func Stark2Snark(inputdir *C.char, outputdir *C.char) C.int {
 	var prover SnarkProver
 	err := prover.Prove(inputDir, outputDir)
 	if err != nil {
-		fmt.Printf("Stark2Snark error: %v\n", err)
+		//fmt.Printf("Stark2Snark error: %v\n", err)
 		return -1
 	}
 	return 0
@@ -26,7 +26,7 @@ func Setup(inputdir *C.char) C.int {
 	var prover SnarkProver
 	err := prover.Setup(inputDir)
 	if err != nil {
-		fmt.Printf("Setup error: %v\n", err)
+		//fmt.Printf("Setup error: %v\n", err)
 		return -1
 	}
 	return 0
