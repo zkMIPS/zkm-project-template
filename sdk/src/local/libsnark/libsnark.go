@@ -3,7 +3,7 @@ package main
 import (
 	"C"
 )
-import "fmt"
+//import "fmt"
 
 //export Stark2Snark
 func Stark2Snark(inputdir *C.char, outputdir *C.char) C.int {
