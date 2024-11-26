@@ -44,7 +44,7 @@ impl ProverTask {
                 "There is only one segment with segment size {}, will skip the aggregation!",
                 self.input.seg_size
             );
-        } else if crate::local::snark::prove_snark(&inputdir, &outputdir) {
+        } else if crate::local::snark::prove_snark(&inputdir, &outputdir).expect("true or false") {
             result.stark_proof =
                 std::fs::read(format!("{}/proof_with_public_inputs.json", inputdir)).unwrap();
             result.proof_with_public_inputs =
@@ -141,11 +141,11 @@ impl Prover for LocalProver {
         }
 
         match crate::local::snark::setup(vk_path) {
-            true => {
+            Ok(true) => {
                 log::info!("setup successful, the verify key is in the {}", vk_path);
                 Ok(())
             }
-            false => Err(anyhow::anyhow!("snark setup failed!")),
+            Ok(false) => Err(anyhow::anyhow!("snark setup failed!")),
         }
     }
 
