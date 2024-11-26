@@ -81,10 +81,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         prover_client
             .setup(zkm_prover_type, &vk_path1, &prover_input)
             .await;
-
         return Ok(());
     }
-
 
     let start = Instant::now();
     let proving_result = prover_client.prover.prove(&prover_input, None).await;

@@ -66,11 +66,7 @@ impl ProverClient {
     }
 
     pub fn is_local_prover(zkm_prover: &str) -> bool {
-        if zkm_prover.to_lowercase() == *LOCAL_PROVER {
-            true
-        } else {
-            false
-        }
+        zkm_prover.to_lowercase() == *LOCAL_PROVER
     }
 
     //If the vk or pk doesn't exist, it will run setup().
