@@ -61,6 +61,9 @@ func (obj *SnarkProver) init_circuit_keys(inputdir string) error {
 		fR1CS, _ := os.Create(circuitPath)
 		obj.r1cs_circuit.WriteTo(fR1CS)
 		fR1CS.Close()
+	} else if err != nil {
+		// Handle other potential errors, such as permission issues
+		return fmt.Errorf("snark: no permission to read the circuit file. ")
 	} else {
 		fCircuit, err := os.Open(circuitPath)
 		if err != nil {
@@ -90,7 +93,10 @@ func (obj *SnarkProver) init_circuit_keys(inputdir string) error {
 			obj.vk.WriteTo(fVK)
 			fVK.Close()
 		}
-	} else {
+	} else if err != nil {
+		// Handle other potential errors, such as permission issues
+		return fmt.Errorf("snark: no permission to read the pk file. ")
+	}  else {
 		obj.pk = groth16.NewProvingKey(ecc.BN254)
 		obj.vk = groth16.NewVerifyingKey(ecc.BN254)
 		fPk, err := os.Open(pkPath)
