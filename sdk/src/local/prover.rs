@@ -146,6 +146,7 @@ impl Prover for LocalProver {
                 Ok(())
             }
             Ok(false) => Err(anyhow::anyhow!("snark setup failed!")),
+            Err(_) => todo!(),
         }
     }
 
