@@ -58,7 +58,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         domain_name: Some(domain_name1),
         private_key: Some(private_key1),
         vk_path: vk_path1.to_owned(),
-        setup_flag: setup_flag1,
+        //setup_flag: setup_flag1,
     };
 
     let prover_client = ProverClient::new(&client_type).await;
