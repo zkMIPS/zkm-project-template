@@ -97,27 +97,21 @@ sdk/src/local/libsnark/compile.sh  # compile snark library
 cargo build --release              # build host programs
 ```
 
-If the program executes successfully, it will generate one binary files in `target/release`: `zkm-prove`
+If successfully, it will generate the binary files in `target/release`/{`sha2-rust` ,`sha2-go` ,`revme`, `mem-alloc-vec`}
 
 > [!NOTE]
 > You can run the guest program without generating a proof by setting the environmental variable `EXECUTE_ONLY` to "true".https://github.com/zkMIPS/zkm/issues/152
 
 ### 3. Generate groth16 proof and verifier contract
 
-```sh
-cd zkm-project-template/host-program
-```
-
 > [!NOTE]
-> 1. The host program executes local proving when the environmental variable `ZKM_PROVER` is set to "local" and performs network proving when `ZKM_PROVER` is set to "network"
+> 1. There is  a script program available: run_proving.sh. The script facilitate the generation of proofs on the local machine and over the proof network.
 
-> 2. There are two script programs available: run_local_proving.sh and run_network_proving.sh. These scripts facilitate the 
-generation of proofs on the local machine and over the proof network, respectively.
+> 2. There are four guest programs(sha2-rust, sha2-go, mem-alloc-vec,revme). The following will use sha2-rust and revme as an example to demonstrate local and network proofs.
 
-> 3. There are four guest programs(sha2-rust, sha2-go, mem-alloc-vec,revme). The following will use sha2-rust and revme as an example to demonstrate local and network proofs.
+> 3. If the environmental variable `PROOF_RESULTS_PATH` is not set, the proof results file will be saved in zkm-project-template/contracts/{src, verifier}; if the environmental variable `PROOF_RESULTS_PATH` is set, after the proof is completed, the proof results file needs to be copied from from 'PROOF_RESULTS_PATH'/{src, verifier} to the corresponding zkm-project-template/contracts/{src, verifier}. 
 
-> 4. If the environmental variable `PROOF_RESULTS_PATH` is not set, the proof results file will be saved in zkm-project-template/contracts/{src, verifier}; if the environmental variable `PROOF_RESULTS_PATH` is set, after the proof is completed, the proof results file needs to be copied from from 'PROOF_RESULTS_PATH'/{src, verifier} to the corresponding zkm-project-template/contracts/{src, verifier}.
-
+> 4. The environment variable `VERIFYING_KEY_PATH` specifies the location of the verification key (vk). When the host is executed for the first time, it will generate both the proof key (pk) and the verification key (vk) and store them at the path indicated by `VERIFYING_KEY_PATH`.
 
 > [!WARNING]
 >  The environmental variable `SEG_SIZE` in the run-xxx_proving.sh affects the final proof generation. 
@@ -132,10 +126,12 @@ This host program sends the private input pri_input = vec![5u8; 1024] and its ha
 
 #### Local Proving
 
-Make any edits to [`run-local-proving.sh`](host-program/run-local-proving.sh) and run the program:
+Make any edits to [`run-proving.sh`](host-program/sha2-rust/run-proving.sh) and run the program:
+
 
 ```sh
-./run-local-proving.sh sha2-rust
+cd zkm-project-template/host-program/sha2-rust
+./run-proving.sh local
 ```
 
 If successful, it will output a similar log:
@@ -143,51 +139,46 @@ If successful, it will output a similar log:
 ##### **`sha2-rust-local-proving.log`**
 
 ```
-[2024-10-09T03:31:00Z INFO  zkm_prove] new prover client.
-[2024-10-09T03:31:00Z INFO  zkm_prove] new prover client,ok.
-[2024-10-09T03:31:00Z INFO  zkm_sdk::local::prover] calling request_proof.
-[2024-10-09T03:31:00Z INFO  zkm_sdk::local::prover] calling wait_proof, proof_id=5c14330a-cc5a-4ad8-9ba4-3996ddafbc57
-[2024-10-09T03:31:00Z INFO  zkm_sdk::local::prover] waiting the proof result.
-[2024-10-09T03:31:00Z INFO  zkm_emulator::utils] Split done 66446 : 89443
-[2024-10-09T03:31:00Z INFO  zkm_sdk::local::stark] !!!*******seg_num:2
-[2024-10-09T03:32:01Z INFO  zkm_sdk::local::util] Process segment /tmp/5c14330a-cc5a-4ad8-9ba4-3996ddafbc57/input/segments/0
-[2024-10-09T03:32:05Z INFO  zkm_prover::cpu::bootstrap_kernel] Bootstrapping took 3228 cycles
-[2024-10-09T03:32:05Z INFO  zkm_prover::generation] CPU halted after 64762 cycles
-[2024-10-09T03:32:05Z INFO  zkm_prover::generation] CPU trace padded to 65536 cycles
-[2024-10-09T03:32:05Z INFO  zkm_prover::generation] Trace lengths (before padding): TraceCheckpoint { arithmetic_len: 18057, cpu_len: 65536, poseidon_len: 3227, poseidon_sponge_len: 3227, logic_len: 15372, memory_len: 390244 }
-[2024-10-09T03:32:22Z INFO  plonky2::util::timing] 20.9778s to prove root first
-[2024-10-09T03:32:22Z INFO  zkm_sdk::local::util] Process segment /tmp/5c14330a-cc5a-4ad8-9ba4-3996ddafbc57/input/segments/1
-[2024-10-09T03:32:26Z INFO  zkm_prover::cpu::bootstrap_kernel] Bootstrapping took 2583 cycles
-[2024-10-09T03:32:26Z INFO  zkm_prover::generation] CPU halted after 7530 cycles
-[2024-10-09T03:32:26Z INFO  zkm_prover::generation] CPU trace padded to 8192 cycles
-[2024-10-09T03:32:26Z INFO  zkm_prover::generation] Trace lengths (before padding): TraceCheckpoint { arithmetic_len: 1511, cpu_len: 8192, poseidon_len: 2582, poseidon_sponge_len: 2582, logic_len: 1157, memory_len: 123358 }
-[2024-10-09T03:32:38Z INFO  plonky2::util::timing] 15.7468s to prove root second
-[2024-10-09T03:32:40Z INFO  plonky2::util::timing] 1.4158s to prove aggression
-[2024-10-09T03:32:42Z INFO  zkm_sdk::local::util] proof size: 412960
-[2024-10-09T03:32:48Z INFO  zkm_sdk::local::util] build finish
-[2024-10-09T03:32:55Z INFO  plonky2x::backend::wrapper::wrap] Succesfully wrote common circuit data to common_circuit_data.json
-[2024-10-09T03:32:55Z INFO  plonky2x::backend::wrapper::wrap] Succesfully wrote verifier data to verifier_only_circuit_data.json
-[2024-10-09T03:32:55Z INFO  plonky2x::backend::wrapper::wrap] Succesfully wrote proof to proof_with_public_inputs.json
-[2024-10-09T03:32:55Z INFO  plonky2::util::timing] 114.2421s to prove total time
-03:32:59 INF compiling circuit
-03:32:59 INF parsed circuit inputs nbPublic=1 nbSecret=11182
-03:33:39 INF building constraint builder nbConstraints=5815132
-Generating witness 2024-10-09 03:40:27.357393651 +0000 UTC m=+565.926341691
-frontend.NewWitness cost time: 130 ms
-Creating proof 2024-10-09 03:40:27.487971493 +0000 UTC m=+566.056919503
-03:40:32 DBG constraint system solver done nbConstraints=5815132 took=5409.755661
-03:40:40 DBG prover done acceleration=none backend=groth16 curve=bn254 nbConstraints=5815132 took=7795.659351
-groth16.Prove cost time: 13205 ms
-Verifying proof 2024-10-09 03:40:40.69365127 +0000 UTC m=+579.262599280
-03:40:40 DBG verifier done backend=groth16 curve=bn254 took=1.583203
+[2024-11-23T13:12:33Z INFO  sha2_rust] new prover client,ok.
+[2024-11-23T13:12:33Z INFO  zkm_sdk] excuting the setup.
+[2024-11-23T13:12:33Z INFO  zkm_emulator::utils] Split done 66446 : 89443
+[2024-11-23T13:21:05Z INFO  zkm_sdk::local::stark] !!!*******seg_num:2
+[2024-11-23T13:21:55Z INFO  zkm_sdk::local::util] Process segment /mnt/data/gavin/zkm-project-template/host-program/sha2-rust/../test-vectors/input/segments/0
+[2024-11-23T13:21:59Z INFO  zkm_prover::cpu::bootstrap_kernel] Bootstrapping took 3228 cycles
+[2024-11-23T13:21:59Z INFO  zkm_prover::generation] CPU halted after 64762 cycles
+[2024-11-23T13:21:59Z INFO  zkm_prover::generation] CPU trace padded to 65536 cycles
+[2024-11-23T13:21:59Z INFO  zkm_prover::generation] Trace lengths (before padding): TraceCheckpoint { arithmetic_len: 18057, cpu_len: 65536, poseidon_len: 3227, poseidon_sponge_len: 3227, logic_len: 15372, memory_len: 390244 }
+[2024-11-23T13:22:14Z INFO  plonky2::util::timing] 19.1346s to prove root first
+[2024-11-23T13:22:15Z INFO  zkm_sdk::local::util] Process segment /mnt/data/gavin/zkm-project-template/host-program/sha2-rust/../test-vectors/input/segments/1
+[2024-11-23T13:22:18Z INFO  zkm_prover::cpu::bootstrap_kernel] Bootstrapping took 2583 cycles
+[2024-11-23T13:22:18Z INFO  zkm_prover::generation] CPU halted after 7530 cycles
+[2024-11-23T13:22:18Z INFO  zkm_prover::generation] CPU trace padded to 8192 cycles
+[2024-11-23T13:22:18Z INFO  zkm_prover::generation] Trace lengths (before padding): TraceCheckpoint { arithmetic_len: 1511, cpu_len: 8192, poseidon_len: 2582, poseidon_sponge_len: 2582, logic_len: 1157, memory_len: 123358 }
+[2024-11-23T13:22:29Z INFO  plonky2::util::timing] 14.4273s to prove root second
+[2024-11-23T13:22:30Z INFO  plonky2::util::timing] 1.3184s to prove aggression
+[2024-11-23T13:22:32Z INFO  zkm_sdk::local::util] proof size: 413003
+[2024-11-23T13:22:38Z INFO  zkm_sdk::local::util] build finish
+[2024-11-23T13:22:45Z INFO  plonky2x::backend::wrapper::wrap] Succesfully wrote common circuit data to common_circuit_data.json
+[2024-11-23T13:22:45Z INFO  plonky2x::backend::wrapper::wrap] Succesfully wrote verifier data to verifier_only_circuit_data.json
+[2024-11-23T13:22:45Z INFO  plonky2x::backend::wrapper::wrap] Succesfully wrote proof to proof_with_public_inputs.json
+[2024-11-23T13:22:45Z INFO  plonky2::util::timing] 99.1857s to prove total time
+Generating witness 2024-11-23 13:24:17.684495304 +0000 UTC m=+703.805549132
+frontend.NewWitness cost time: 143 ms
+Creating proof 2024-11-23 13:24:17.828400392 +0000 UTC m=+703.949454200
+13:24:23 DBG constraint system solver done nbConstraints=5815132 took=5606.081295
+13:24:30 DBG prover done acceleration=none backend=groth16 curve=bn254 nbConstraints=5815132 took=7527.912415
+groth16.Prove cost time: 13134 ms
+Verifying proof 2024-11-23 13:24:30.962722326 +0000 UTC m=+717.083776144
+13:24:30 DBG verifier done backend=groth16 curve=bn254 took=1.441281
 groth16.Verify cost time: 1 ms
 before len of publicWitness:1
 after len of publicWitness:2
-03:40:40 DBG verifier done backend=groth16 curve=bn254 took=1.247698
-[2024-10-09T03:40:40Z INFO  zkm_prove] Proof: successfully written 1265 bytes.
-[2024-10-09T03:40:40Z INFO  zkm_prove] Contract: successfully written 10334 bytes.
-[2024-10-09T03:40:40Z INFO  zkm_prove] Generating proof successfully .The proof file and verifier contract are in the the path contracts/verifier and contracts/src .
-[2024-10-09T03:40:40Z INFO  zkm_prove] Elapsed time: 579 secs
+13:24:30 DBG verifier done backend=groth16 curve=bn254 took=1.288129
+[2024-11-23T13:24:30Z INFO  sha2_rust] Proof: successfully written 1268 bytes.
+[2024-11-23T13:24:30Z INFO  sha2_rust]  hash(bincode(pulic_input))1: [197, 85, 237, 192, 203, 240, 69, 67, 7, 62, 23, 5, 10, 112, 210, 80, 40, 245, 196, 9, 255, 152, 190, 127, 32, 148, 73, 249, 212, 64, 168, 103]
+[2024-11-23T13:24:30Z INFO  sha2_rust] Contract: successfully written 12961 bytes.
+[2024-11-23T13:24:30Z INFO  sha2_rust] Generating proof successfully .The proof file and verifier contract are in the the path /mnt/data/gavin/zkm-project-template/host-program/sha2-rust/../../contracts/{verifier,src} .
+[2024-11-23T13:24:30Z INFO  sha2_rust] Elapsed time: 205 secs
 ```
 
 The result proof and contract file will be in the contracts/verifier and contracts/src respectively.
@@ -199,10 +190,10 @@ The result proof and contract file will be in the contracts/verifier and contrac
 
 > The proving task requires several stages: queuing, splitting, proving, aggregating and finalizing. Each stage involves a varying duration.
 
-Must set the `PRIVATE_KEY` in [`run-network-proving.sh`](host-program/run-network-proving.sh) and run the program:
+Must set the `PRIVATE_KEY` in [`run-proving.sh`](host-program/sha2-rust/run-proving.sh) and run the program:
 
 ```sh
-./run-network-proving.sh sha2-rust
+./run-proving.sh network
 ```
 
 If successful, it will output a similar log:
@@ -210,16 +201,17 @@ If successful, it will output a similar log:
 ##### **`sha2-rust-network-proving.log`**
 
 ```
-[2024-10-09T03:55:06Z INFO  zkm_prove] new prover client.
-[2024-10-09T03:55:07Z INFO  zkm_prove] new prover client,ok.
-[2024-10-09T03:55:07Z INFO  zkm_sdk::network::prover] calling request_proof.
-[2024-10-09T03:55:10Z INFO  zkm_sdk::network::prover] calling wait_proof, proof_id=fccd67f1-0bb3-498d-a048-50578b4a6360
-[2024-10-09T03:55:10Z INFO  zkm_sdk::network::prover] generate_proof : queuing the task.
-[2024-10-09T03:55:40Z INFO  zkm_sdk::network::prover] generate_proof : finalizing the proof.
-[2024-10-09T03:56:14Z INFO  zkm_prove] Proof: successfully written 1262 bytes.
-[2024-10-09T03:56:14Z INFO  zkm_prove] Contract: successfully written 10329 bytes.
-[2024-10-09T03:56:14Z INFO  zkm_prove] Generating proof successfully .The proof file and verifier contract are in the the path contracts/verifier and contracts/src .
-[2024-10-09T03:56:14Z INFO  zkm_prove] Elapsed time: 66 secs
+[2024-11-23T10:13:04Z INFO  sha2_rust] new prover client.
+[2024-11-23T10:13:05Z INFO  sha2_rust] new prover client,ok.
+[2024-11-23T10:13:05Z INFO  zkm_sdk::network::prover] calling request_proof.
+[2024-11-23T10:13:08Z INFO  zkm_sdk::network::prover] calling wait_proof, proof_id=31134979-8e99-4de6-988c-46211df28c80
+[2024-11-23T10:13:08Z INFO  zkm_sdk::network::prover] generate_proof : proving the task.
+[2024-11-23T10:13:38Z INFO  zkm_sdk::network::prover] generate_proof : finalizing the proof.
+[2024-11-23T10:14:11Z INFO  sha2_rust] Proof: successfully written 1263 bytes.
+[2024-11-23T10:14:11Z INFO  sha2_rust]  hash(bincode(pulic_input))1: [197, 85, 237, 192, 203, 240, 69, 67, 7, 62, 23, 5, 10, 112, 210, 80, 40, 245, 196, 9, 255, 152, 190, 127, 32, 148, 73, 249, 212, 64, 168, 103]
+[2024-11-23T10:14:11Z INFO  sha2_rust] Contract: successfully written 12960 bytes.
+[2024-11-23T10:14:11Z INFO  sha2_rust] Generating proof successfully .The proof file and verifier contract are in the the path /mnt/data/gavin/zkm-project-template/host-program/sha2-rust/../../contracts/{verifier,src} .
+[2024-11-23T10:14:11Z INFO  sha2_rust] Elapsed time: 66 secs
 ```
 
 The result proof and contract file will be in the contracts/verifier and contracts/src.
@@ -242,15 +234,14 @@ If successful, it will output a similar log:
 
 ```
 [⠊] Compiling...
-[⠊] Compiling 2 files with Solc 0.8.26
-[⠢] Solc 0.8.26 finished in 921.86ms
-Compiler run successful!
+No files changed, compilation skipped
 
-Ran 1 test for test/verifier.t.sol:VerifierTest
-[PASS] test_ValidProof() (gas: 286833)
-Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 8.16ms (7.51ms CPU time)
+Ran 2 tests for test/verifier.t.sol:VerifierTest
+[PASS] test_ValidProof() (gas: 287072)
+[PASS] test_ValidPublicInputs() (gas: 67184)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 8.51ms (8.64ms CPU time)
 
-Ran 1 test suite in 9.02ms (8.16ms CPU time): 1 tests passed, 0 failed, 0 skipped (1 total tests)
+Ran 1 test suite in 9.28ms (8.51ms CPU time): 2 tests passed, 0 failed, 0 skipped (2 total tests)
 ```
 
 #### Deploy the contract generateing in the step 3
@@ -315,6 +306,6 @@ If successfully, it will generate `244.json` in the path test-vectors
 cp test-vectors/244.json zkm-project-template/host-program/test-vectors/
 ```
 
-Next, you need to edit the `JSON_PATH` variable in the [`run-local-proving.sh`](host-program/run-local-proving.sh) or [`run-network-proving.sh`](host-program/run-network-proving.sh) to match the name of the  JSON file mentioned above.
+Next, you need to edit the `JSON_PATH` variable in the [`run-proving.sh`](host-program/revme/run-proving.sh) to match the name of the  JSON file mentioned above.
 
-Then, you can execute the run-xxx-proving.sh by following the steps outlined in `Example 1: sha2-rust`.
+Then, you can execute the run-proving.sh by following the steps outlined in `Example 1: sha2-rust`.

@@ -1,12 +1,12 @@
 use common::tls::Config;
 use stage_service::stage_service_client::StageServiceClient;
 use stage_service::{GenerateProofRequest, GetStatusRequest};
-use std::env;
+
 use std::time::Instant;
 use tonic::transport::Endpoint;
 use tonic::transport::{Channel, ClientTlsConfig};
 
-use crate::prover::{Prover, ProverInput, ProverResult};
+use crate::prover::{ClientType, Prover, ProverInput, ProverResult};
 use ethers::signers::{LocalWallet, Signer};
 use tokio::time::sleep;
 use tokio::time::Duration;
@@ -19,43 +19,59 @@ pub mod stage_service {
 
 use crate::network::prover::stage_service::Status;
 
-pub const DEFAULT_PROVER_NETWORK_RPC: &str = "https://152.32.186.45:20002";
-pub const DEFALUT_PROVER_NETWORK_DOMAIN: &str = "stage";
-
 pub struct NetworkProver {
     pub stage_client: StageServiceClient<Channel>,
     pub wallet: LocalWallet,
 }
 
 impl NetworkProver {
-    pub async fn new() -> anyhow::Result<NetworkProver> {
-        let endpoint = env::var("ENDPOINT").unwrap_or(DEFAULT_PROVER_NETWORK_RPC.to_string());
-        let ca_cert_path = env::var("CA_CERT_PATH").unwrap_or("".to_string());
-        let cert_path = env::var("CERT_PATH").unwrap_or("".to_string());
-        let key_path = env::var("KEY_PATH").unwrap_or("".to_string());
-        let domain_name =
-            env::var("DOMAIN_NAME").unwrap_or(DEFALUT_PROVER_NETWORK_DOMAIN.to_string());
-        let private_key = env::var("PRIVATE_KEY").unwrap_or("".to_string());
-
+    pub async fn new(client_type: &ClientType) -> anyhow::Result<NetworkProver> {
+        let ca_cert_path = client_type
+            .ca_cert_path
+            .to_owned()
+            .expect("CA_CERT_PATH must be set");
+        let cert_path = client_type
+            .cert_path
+            .to_owned()
+            .expect("CERT_PATH must be set");
+        let key_path = client_type
+            .key_path
+            .to_owned()
+            .expect("KEY_PATH must be set");
         let ssl_config = if ca_cert_path.is_empty() {
             None
         } else {
             Some(Config::new(ca_cert_path, cert_path, key_path).await?)
         };
-
+        let endpoint_para = client_type
+            .endpoint
+            .to_owned()
+            .expect("ENDPOINT must be set");
         let endpoint = match ssl_config {
             Some(config) => {
-                let mut tls_config = ClientTlsConfig::new().domain_name(domain_name);
+                let mut tls_config = ClientTlsConfig::new().domain_name(
+                    client_type
+                        .domain_name
+                        .to_owned()
+                        .expect("DOMAIN_NAME must be set"),
+                );
                 if let Some(ca_cert) = config.ca_cert {
                     tls_config = tls_config.ca_certificate(ca_cert);
                 }
                 if let Some(identity) = config.identity {
                     tls_config = tls_config.identity(identity);
                 }
-                Endpoint::new(endpoint)?.tls_config(tls_config)?
+                Endpoint::new(endpoint_para.to_owned())?.tls_config(tls_config)?
             }
-            None => Endpoint::new(endpoint)?,
+            None => Endpoint::new(endpoint_para.to_owned())?,
         };
+        let private_key = client_type
+            .private_key
+            .to_owned()
+            .expect("PRIVATE_KEY must be set");
+        if private_key.is_empty() {
+            panic!("Please set the PRIVATE_KEY");
+        }
         let stage_client = StageServiceClient::connect(endpoint).await?;
         let wallet = private_key.parse::<LocalWallet>().unwrap();
         Ok(NetworkProver {
@@ -180,6 +196,18 @@ impl Prover for NetworkProver {
                 }
             }
         }
+    }
+
+    async fn setup<'a>(
+        &self,
+        _vk_path: &'a str,
+        _input: &'a ProverInput,
+        _timeout: Option<Duration>,
+    ) -> anyhow::Result<()> {
+        log::info!("The proof network does not support the method.");
+        return Err(anyhow::anyhow!(
+            "The proof network does not support the method!"
+        ));
     }
 
     async fn prove<'a>(

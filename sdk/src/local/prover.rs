@@ -13,21 +13,23 @@ pub struct ProverTask {
     input: ProverInput,
     result: Option<ProverResult>,
     is_done: bool,
+    vk_path: String,
 }
 
 impl ProverTask {
-    fn new(proof_id: &str, input: &ProverInput) -> ProverTask {
+    fn new(proof_id: &str, vk_path: &str, input: &ProverInput) -> ProverTask {
         ProverTask {
             proof_id: proof_id.to_string(),
             input: input.clone(),
             result: None,
             is_done: false,
+            vk_path: vk_path.to_string(),
         }
     }
 
     fn run(&mut self) {
         let mut result = ProverResult::default();
-        let inputdir = format!("/tmp/{}/input", self.proof_id);
+        let inputdir = self.vk_path.clone();
         let outputdir = format!("/tmp/{}/output", self.proof_id);
         fs::create_dir_all(&inputdir).unwrap();
         fs::create_dir_all(&outputdir).unwrap();
@@ -66,18 +68,20 @@ impl ProverTask {
 
 pub struct LocalProver {
     tasks: Arc<Mutex<HashMap<String, Arc<Mutex<ProverTask>>>>>,
+    vk_path: String,
 }
 
-impl Default for LocalProver {
+/*impl Default for LocalProver {
     fn default() -> Self {
-        Self::new()
+        Self::new("")
     }
-}
+}*/
 
 impl LocalProver {
-    pub fn new() -> LocalProver {
+    pub fn new(vk_path: &str) -> LocalProver {
         LocalProver {
             tasks: Arc::new(Mutex::new(HashMap::new())),
+            vk_path: vk_path.to_string(),
         }
     }
 }
@@ -86,7 +90,8 @@ impl LocalProver {
 impl Prover for LocalProver {
     async fn request_proof<'a>(&self, input: &'a ProverInput) -> anyhow::Result<String> {
         let proof_id: String = uuid::Uuid::new_v4().to_string();
-        let task: Arc<Mutex<ProverTask>> = Arc::new(Mutex::new(ProverTask::new(&proof_id, input)));
+        let task: Arc<Mutex<ProverTask>> =
+            Arc::new(Mutex::new(ProverTask::new(&proof_id, &self.vk_path, input)));
         self.tasks
             .lock()
             .unwrap()
@@ -116,6 +121,31 @@ impl Prover for LocalProver {
             }
             log::info!("waiting the proof result.");
             sleep(Duration::from_secs(30)).await;
+        }
+    }
+
+    async fn setup<'a>(
+        &self,
+        vk_path: &'a str,
+        input: &'a ProverInput,
+        _timeout: Option<Duration>,
+    ) -> anyhow::Result<()> {
+        let mut result = ProverResult::default();
+        //let inputdir = format!("{}/input", vk_path);
+        fs::create_dir_all(vk_path).unwrap();
+        let should_agg = crate::local::stark::prove_stark(input, vk_path, &mut result).unwrap();
+        if !should_agg {
+            log::info!("Setup: generating the stark proof false, please check the SEG_SIZE or other parameters.");
+            return Err(anyhow::anyhow!(
+                "Setup: generating the stark proof false, please check the SEG_SIZE or other parameters!"));
+        }
+
+        match crate::local::snark::setup(vk_path) {
+            true => {
+                log::info!("setup successful, the verify key is in the {}", vk_path);
+                Ok(())
+            }
+            false => Err(anyhow::anyhow!("snark setup failed!")),
         }
     }
 

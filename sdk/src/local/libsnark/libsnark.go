@@ -19,4 +19,18 @@ func Stark2Snark(inputdir *C.char, outputdir *C.char) C.int {
 	return 0
 }
 
+//export  Setup
+func Setup(inputdir *C.char) C.int {
+	// Convert C strings to Go strings
+	inputDir := C.GoString(inputdir)
+	var prover SnarkProver
+	err := prover.Setup(inputDir)
+	if err != nil {
+		fmt.Printf("Setup error: %v\n", err)
+		return -1
+	}
+	return 0
+}
+
+
 func main() {}

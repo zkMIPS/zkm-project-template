@@ -3,6 +3,18 @@ use serde::Deserialize;
 use serde::Serialize;
 use tokio::time::Duration;
 
+#[derive(Debug, Default, Clone)]
+pub struct ClientType {
+    pub zkm_prover: String,
+    pub vk_path: String,
+    pub endpoint: Option<String>,
+    pub ca_cert_path: Option<String>,
+    pub cert_path: Option<String>,
+    pub key_path: Option<String>,
+    pub domain_name: Option<String>,
+    pub private_key: Option<String>,
+}
+
 #[derive(Debug, Default, Deserialize, Serialize, Clone)]
 pub struct ProverInput {
     pub elf: Vec<u8>,
@@ -30,6 +42,12 @@ pub trait Prover {
         proof_id: &'a str,
         timeout: Option<Duration>,
     ) -> anyhow::Result<Option<ProverResult>>;
+    async fn setup<'a>(
+        &self,
+        vk_path: &'a str,
+        input: &'a ProverInput,
+        timeout: Option<Duration>,
+    ) -> anyhow::Result<()>;
     async fn prove<'a>(
         &self,
         input: &'a ProverInput,
