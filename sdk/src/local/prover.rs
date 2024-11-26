@@ -2,6 +2,7 @@ use crate::prover::{Prover, ProverInput, ProverResult};
 use async_trait::async_trait;
 use std::collections::HashMap;
 use std::fs;
+use std::path::Path;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
@@ -29,7 +30,12 @@ impl ProverTask {
 
     fn run(&mut self) {
         let mut result = ProverResult::default();
-        let inputdir = self.vk_path.clone();
+        let inputdir = self.vk_path.to_owned();
+        /*let inputdir = if self.setup_flag {
+            self.vk_path.to_owned()
+        } else {
+            format!("/tmp/{}/input", self.proof_id)
+        };*/
         let outputdir = format!("/tmp/{}/output", self.proof_id);
         fs::create_dir_all(&inputdir).unwrap();
         fs::create_dir_all(&outputdir).unwrap();
@@ -69,21 +75,32 @@ impl ProverTask {
 pub struct LocalProver {
     tasks: Arc<Mutex<HashMap<String, Arc<Mutex<ProverTask>>>>>,
     vk_path: String,
+    setup_flag: bool,
 }
 
-/*impl Default for LocalProver {
-    fn default() -> Self {
-        Self::new("")
-    }
-}*/
 
 impl LocalProver {
     pub fn new(vk_path: &str) -> LocalProver {
         LocalProver {
             tasks: Arc::new(Mutex::new(HashMap::new())),
             vk_path: vk_path.to_string(),
+           // setup_flag: flag,
         }
     }
+}
+
+pub fn delete_dir_contents<P: AsRef<Path>>(path: P) -> anyhow::Result<()> {
+    for entry in fs::read_dir(path).context("Failed to read directory")? {
+        let entry = entry.context("Failed to read directory entry")?;
+        let path = entry.path();
+
+        if path.is_dir() {
+            Self::delete_dir_contents(&path).context("Failed to delete directory contents")?;
+        } else {
+            fs::remove_file(&path).context("Failed to delete file")?;
+        }
+    }
+    Ok(())
 }
 
 #[async_trait]
@@ -133,6 +150,7 @@ impl Prover for LocalProver {
         let mut result = ProverResult::default();
         //let inputdir = format!("{}/input", vk_path);
         fs::create_dir_all(vk_path).unwrap();
+        delete_dir_contents(&vk_path).context("Failed to clear input directory")?
         let should_agg = crate::local::stark::prove_stark(input, vk_path, &mut result).unwrap();
         if !should_agg {
             log::info!("Setup: generating the stark proof false, please check the SEG_SIZE or other parameters.");
