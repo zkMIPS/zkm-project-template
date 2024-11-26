@@ -8,6 +8,7 @@ use std::thread;
 use std::time::Duration;
 use std::time::Instant;
 use tokio::time::sleep;
+use anyhow::Context;
 
 pub struct ProverTask {
     proof_id: String,
@@ -75,7 +76,7 @@ impl ProverTask {
 pub struct LocalProver {
     tasks: Arc<Mutex<HashMap<String, Arc<Mutex<ProverTask>>>>>,
     vk_path: String,
-    setup_flag: bool,
+    //setup_flag: bool,
 }
 
 
@@ -95,7 +96,7 @@ pub fn delete_dir_contents<P: AsRef<Path>>(path: P) -> anyhow::Result<()> {
         let path = entry.path();
 
         if path.is_dir() {
-            Self::delete_dir_contents(&path).context("Failed to delete directory contents")?;
+            delete_dir_contents(&path).context("Failed to delete directory contents")?;
         } else {
             fs::remove_file(&path).context("Failed to delete file")?;
         }
