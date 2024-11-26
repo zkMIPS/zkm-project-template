@@ -33,6 +33,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .and_then(|seg| seg.parse::<bool>().ok())
         .unwrap_or(false);
 
+    let setup_flag1 = env::var("SETUP_FLAG")
+        .ok()
+        .and_then(|seg| seg.parse::<bool>().ok())
+        .unwrap_or(false);
+
     let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
     //let args_parameter = env::var("ARGS").unwrap_or("data-to-hash".to_string());
     //let json_path = env::var("JSON_PATH").expect("JSON PATH is missing");
@@ -74,11 +79,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //If the guest program does't have inputs, it does't need the setting.
     set_guest_input(&mut prover_input, None);
 
-    //When the host is executed for the first time, it will generate both the proof key (pk) and the verification key (vk)  through setup().
-    //if you want to generate the new vk , you should delete the files in the vk_path, then run the host program.
-    prover_client
+    //excuting the setup 
+    if setup_flag1 {
+        prover_client
         .setup(zkm_prover_type, &vk_path1, &prover_input)
         .await;
+
+        return Ok(());
+    }
+
 
     let start = Instant::now();
     let proving_result = prover_client.prover.prove(&prover_input, None).await;

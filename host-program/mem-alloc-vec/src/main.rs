@@ -82,10 +82,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .setup(zkm_prover_type, &vk_path1, &prover_input)
         .await;
 
-        log::info!("Finish setup and snark proof will use the key in {}.", vk_path1);
         return Ok(());
     }
-    
 
     let start = Instant::now();
     let proving_result = prover_client.prover.prove(&prover_input, None).await;
