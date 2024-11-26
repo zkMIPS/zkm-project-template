@@ -10,6 +10,7 @@ use std::fs;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
+use anyhow::bail;
 
 use serde_json::to_writer;
 use sha2::{Digest, Sha256};
@@ -74,7 +75,7 @@ impl ProverClient {
 
     //If the vk or pk doesn't exist, it will run setup().
     pub async fn setup(&self, zkm_prover: &str, vk_path: &str, prover_input: &ProverInput) {
-        if is_local_prover(zkm_prover) {
+        if Self::is_local_prover(zkm_prover) {
             //let pk_file = format!("{}/proving.key", vk_path);
             //let vk_file = format!("{}/verifying.key", vk_path); 
             let path = Path::new(vk_path);
@@ -107,7 +108,7 @@ impl ProverClient {
         zkm_prover_type: &str,
     ) -> anyhow::Result<()> {
         if prover_result.proof_with_public_inputs.is_empty() {
-            if is_local_prover(zkm_prover_type) {
+            if Self::is_local_prover(zkm_prover_type) {
                 //local proving
                 log::info!("Fail: please try setting SEG_SIZE={}", input.seg_size / 2);
                 //return Err(anyhow::anyhow!("SEG_SIZE is excessively large."));
