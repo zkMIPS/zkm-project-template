@@ -47,7 +47,10 @@ impl ProverTask {
                 "There is only one segment with segment size {}, will skip the aggregation!",
                 self.input.seg_size
             );
-        } else if crate::local::snark::prove_snark(&vk_path, &inputdir, &outputdir).expect("true or false") {
+
+        } else if crate::local::snark::prove_snark(&vk_path, &inputdir, &outputdir)
+            .expect("true or false")
+        {
             result.stark_proof =
                 std::fs::read(format!("{}/proof_with_public_inputs.json", inputdir)).unwrap();
             result.proof_with_public_inputs =
@@ -160,7 +163,7 @@ impl Prover for LocalProver {
         match crate::local::snark::setup_and_generate_sol_verifier(tem_dir) {
             Ok(true) => {
                 //copy the result files to vk_path
-                //1. pk 
+                //1. pk
                 let src_path = Path::new(tem_dir);
                 let src_file = src_path.join("proving.key");
                 let dst_path = Path::new(vk_path);
@@ -181,11 +184,12 @@ impl Prover for LocalProver {
                 let src_file = src_path.join("circuit");
                 let dst_file = dst_path.join("circuit");
                 fs::copy(src_file, dst_file)?;
-                
                 log::info!("setup_and_generate_sol_verifier successfully, the verify key and verifier contract are in the {}", vk_path);
                 Ok(())
             }
-            Ok(false) => Err(anyhow::anyhow!("snark: setup_and_generate_sol_verifier failed!")),
+            Ok(false) => Err(anyhow::anyhow!(
+                "snark: setup_and_generate_sol_verifier failed!"
+            )),
             Err(_) => todo!(),
         }
     }

@@ -4,7 +4,11 @@ use std::os::raw::c_char;
 use std::path::Path;
 
 extern "C" {
-    fn Stark2Snark(keypath: *const c_char, inputdir: *const c_char, outputdir: *const c_char) -> c_int;
+    fn Stark2Snark(
+        keypath: *const c_char,
+        inputdir: *const c_char,
+        outputdir: *const c_char,
+    ) -> c_int;
     fn SetupAndGenerateSolVerifier(inputdir: *const c_char) -> c_int;
 }
 

@@ -205,9 +205,8 @@ impl Prover for NetworkProver {
         _timeout: Option<Duration>,
     ) -> anyhow::Result<()> {
         log::info!("The proof network does not support the method.");
-        panic!(
-            "The proof network does not support the method!"
-        );
+
+        panic!("The proof network does not support the method!");
     }
 
     async fn prove<'a>(

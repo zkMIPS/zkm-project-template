@@ -118,7 +118,6 @@ pub fn update_public_inputs_with_bincode(
             userdata,
             output_hs
         );
-        
         bail!("Public inputs's hash does not match the proof's userdata.");
     }
 
@@ -187,7 +186,7 @@ impl ProverClient {
                     "Fail: the SEG_SIZE={} out of the range of the proof network's.",
                     input.seg_size
                 );
-                
+
                 bail!("SEG_SIZE is out of the range of the proof network's");
             }
         }

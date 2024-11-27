@@ -82,7 +82,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .setup_and_generate_sol_verifier(zkm_prover_type, &vk_path1, &prover_input)
             .await;
 
-     //   return Ok(());
+        //   return Ok(());
     }
 
     let start = Instant::now();
