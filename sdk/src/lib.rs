@@ -127,7 +127,7 @@ pub fn update_public_inputs_with_bincode(
 impl ProverClient {
     pub async fn new(client_config: &ClientCfg) -> Self {
         #[allow(unreachable_code)]
-        match client_type.zkm_prover.as_str() {
+        match client_config.zkm_prover.as_str() {
             "local" => Self {
                 prover: Box::new(LocalProver::new(&client_type.vk_path)),
             },
@@ -146,9 +146,9 @@ impl ProverClient {
         }
     }
 
-    pub async fn network(client_type: &ClientCfg) -> Self {
+    pub async fn network(client_config: &ClientCfg) -> Self {
         Self {
-            prover: Box::new(NetworkProver::new(client_type).await.unwrap()),
+            prover: Box::new(NetworkProver::new(client_config).await.unwrap()),
         }
     }
 

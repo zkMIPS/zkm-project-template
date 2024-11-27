@@ -145,14 +145,14 @@ impl Prover for LocalProver {
         _timeout: Option<Duration>,
     ) -> anyhow::Result<()> {
         let mut result = ProverResult::default();
-        let path = Path::new(vk_path.to_owned());
+        let path = Path::new(vk_path);
         if !path.is_dir() {
             fs::create_dir_all(vk_path).unwrap();
         }
         
         //delete_dir_contents(vk_path).context("Failed to clear input directory")?;
         let tem_dir = "/tmp/setup";
-        let path = Path::new(tem_dir.to_owned());
+        let path = Path::new(tem_dir;
         if !path.is_dir() {
             fs::create_dir_all(tem_dir).unwrap();
         } else {

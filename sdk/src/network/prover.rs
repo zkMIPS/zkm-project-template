@@ -6,7 +6,7 @@ use std::time::Instant;
 use tonic::transport::Endpoint;
 use tonic::transport::{Channel, ClientTlsConfig};
 
-use crate::prover::{ClientType, Prover, ProverInput, ProverResult};
+use crate::prover::{ClientCfg, Prover, ProverInput, ProverResult};
 use ethers::signers::{LocalWallet, Signer};
 use tokio::time::sleep;
 use tokio::time::Duration;
@@ -25,16 +25,16 @@ pub struct NetworkProver {
 }
 
 impl NetworkProver {
-    pub async fn new(client_type: &ClientType) -> anyhow::Result<NetworkProver> {
-        let ca_cert_path = client_type
+    pub async fn new(client_config: &ClientCfg) -> anyhow::Result<NetworkProver> {
+        let ca_cert_path = client_config
             .ca_cert_path
             .to_owned()
             .expect("CA_CERT_PATH must be set");
-        let cert_path = client_type
+        let cert_path = client_config
             .cert_path
             .to_owned()
             .expect("CERT_PATH must be set");
-        let key_path = client_type
+        let key_path = client_config
             .key_path
             .to_owned()
             .expect("KEY_PATH must be set");
@@ -43,14 +43,14 @@ impl NetworkProver {
         } else {
             Some(Config::new(ca_cert_path, cert_path, key_path).await?)
         };
-        let endpoint_para = client_type
+        let endpoint_para = client_config
             .endpoint
             .to_owned()
             .expect("ENDPOINT must be set");
         let endpoint = match ssl_config {
             Some(config) => {
                 let mut tls_config = ClientTlsConfig::new().domain_name(
-                    client_type
+                    client_config
                         .domain_name
                         .to_owned()
                         .expect("DOMAIN_NAME must be set"),
@@ -65,7 +65,7 @@ impl NetworkProver {
             }
             None => Endpoint::new(endpoint_para.to_owned())?,
         };
-        let private_key = client_type
+        let private_key = client_config
             .private_key
             .to_owned()
             .expect("PRIVATE_KEY must be set");
