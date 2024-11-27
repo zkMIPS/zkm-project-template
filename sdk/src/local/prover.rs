@@ -152,7 +152,7 @@ impl Prover for LocalProver {
         
         //delete_dir_contents(vk_path).context("Failed to clear input directory")?;
         let tem_dir = "/tmp/setup";
-        let path = Path::new(tem_dir;
+        let path = Path::new(tem_dir);
         if !path.is_dir() {
             fs::create_dir_all(tem_dir).unwrap();
         } else {
