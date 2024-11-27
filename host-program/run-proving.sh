@@ -39,5 +39,5 @@ cd -
 echo "SEG_SIZE:$SEG_SIZE"
 echo "BASEDIR:$BASEDIR"
 
-nohup $BASEDIR/../target/release/$program $1 >./$program-$1-proving.log 2>&1 &
-echo "Check out the log by tail -f $program-$1-proving.log"
+nohup $BASEDIR/../target/release/$program  >./$program-$ZKM_PROVER-proving.log 2>&1 &
+echo "Check out the log by tail -f $program-$ZKM_PROVER-proving.log"
