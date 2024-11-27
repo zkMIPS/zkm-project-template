@@ -2,7 +2,7 @@ use std::env;
 use std::fs::read;
 
 use std::time::Instant;
-use zkm_sdk::{prover::ClientType, prover::ProverInput, ProverClient};
+use zkm_sdk::{prover::ClientCfg, prover::ProverInput, ProverClient};
 
 pub const DEFAULT_PROVER_NETWORK_RPC: &str = "https://152.32.186.45:20002";
 pub const DEFALUT_PROVER_NETWORK_DOMAIN: &str = "stage";
@@ -79,7 +79,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //excuting the setup_and_generate_sol_verifier
     if setup_flag1 {
         prover_client
-            .setup_and_generate_sol_verifier(zkm_prover_type, &vk_path1, &prover_input)
+            .setup_and_generate_sol_verifier(&zkm_prover_type, &vk_path1, &prover_input)
             .await;
 
         //  return Ok(());
@@ -96,7 +96,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         &prover_result,
                         &prover_input,
                         &proof_results_path,
-                        zkm_prover_type,
+                        &zkm_prover_type,
                     )
                     .expect("process proof results error");
             } else {
