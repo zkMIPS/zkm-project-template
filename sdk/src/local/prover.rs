@@ -47,7 +47,6 @@ impl ProverTask {
                 "There is only one segment with segment size {}, will skip the aggregation!",
                 self.input.seg_size
             );
-
         } else if crate::local::snark::prove_snark(&vk_path, &inputdir, &outputdir)
             .expect("true or false")
         {
