@@ -4,7 +4,7 @@ use serde::Serialize;
 use tokio::time::Duration;
 
 #[derive(Debug, Default, Clone)]
-pub struct ClientType {
+pub struct ClientCfg {
     pub zkm_prover: String,
     pub vk_path: String,
     //pub setup_flag: bool,

@@ -1,11 +1,13 @@
 if [ $# -lt 1 ]; then
-    echo "usage: ./run_proving local or network"
+    echo "usage: ./run_proving revme[sha2-rust, sha2-go, mem-alloc-vec]"
     exit 1
 fi
 
 set -e
-program="sha2-go"
+program=$1
 BASEDIR=$(cd $(dirname $0); pwd)
+export ZKM_PROVER=local
+#export ZKM_PROVER=network
 export LD_LIBRARY_PATH=$BASEDIR/../../sdk/src/local/libsnark:$LD_LIBRARY_PATH  ##Modify it according your template
 export RUST_LOG=info
 export SEG_SIZE=262144

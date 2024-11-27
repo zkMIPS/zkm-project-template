@@ -5,7 +5,7 @@ pub mod prover;
 use anyhow::bail;
 use local::prover::LocalProver;
 use network::prover::NetworkProver;
-use prover::{ClientType, Prover, ProverInput, ProverResult};
+use prover::{ClientCfg, Prover, ProverInput, ProverResult};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::fs::File;
@@ -125,14 +125,14 @@ pub fn update_public_inputs_with_bincode(
 }
 
 impl ProverClient {
-    pub async fn new(client_type: &ClientType) -> Self {
+    pub async fn new(client_config: &ClientCfg) -> Self {
         #[allow(unreachable_code)]
         match client_type.zkm_prover.as_str() {
             "local" => Self {
                 prover: Box::new(LocalProver::new(&client_type.vk_path)),
             },
             "network" => Self {
-                prover: Box::new(NetworkProver::new(client_type).await.unwrap()),
+                prover: Box::new(NetworkProver::new(client_config).await.unwrap()),
             },
             _ => panic!(
                 "invalid value for ZKM_PROVER enviroment variable: expected 'local', or 'network'"
@@ -146,7 +146,7 @@ impl ProverClient {
         }
     }
 
-    pub async fn network(client_type: &ClientType) -> Self {
+    pub async fn network(client_type: &ClientCfg) -> Self {
         Self {
             prover: Box::new(NetworkProver::new(client_type).await.unwrap()),
         }

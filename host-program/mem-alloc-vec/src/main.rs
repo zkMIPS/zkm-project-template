@@ -3,7 +3,7 @@ use std::env;
 use std::fs::read;
 
 use std::time::Instant;
-use zkm_sdk::{prover::ClientType, prover::ProverInput, ProverClient};
+use zkm_sdk::{prover::ClientCfg, prover::ProverInput, ProverClient};
 
 pub const DEFAULT_PROVER_NETWORK_RPC: &str = "https://152.32.186.45:20002";
 pub const DEFALUT_PROVER_NETWORK_DOMAIN: &str = "stage";
@@ -20,7 +20,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         helper();
     }
 
-    let zkm_prover_type = &args[1];
+    //let zkm_prover_type = &args[1];
 
     let seg_size1 = env::var("SEG_SIZE")
         .ok()
@@ -48,8 +48,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let key_path1 = env::var("KEY_PATH").unwrap_or("".to_string());
     let domain_name1 = env::var("DOMAIN_NAME").unwrap_or(DEFALUT_PROVER_NETWORK_DOMAIN.to_string());
     let private_key1 = env::var("PRIVATE_KEY").unwrap_or("".to_string());
+    let zkm_prover_type = env::var("ZKM_PROVER").expect("ZKM PROVER is missing");
 
-    let client_type: ClientType = ClientType {
+    let client_config: ClientCfg = ClientCfg {
         zkm_prover: zkm_prover_type.to_owned(),
         endpoint: Some(endpoint1),
         ca_cert_path: Some(ca_cert_path1),
@@ -61,7 +62,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         //setup_flag: setup_flag1,
     };
 
-    let prover_client = ProverClient::new(&client_type).await;
+    let prover_client = ProverClient::new(&client_config).await;
     log::info!("new prover client,ok.");
 
     let prover_input = ProverInput {

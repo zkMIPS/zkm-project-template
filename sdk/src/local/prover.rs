@@ -145,13 +145,20 @@ impl Prover for LocalProver {
         _timeout: Option<Duration>,
     ) -> anyhow::Result<()> {
         let mut result = ProverResult::default();
-        //let inputdir = format!("{}/input", vk_path);
-        fs::create_dir_all(vk_path).unwrap();
+        let path = Path::new(vk_path.to_owned());
+        if !path.is_dir() {
+            fs::create_dir_all(vk_path).unwrap();
+        }
+        
         //delete_dir_contents(vk_path).context("Failed to clear input directory")?;
         let tem_dir = "/tmp/setup";
-        fs::create_dir_all(tem_dir).unwrap();
-        delete_dir_contents(tem_dir).context("Failed to clear input directory")?;
-
+        let path = Path::new(tem_dir.to_owned());
+        if !path.is_dir() {
+            fs::create_dir_all(tem_dir).unwrap();
+        } else {
+            delete_dir_contents(tem_dir).context("Failed to clear input directory")?;
+        }
+        
         let should_agg = crate::local::stark::prove_stark(input, tem_dir, &mut result).unwrap();
         if !should_agg {
             log::info!("Setup: generating the stark proof false, please check the SEG_SIZE or other parameters.");
