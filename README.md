@@ -34,14 +34,27 @@ There are two ways to prove the guest program:
 │   ├── sha2-go
 │   └── sha2-rust
 │  
-├── host-program                //Generate the proof and verifier contracts  to the  guest programs
-│   ├── Cargo.toml
-│   ├── run-local-proving.sh
-│   ├── run-network-proving.sh
-│   ├── src
-│      └── bin
-│          └── zkm-prove.rs
-
+├── host-program                //Generate the proof and verifier contracts  for the  guest programs
+│   ├── mem-alloc-vec
+│   │   ├── Cargo.toml
+│   │   ├── run-proving.sh
+│   │   └── src
+│   │       └── main.rs
+│   ├── revme
+│   │   ├── Cargo.toml
+│   │   ├── run-proving.sh
+│   │   └── src
+│   │       └── main.rs
+│   ├── sha2-go
+│   │   ├── Cargo.toml
+│   │   ├── run-proving.sh
+│   │   └── src
+│   │       └── main.rs
+│   ├── sha2-rust
+│   │   ├── Cargo.toml
+│   │   ├── run-proving.sh
+│   │   └── src
+│   │       └── main.rs
 ├── install_mips_rust_tool
 ├── rust-toolchain.toml
 ├── sdk                         //Support proof network and local proof
@@ -111,9 +124,9 @@ If successfully, it will generate the binary files in `target/release`/{`sha2-ru
 
 > 3. If the environmental variable `PROOF_RESULTS_PATH` is not set, the proof results file will be saved in zkm-project-template/contracts/{src, verifier}; if the environmental variable `PROOF_RESULTS_PATH` is set, after the proof is completed, the proof results file needs to be copied from from 'PROOF_RESULTS_PATH'/{src, verifier} to the corresponding zkm-project-template/contracts/{src, verifier}. 
 
-> 4. The environment variable `VERIFYING_KEY_PATH` specifies the location of the verification key (vk). 
+> 4. The environment variable `VERIFYING_KEY_PATH` specifies the location of the verification key (vk). If this variable is not set to zkm-project-template/contracts/src, you should copy the  `VERIFYING_KEY_PATH`/verifier.sol to zkm-project-template/contracts/src/ after executing the host program.
 
-> 5. The environment variable `SETUP_FLAG` is set to "true", it will generate both the proof key (pk) and the verification key (vk) and store them at the path indicated by `VERIFYING_KEY_PATH`.Then, the `SETUP_FLAG` should be set to "false" , executing the host will  generate the snark proof using the new pk and vk.
+> 5. The environment variable `SETUP_FLAG` is set to "true", it will generate  the proof key (pk), the verification key (vk) and the verifier contract and store them at the path indicated by `VERIFYING_KEY_PATH`.Then, the `SETUP_FLAG` should be set to "false" , next executing the host will  generate the snark proof using the same pk and vk.
 
 > [!WARNING]
 >  The environmental variable `SEG_SIZE` in the run-xxx_proving.sh affects the final proof generation. 
@@ -144,7 +157,7 @@ If successful, it will output a similar log:
 [2024-11-23T13:12:33Z INFO  sha2_rust] new prover client,ok.
 [2024-11-23T13:12:33Z INFO  zkm_sdk] excuting the setup.
 [2024-11-23T13:12:33Z INFO  zkm_emulator::utils] Split done 66446 : 89443
-[2024-11-23T13:21:05Z INFO  zkm_sdk::local::stark] !!!*******seg_num:2
+[2024-11-23T13:21:05Z INFO  zkm_sdk::local::stark] [*** the seg_num is:2 ***]
 [2024-11-23T13:21:55Z INFO  zkm_sdk::local::util] Process segment /mnt/data/gavin/zkm-project-template/host-program/sha2-rust/../test-vectors/input/segments/0
 [2024-11-23T13:21:59Z INFO  zkm_prover::cpu::bootstrap_kernel] Bootstrapping took 3228 cycles
 [2024-11-23T13:21:59Z INFO  zkm_prover::generation] CPU halted after 64762 cycles

@@ -14,7 +14,7 @@ export ELF_PATH=${BASEDIR}/../../guest-program/$program/target/mips-unknown-linu
 export JSON_PATH=${BASEDIR}/../test-vectors/test.json
 export PROOF_RESULTS_PATH=${BASEDIR}/../../contracts
 export EXECUTE_ONLY=false
-export VERIFYING_KEY_PATH=${BASEDIR}/../test-vectors/input
+export VERIFYING_KEY_PATH=${BASEDIR}/../../contracts/src
 export SETUP_FLAG=false
 
 ##network proving

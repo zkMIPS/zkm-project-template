@@ -31,12 +31,8 @@ impl ProverTask {
 
     fn run(&mut self) {
         let mut result = ProverResult::default();
-        let inputdir = self.vk_path.to_owned();
-        /*let inputdir = if self.setup_flag {
-            self.vk_path.to_owned()
-        } else {
-            format!("/tmp/{}/input", self.proof_id)
-        };*/
+        let vk_path = self.vk_path.to_owned();
+        let inputdir = format!("/tmp/{}/input", self.proof_id);
         let outputdir = format!("/tmp/{}/output", self.proof_id);
         fs::create_dir_all(&inputdir).unwrap();
         fs::create_dir_all(&outputdir).unwrap();
@@ -51,14 +47,14 @@ impl ProverTask {
                 "There is only one segment with segment size {}, will skip the aggregation!",
                 self.input.seg_size
             );
-        } else if crate::local::snark::prove_snark(&inputdir, &outputdir).expect("true or false") {
+        } else if crate::local::snark::prove_snark(&vk_path, &inputdir, &outputdir).expect("true or false") {
             result.stark_proof =
                 std::fs::read(format!("{}/proof_with_public_inputs.json", inputdir)).unwrap();
             result.proof_with_public_inputs =
                 std::fs::read(format!("{}/snark_proof_with_public_inputs.json", outputdir))
                     .unwrap();
-            result.solidity_verifier =
-                std::fs::read(format!("{}/verifier.sol", outputdir)).unwrap();
+            //result.solidity_verifier =
+            //    std::fs::read(format!("{}/verifier.sol", outputdir)).unwrap();
             result.public_values =
                 std::fs::read(format!("{}/public_values.json", inputdir)).unwrap();
         } else {
@@ -76,7 +72,6 @@ impl ProverTask {
 pub struct LocalProver {
     tasks: Arc<Mutex<HashMap<String, Arc<Mutex<ProverTask>>>>>,
     vk_path: String,
-    //setup_flag: bool,
 }
 
 impl LocalProver {
@@ -141,7 +136,7 @@ impl Prover for LocalProver {
         }
     }
 
-    async fn setup<'a>(
+    async fn setup_and_generate_sol_verifier<'a>(
         &self,
         vk_path: &'a str,
         input: &'a ProverInput,
@@ -150,20 +145,47 @@ impl Prover for LocalProver {
         let mut result = ProverResult::default();
         //let inputdir = format!("{}/input", vk_path);
         fs::create_dir_all(vk_path).unwrap();
-        delete_dir_contents(vk_path).context("Failed to clear input directory")?;
-        let should_agg = crate::local::stark::prove_stark(input, vk_path, &mut result).unwrap();
+        //delete_dir_contents(vk_path).context("Failed to clear input directory")?;
+        let tem_dir = "/tmp/setup";
+        fs::create_dir_all(tem_dir).unwrap();
+        delete_dir_contents(tem_dir).context("Failed to clear input directory")?;
+
+        let should_agg = crate::local::stark::prove_stark(input, tem_dir, &mut result).unwrap();
         if !should_agg {
             log::info!("Setup: generating the stark proof false, please check the SEG_SIZE or other parameters.");
             return Err(anyhow::anyhow!(
                 "Setup: generating the stark proof false, please check the SEG_SIZE or other parameters!"));
         }
 
-        match crate::local::snark::setup(vk_path) {
+        match crate::local::snark::setup_and_generate_sol_verifier(tem_dir) {
             Ok(true) => {
-                log::info!("setup successful, the verify key is in the {}", vk_path);
+                //copy the result files to vk_path
+                //1. pk 
+                let src_path = Path::new(tem_dir);
+                let src_file = src_path.join("proving.key");
+                let dst_path = Path::new(vk_path);
+                let dst_file = dst_path.join("proving.key");
+                fs::copy(src_file, dst_file)?;
+
+                //2. vk
+                let src_file = src_path.join("verifying.key");
+                let dst_file = dst_path.join("verifying.key");
+                fs::copy(src_file, dst_file)?;
+
+                //3. contract
+                let src_file = src_path.join("verifier.sol");
+                let dst_file = dst_path.join("verifier.sol");
+                fs::copy(src_file, dst_file)?;
+
+                //4. circuit
+                let src_file = src_path.join("circuit");
+                let dst_file = dst_path.join("circuit");
+                fs::copy(src_file, dst_file)?;
+                
+                log::info!("setup_and_generate_sol_verifier successfully, the verify key and verifier contract are in the {}", vk_path);
                 Ok(())
             }
-            Ok(false) => Err(anyhow::anyhow!("snark setup failed!")),
+            Ok(false) => Err(anyhow::anyhow!("snark: setup_and_generate_sol_verifier failed!")),
             Err(_) => todo!(),
         }
     }
