@@ -129,7 +129,7 @@ impl ProverClient {
         #[allow(unreachable_code)]
         match client_config.zkm_prover.as_str() {
             "local" => Self {
-                prover: Box::new(LocalProver::new(&client_type.vk_path)),
+                prover: Box::new(LocalProver::new(&client_config.vk_path)),
             },
             "network" => Self {
                 prover: Box::new(NetworkProver::new(client_config).await.unwrap()),
