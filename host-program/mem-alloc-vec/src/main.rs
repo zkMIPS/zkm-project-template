@@ -11,14 +11,14 @@ pub const DEFALUT_PROVER_NETWORK_DOMAIN: &str = "stage";
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::try_init().unwrap_or_default();
-    let args: Vec<String> = env::args().collect();
+    /*let args: Vec<String> = env::args().collect();
     let helper = || {
         log::info!("Help: {} local or network", args[0]);
         std::process::exit(-1);
     };
     if args.len() < 2 {
         helper();
-    }
+    }*/
 
     //let zkm_prover_type = &args[1];
 
