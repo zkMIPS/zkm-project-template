@@ -35,6 +35,11 @@ else
 fi
 cd -
 
+if [ "$program" == "sha2-rust" ];then
+    export SEG_SIZE=65536
+elif [ "$program" == "mem-alloc-vec" ];then
+     export SEG_SIZE=65536
+fi
 
 echo "SEG_SIZE:$SEG_SIZE"
 echo "BASEDIR:$BASEDIR"
