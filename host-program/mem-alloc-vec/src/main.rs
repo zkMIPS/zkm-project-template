@@ -1,7 +1,7 @@
+use anyhow::bail;
+use anyhow::Result;
 use std::env;
 use std::fs::read;
-use anyhow::Result;
-use anyhow::bail;
 use std::time::Instant;
 use zkm_sdk::{prover::ClientCfg, prover::ProverInput, ProverClient};
 
@@ -69,13 +69,14 @@ async fn main() -> Result<()> {
     if setup_flag {
         match prover_client
             .setup_and_generate_sol_verifier(&zkm_prover_type, &vk_path, &prover_input)
-            .await {
-                Ok(()) => log::info!("Succussfully setup_and_generate_sol_verifier."),
-                Err(e) => {
-                    log::info!("Error during setup_and_generate_sol_verifier: {}", e);
-                    bail!("Failed to setup_and_generate_sol_verifier.");
-                },
+            .await
+        {
+            Ok(()) => log::info!("Succussfully setup_and_generate_sol_verifier."),
+            Err(e) => {
+                log::info!("Error during setup_and_generate_sol_verifier: {}", e);
+                bail!("Failed to setup_and_generate_sol_verifier.");
             }
+        }
     }
 
     let start = Instant::now();

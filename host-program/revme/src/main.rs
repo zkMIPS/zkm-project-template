@@ -1,8 +1,8 @@
+use anyhow::bail;
+use anyhow::Result;
 use std::env;
 use std::fs::read;
 use std::time::Instant;
-use anyhow::Result;
-use anyhow::bail;
 use zkm_sdk::{prover::ClientCfg, prover::ProverInput, ProverClient};
 
 pub const DEFAULT_PROVER_NETWORK_RPC: &str = "https://152.32.186.45:20002";
@@ -70,13 +70,14 @@ async fn main() -> Result<()> {
     if setup_flag {
         match prover_client
             .setup_and_generate_sol_verifier(&zkm_prover_type, &vk_path, &prover_input)
-            .await {
-                Ok(()) => log::info!("Succussfully setup_and_generate_sol_verifier."),
-                Err(e) => {
-                    log::info!("Error during setup_and_generate_sol_verifier: {}", e);
-                    bail!("Failed to setup_and_generate_sol_verifier.");
-                },
+            .await
+        {
+            Ok(()) => log::info!("Succussfully setup_and_generate_sol_verifier."),
+            Err(e) => {
+                log::info!("Error during setup_and_generate_sol_verifier: {}", e);
+                bail!("Failed to setup_and_generate_sol_verifier.");
             }
+        }
     }
 
     let start = Instant::now();
