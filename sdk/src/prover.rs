@@ -1,8 +1,8 @@
 use async_trait::async_trait;
 use serde::Deserialize;
 use serde::Serialize;
-use tokio::time::Duration;
 use std::default::Default;
+use tokio::time::Duration;
 
 #[derive(Debug, Default, Clone)]
 pub struct ClientCfg {
