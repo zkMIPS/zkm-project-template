@@ -1,5 +1,5 @@
 if [ $# -lt 1 ]; then
-    echo "usage: ./run_proving revme[sha2-rust, sha2-go, mem-alloc-vec]"
+    echo "usage: ./run_proving  revme or sha2-rust or sha2-go or mem-alloc-vec"
     exit 1
 fi
 
@@ -43,6 +43,7 @@ fi
 
 echo "SEG_SIZE:$SEG_SIZE"
 echo "BASEDIR:$BASEDIR"
+echo "ZKM_PROVER:$ZKM_PROVER"
 
 nohup $BASEDIR/../target/release/$program  >./$program-$ZKM_PROVER-proving.log 2>&1 &
-echo "Check out the log by tail -f $program-$ZKM_PROVER-proving.log"
+echo "Check out the log: tail -f $program-$ZKM_PROVER-proving.log"

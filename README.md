@@ -133,7 +133,7 @@ If successfully, it will generate the binary files in `target/release`/{`sha2-ru
 
 >  The guest program's ELF with the input is split into segments according the SEG_SIZE, based on the cycle count.
 
->  When generating proofs on the local machine, if the log shows "!!!*******seg_num: 1", please reduce SEG_SIZE or increase the input. If generating proofs through the proof network, SEG_SIZE must be within the range [65536, 262144]. 
+>  When generating proofs on the local machine, if the log shows "[the seg_num is:1 ]", please reduce SEG_SIZE or increase the input. If generating proofs through the proof network, SEG_SIZE must be within the range [65536, 262144]. 
 
 ### Example 1 : `sha2-rust`
 
@@ -141,12 +141,12 @@ This host program sends the private input pri_input = vec![5u8; 1024] and its ha
 
 #### Local Proving
 
-Make any edits to [`run-proving.sh`](host-program/sha2-rust/run-proving.sh) and run the program:
+Make any edits to [`run-proving.sh`](host-program/run-proving.sh) and run the program:
 
 
 ```sh
 cd zkm-project-template/host-program/sha2-rust
-./run-proving.sh local
+./run-proving.sh sha2-rust
 ```
 
 If successful, it will output a similar log:
@@ -157,7 +157,7 @@ If successful, it will output a similar log:
 [2024-11-23T13:12:33Z INFO  sha2_rust] new prover client,ok.
 [2024-11-23T13:12:33Z INFO  zkm_sdk] excuting the setup.
 [2024-11-23T13:12:33Z INFO  zkm_emulator::utils] Split done 66446 : 89443
-[2024-11-23T13:21:05Z INFO  zkm_sdk::local::stark] [*** the seg_num is:2 ***]
+[2024-11-23T13:21:05Z INFO  zkm_sdk::local::stark] [the seg_num is:2 ]
 [2024-11-23T13:21:55Z INFO  zkm_sdk::local::util] Process segment /mnt/data/gavin/zkm-project-template/host-program/sha2-rust/../test-vectors/input/segments/0
 [2024-11-23T13:21:59Z INFO  zkm_prover::cpu::bootstrap_kernel] Bootstrapping took 3228 cycles
 [2024-11-23T13:21:59Z INFO  zkm_prover::generation] CPU halted after 64762 cycles
@@ -205,10 +205,10 @@ The result proof and contract file will be in the contracts/verifier and contrac
 
 > The proving task requires several stages: queuing, splitting, proving, aggregating and finalizing. Each stage involves a varying duration.
 
-Must set the `PRIVATE_KEY` in [`run-proving.sh`](host-program/sha2-rust/run-proving.sh) and run the program:
+Must set the `PRIVATE_KEY` and `ZKM_PROVER=network` in [`run-proving.sh`](host-program/run-proving.sh) and run the program:
 
 ```sh
-./run-proving.sh network
+./run-proving.sh sha2-rust
 ```
 
 If successful, it will output a similar log:

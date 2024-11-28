@@ -1,5 +1,5 @@
 use crate::prover::{Prover, ProverInput, ProverResult};
-use anyhow::Context;
+use anyhow::bail;
 use async_trait::async_trait;
 use std::collections::HashMap;
 use std::fs;
@@ -47,20 +47,24 @@ impl ProverTask {
                 "There is only one segment with segment size {}, will skip the aggregation!",
                 self.input.seg_size
             );
-        } else if crate::local::snark::prove_snark(&vk_path, &inputdir, &outputdir)
-            .expect("true or false")
-        {
-            result.stark_proof =
-                std::fs::read(format!("{}/proof_with_public_inputs.json", inputdir)).unwrap();
-            result.proof_with_public_inputs =
-                std::fs::read(format!("{}/snark_proof_with_public_inputs.json", outputdir))
-                    .unwrap();
-            //result.solidity_verifier =
-            //    std::fs::read(format!("{}/verifier.sol", outputdir)).unwrap();
-            result.public_values =
-                std::fs::read(format!("{}/public_values.json", inputdir)).unwrap();
         } else {
-            log::error!("Failed to generate snark proof.");
+            match crate::local::snark::prove_snark(&vk_path, &inputdir, &outputdir) {
+                Ok(()) => {
+                    result.stark_proof =
+                        std::fs::read(format!("{}/proof_with_public_inputs.json", inputdir))
+                            .unwrap();
+                    result.proof_with_public_inputs =
+                        std::fs::read(format!("{}/snark_proof_with_public_inputs.json", outputdir))
+                            .unwrap();
+                    //result.solidity_verifier =
+                    //    std::fs::read(format!("{}/verifier.sol", outputdir)).unwrap();
+                    result.public_values =
+                        std::fs::read(format!("{}/public_values.json", inputdir)).unwrap();
+                }
+                Err(e) => {
+                    log::error!("prove_snark error : {}", e);
+                }
+            }
         }
         self.result = Some(result);
         self.is_done = true;
@@ -81,23 +85,8 @@ impl LocalProver {
         LocalProver {
             tasks: Arc::new(Mutex::new(HashMap::new())),
             vk_path: vk_path.to_string(),
-            // setup_flag: flag,
         }
     }
-}
-
-pub fn delete_dir_contents<P: AsRef<Path>>(path: P) -> anyhow::Result<()> {
-    for entry in fs::read_dir(path).context("Failed to read directory")? {
-        let entry = entry.context("Failed to read directory entry")?;
-        let path = entry.path();
-
-        if path.is_dir() {
-            delete_dir_contents(&path).context("Failed to delete directory contents")?;
-        } else {
-            fs::remove_file(&path).context("Failed to delete file")?;
-        }
-    }
-    Ok(())
 }
 
 #[async_trait]
@@ -133,7 +122,7 @@ impl Prover for LocalProver {
                 self.tasks.lock().unwrap().remove(proof_id);
                 return Ok(task.lock().unwrap().result.clone());
             }
-            log::info!("waiting the proof result.");
+            log::info!("Waiting the proof result.");
             sleep(Duration::from_secs(30)).await;
         }
     }
@@ -146,55 +135,27 @@ impl Prover for LocalProver {
     ) -> anyhow::Result<()> {
         let mut result = ProverResult::default();
         let path = Path::new(vk_path);
-        if !path.is_dir() {
-            fs::create_dir_all(vk_path).unwrap();
+
+        if path.is_dir() {
+            fs::remove_dir_all(vk_path).unwrap();
         }
-        //delete_dir_contents(vk_path).context("Failed to clear input directory")?;
-        let tem_dir = "/tmp/setup";
-        let path = Path::new(tem_dir);
-        if !path.is_dir() {
-            fs::create_dir_all(tem_dir).unwrap();
-        } else {
-            delete_dir_contents(tem_dir).context("Failed to clear input directory")?;
-        }
-        let should_agg = crate::local::stark::prove_stark(input, tem_dir, &mut result).unwrap();
+        fs::create_dir_all(vk_path).unwrap();
+
+        let should_agg = crate::local::stark::prove_stark(input, vk_path, &mut result).unwrap();
         if !should_agg {
             log::info!("Setup: generating the stark proof false, please check the SEG_SIZE or other parameters.");
-            return Err(anyhow::anyhow!(
-                "Setup: generating the stark proof false, please check the SEG_SIZE or other parameters!"));
+            bail!("Setup: generating the stark proof false, please check the SEG_SIZE or other parameters!");
         }
 
-        match crate::local::snark::setup_and_generate_sol_verifier(tem_dir) {
-            Ok(true) => {
-                //copy the result files to vk_path
-                //1. pk
-                let src_path = Path::new(tem_dir);
-                let src_file = src_path.join("proving.key");
-                let dst_path = Path::new(vk_path);
-                let dst_file = dst_path.join("proving.key");
-                fs::copy(src_file, dst_file)?;
-
-                //2. vk
-                let src_file = src_path.join("verifying.key");
-                let dst_file = dst_path.join("verifying.key");
-                fs::copy(src_file, dst_file)?;
-
-                //3. contract
-                let src_file = src_path.join("verifier.sol");
-                let dst_file = dst_path.join("verifier.sol");
-                fs::copy(src_file, dst_file)?;
-
-                //4. circuit
-                let src_file = src_path.join("circuit");
-                let dst_file = dst_path.join("circuit");
-                fs::copy(src_file, dst_file)?;
+        match crate::local::snark::setup_and_generate_sol_verifier(vk_path) {
+            Ok(()) => {
                 log::info!("setup_and_generate_sol_verifier successfully, the verify key and verifier contract are in the {}", vk_path);
                 Ok(())
             }
-            Ok(false) => Err(anyhow::anyhow!(
-                "snark: setup_and_generate_sol_verifier failed!"
-            )),
-            Err(_) => todo!(),
+            Err(e) => {
+                log::error!("setup_and_generate_sol_verifier error : {}", e);
+                bail!("setup_and_generate_sol_verifier error");
+            }
         }
     }
 
@@ -203,9 +164,9 @@ impl Prover for LocalProver {
         input: &'a ProverInput,
         timeout: Option<Duration>,
     ) -> anyhow::Result<Option<ProverResult>> {
-        log::info!("calling request_proof.");
+        log::info!("Calling request_proof.");
         let proof_id = self.request_proof(input).await?;
-        log::info!("calling wait_proof, proof_id={}", proof_id);
+        log::info!("Calling wait_proof, proof_id={}", proof_id);
         self.wait_proof(&proof_id, timeout).await
     }
 }

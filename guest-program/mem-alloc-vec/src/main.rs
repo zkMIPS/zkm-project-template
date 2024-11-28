@@ -2,6 +2,7 @@
 #![no_main]
 
 mod memory_allocations;
+
 zkm_runtime::entrypoint!(main);
 use memory_allocations::{alloc_vec, push_vec, pop_vec};
 

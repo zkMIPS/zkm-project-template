@@ -40,12 +40,7 @@ func (obj *SnarkProver) loadKeys(inputdir string) error {
 	vkPath := inputdir + "/verifying.key"
 	_, err := os.Stat(circuitPath)
 
-	if os.IsNotExist(err) {
-		return fmt.Errorf("snark: doesn't find the circuit file in %s.", inputdir)
-	} else if err != nil {
-		// Handle other potential errors, such as permission issues
-		return fmt.Errorf("snark: no permission to read the circuit file. ")
-	} else {
+	if err == nil {
 		fCircuit, err := os.Open(circuitPath)
 		if err != nil {
 			fmt.Println(err)
@@ -55,16 +50,16 @@ func (obj *SnarkProver) loadKeys(inputdir string) error {
 		obj.r1cs_circuit = groth16.NewCS(ecc.BN254)
 		obj.r1cs_circuit.ReadFrom(fCircuit)
 		fCircuit.Close()
+	} else if os.IsNotExist(err) {
+		return fmt.Errorf("snark: doesn't find the circuit file in %s.", inputdir)
+	} else {
+		// Handle other potential errors, such as permission issues
+		return fmt.Errorf("snark: no permission to read the circuit file. ")
 	}
 
 	_, err = os.Stat(pkPath)
-	if os.IsNotExist(err) {
-		return fmt.Errorf("snark: doesn't find the pk file in %s.", inputdir)
-		
-	} else if err != nil {
-		// Handle other potential errors, such as permission issues
-		return fmt.Errorf("snark: no permission to read the pk file. ")
-	}  else {
+	
+	if err == nil {
 		obj.pk = groth16.NewProvingKey(ecc.BN254)
 		obj.vk = groth16.NewVerifyingKey(ecc.BN254)
 		fPk, err := os.Open(pkPath)
@@ -81,7 +76,13 @@ func (obj *SnarkProver) loadKeys(inputdir string) error {
 		}
 		obj.vk.ReadFrom(fVk)
 		defer fVk.Close()
-	}
+	} else if os.IsNotExist(err) {
+		return fmt.Errorf("snark: doesn't find the pk file in %s.", inputdir)
+		
+	} else {
+		// Handle other potential errors, such as permission issues
+		return fmt.Errorf("snark: no permission to read the pk file. ")
+	}  
 	return nil
 }
 
