@@ -26,13 +26,13 @@ pub struct ProverInput {
     pub args: String,
 }
 
-impl ProverInput {
+impl Default for ProverInput {
     pub fn default() -> Self {
         ProverInput {
             elf: Vec::new(),
             public_inputstream: Vec::new(),
             private_inputstream: Vec::new(),
-            seg_size: 0, 
+            seg_size: 0,
             execute_only: false,
             args: "".to_owned(), // empty string
         }
