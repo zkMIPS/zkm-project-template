@@ -53,10 +53,12 @@ async fn main() -> Result<()> {
     let prover_client = ProverClient::new(&client_config).await;
     log::info!("new prover client,ok.");
 
-    let mut prover_input = ProverInput::default();
-    prover_input.elf = read(elf_path).unwrap();
-    prover_input.seg_size = seg_size;
-    prover_input.execute_only = execute_only;
+    let prover_input = ProverInput {
+        elf: read(elf_path).unwrap(),
+        seg_size,
+        execute_only,
+        ..Default::default()
+    };
 
     //If the guest program does't have inputs, it does't need the set_guest_input().
     //set_guest_input(&mut prover_input, None);
