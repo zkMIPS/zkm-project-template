@@ -2,6 +2,7 @@ use async_trait::async_trait;
 use serde::Deserialize;
 use serde::Serialize;
 use tokio::time::Duration;
+use std::default::Default;
 
 #[derive(Debug, Default, Clone)]
 pub struct ClientCfg {
@@ -16,7 +17,7 @@ pub struct ClientCfg {
     pub private_key: Option<String>,
 }
 
-#[derive(Debug, Default, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct ProverInput {
     pub elf: Vec<u8>,
     pub public_inputstream: Vec<u8>,
@@ -27,7 +28,7 @@ pub struct ProverInput {
 }
 
 impl Default for ProverInput {
-    pub fn default() -> Self {
+    fn default() -> Self {
         ProverInput {
             elf: Vec::new(),
             public_inputstream: Vec::new(),
