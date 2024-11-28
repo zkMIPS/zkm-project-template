@@ -26,6 +26,19 @@ pub struct ProverInput {
     pub args: String,
 }
 
+impl ProverInput {
+    pub fn default() -> Self {
+        ProverInput {
+            elf: Vec::new(),
+            public_inputstream: Vec::new(),
+            private_inputstream: Vec::new(),
+            seg_size: 0, 
+            execute_only: false,
+            args: "".to_owned(), // empty string
+        }
+    }
+}
+
 #[derive(Debug, Default, Deserialize, Serialize, Clone)]
 pub struct ProverResult {
     pub output_stream: Vec<u8>,
