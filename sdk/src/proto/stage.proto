@@ -41,7 +41,7 @@ message GenerateProofRequest {
     repeated BlockFileItem block_data = 3;
     optional uint64 block_no = 4;
     uint32 seg_size = 5;
-    string args = 6;
+
     string signature = 7;
     bytes public_input_stream = 8;
     bytes private_input_stream = 9;
