@@ -55,9 +55,10 @@ async fn main() -> Result<()> {
 
     let prover_input = ProverInput {
         elf: read(elf_path).unwrap(),
+        public_inputstream: vec![],
+        private_inputstream: vec![],
         seg_size,
-        execute_only,
-        ..Default::default()
+        execute_only
     };
 
     //If the guest program does't have inputs, it does't need the set_guest_input().
