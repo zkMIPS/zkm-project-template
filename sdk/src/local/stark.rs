@@ -12,7 +12,7 @@ pub fn prove_stark(
     let seg_path = format!("{}/segments", storedir);
     let seg_size = input.seg_size as usize;
     let file = ElfBytes::<AnyEndian>::minimal_parse(input.elf.as_slice())
-        .expect("opening elf file failed");
+        .expect("Opening elf file failed");
     let mut state = State::load_elf(&file);
     state.patch_elf(&file);
     state.patch_stack(vec![]);
@@ -25,7 +25,7 @@ pub fn prove_stark(
     if input.execute_only {
         return Ok(false);
     }
-    log::info!("!!!*******seg_num:{}", &seg_num);
+    log::info!("[The seg_num is:{} ]", &seg_num);
     if seg_num == 1 {
         let seg_file = format!("{seg_path}/{}", 0);
         util::prove_single_seg_common(&seg_file, "", "", "")?;

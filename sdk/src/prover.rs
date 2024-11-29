@@ -1,9 +1,23 @@
 use async_trait::async_trait;
 use serde::Deserialize;
 use serde::Serialize;
+use std::default::Default;
 use tokio::time::Duration;
 
-#[derive(Debug, Default, Deserialize, Serialize, Clone)]
+#[derive(Debug, Default, Clone)]
+pub struct ClientCfg {
+    pub zkm_prover: String,
+    pub vk_path: String,
+    //pub setup_flag: bool,
+    pub endpoint: Option<String>,
+    pub ca_cert_path: Option<String>,
+    pub cert_path: Option<String>,
+    pub key_path: Option<String>,
+    pub domain_name: Option<String>,
+    pub private_key: Option<String>,
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct ProverInput {
     pub elf: Vec<u8>,
     pub public_inputstream: Vec<u8>,
@@ -11,6 +25,19 @@ pub struct ProverInput {
     pub seg_size: u32,
     pub execute_only: bool,
     pub args: String,
+}
+
+impl Default for ProverInput {
+    fn default() -> Self {
+        ProverInput {
+            elf: Vec::new(),
+            public_inputstream: Vec::new(),
+            private_inputstream: Vec::new(),
+            seg_size: 0,
+            execute_only: false,
+            args: "".to_owned(), // empty string
+        }
+    }
 }
 
 #[derive(Debug, Default, Deserialize, Serialize, Clone)]
@@ -30,6 +57,12 @@ pub trait Prover {
         proof_id: &'a str,
         timeout: Option<Duration>,
     ) -> anyhow::Result<Option<ProverResult>>;
+    async fn setup_and_generate_sol_verifier<'a>(
+        &self,
+        vk_path: &'a str,
+        input: &'a ProverInput,
+        timeout: Option<Duration>,
+    ) -> anyhow::Result<()>;
     async fn prove<'a>(
         &self,
         input: &'a ProverInput,

@@ -5,4 +5,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-zkm-runtime = { git = "https://github.com/zkMIPS/zkm.git" }
+zkm-runtime = { git = "https://github.com/zkMIPS/zkm.git"}
+##just testing
+#zkm-runtime = { path = "../../../zkm/runtime/entrypoint" }

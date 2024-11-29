@@ -1,6 +1,6 @@
 # Guest Program Examples
 
-ZKM can generate proof for  Go and Rust (guest) Programs.
+## ZKM can generate proof for  Go and Rust (guest) Programs.
 
 * sha2-go
   
@@ -17,6 +17,8 @@ ZKM can generate proof for  Go and Rust (guest) Programs.
 * revme
 
   This program is more complex, taking a block data as input and simulating the Ethereum Virtual Machine's computation for that block.
+
+## Compiling
 
 > [!NOTE]
 > If you want to compile the guest programs, you should use a x86 Ubuntu22 machine with Rust: 1.81.0-nightly and Go : 1.22.1
@@ -58,3 +60,6 @@ cargo build --target=mips-unknown-linux-musl --release
 
 The compiled mips ELF is in the zkm-project-template/guest-program/{sha2-rust,mem-alloc-vec,revme}/target/mips-unknown-linux-musl/release/ .
 
+## Remarks
+
+If the guest program need outputing some messages , it must use the runtime::commit(). Then, the messages can be catched in the host program: [`fn print_guest_execution_output() or print_guest_execution_output_struct()`](../sdk/src/lib.rs)

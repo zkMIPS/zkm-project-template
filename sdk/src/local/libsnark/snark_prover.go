@@ -30,7 +30,7 @@ type SnarkProver struct {
 	vk           groth16.VerifyingKey
 }
 
-func (obj *SnarkProver) init_circuit_keys(inputdir string) error {
+func (obj *SnarkProver) loadKeys(inputdir string) error {
 	if obj.r1cs_circuit != nil {
 		return nil
 	}
@@ -40,28 +40,7 @@ func (obj *SnarkProver) init_circuit_keys(inputdir string) error {
 	vkPath := inputdir + "/verifying.key"
 	_, err := os.Stat(circuitPath)
 
-	if os.IsNotExist(err) {
-		commonCircuitData, _ := types.ReadCommonCircuitData(inputdir + "/common_circuit_data.json")
-		proofWithPisData, _ := types.ReadProofWithPublicInputs(inputdir + "/proof_with_public_inputs.json")
-		proofWithPis := variables.DeserializeProofWithPublicInputs(proofWithPisData)
-
-		verifierOnlyCircuitRawData, _ := types.ReadVerifierOnlyCircuitData(inputdir + "/verifier_only_circuit_data.json")
-		verifierOnlyCircuitData := variables.DeserializeVerifierOnlyCircuitData(verifierOnlyCircuitRawData)
-
-		circuit := verifier.ExampleVerifierCircuit{
-			PublicInputsHash:        proofWithPis.PublicInputsHash,
-			Proof:                   proofWithPis.Proof,
-			PublicInputs:            proofWithPis.PublicInputs,
-			VerifierOnlyCircuitData: verifierOnlyCircuitData,
-			CommonCircuitData:       commonCircuitData,
-		}
-
-		var builder frontend.NewBuilder = r1cs.NewBuilder
-		obj.r1cs_circuit, _ = frontend.Compile(ecc.BN254.ScalarField(), builder, &circuit)
-		fR1CS, _ := os.Create(circuitPath)
-		obj.r1cs_circuit.WriteTo(fR1CS)
-		fR1CS.Close()
-	} else {
+	if err == nil {
 		fCircuit, err := os.Open(circuitPath)
 		if err != nil {
 			fmt.Println(err)
@@ -71,26 +50,16 @@ func (obj *SnarkProver) init_circuit_keys(inputdir string) error {
 		obj.r1cs_circuit = groth16.NewCS(ecc.BN254)
 		obj.r1cs_circuit.ReadFrom(fCircuit)
 		fCircuit.Close()
+	} else if os.IsNotExist(err) {
+		return fmt.Errorf("snark: doesn't find the circuit file in %s.", inputdir)
+	} else {
+		// Handle other potential errors, such as permission issues
+		return fmt.Errorf("snark: no permission to read the circuit file. ")
 	}
 
 	_, err = os.Stat(pkPath)
-	if os.IsNotExist(err) {
-		obj.pk, obj.vk, err = groth16.Setup(obj.r1cs_circuit)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
-		fPK, _ := os.Create(pkPath)
-		obj.pk.WriteTo(fPK)
-		fPK.Close()
-
-		if obj.vk != nil {
-			fVK, _ := os.Create(vkPath)
-			obj.vk.WriteTo(fVK)
-			fVK.Close()
-		}
-	} else {
+	
+	if err == nil {
 		obj.pk = groth16.NewProvingKey(ecc.BN254)
 		obj.vk = groth16.NewVerifyingKey(ecc.BN254)
 		fPk, err := os.Open(pkPath)
@@ -107,7 +76,13 @@ func (obj *SnarkProver) init_circuit_keys(inputdir string) error {
 		}
 		obj.vk.ReadFrom(fVk)
 		defer fVk.Close()
-	}
+	} else if os.IsNotExist(err) {
+		return fmt.Errorf("snark: doesn't find the pk file in %s.", inputdir)
+		
+	} else {
+		// Handle other potential errors, such as permission issues
+		return fmt.Errorf("snark: no permission to read the pk file. ")
+	}  
 	return nil
 }
 
@@ -174,7 +149,7 @@ func (obj *SnarkProver) groth16ProofWithCache(r1cs constraint.ConstraintSystem, 
 	return nil
 }
 
-func (obj *SnarkProver) generateVerifySol(inputDir, outputDir string) error {
+func (obj *SnarkProver) generateVerifySol(inputDir string) error {
 	tmpl, err := template.New("contract").Parse(Gtemplate)
 	if err != nil {
 		return err
@@ -240,7 +215,7 @@ func (obj *SnarkProver) generateVerifySol(inputDir, outputDir string) error {
 	if err != nil {
 		return err
 	}
-	fSol, _ := os.Create(filepath.Join(outputDir, "verifier.sol"))
+	fSol, _ := os.Create(filepath.Join(inputDir, "verifier.sol"))
 	_, err = fSol.Write(buf.Bytes())
 	if err != nil {
 		return err
@@ -262,14 +237,68 @@ func (obj *SnarkProver) combineToBigInt(data []uint64, idx int) *big.Int {
 	return result
 }
 
-func (obj *SnarkProver) Prove(inputdir string, outputdir string) error {
-	if err := obj.init_circuit_keys(inputdir); err != nil {
+func (obj *SnarkProver) SetupAndGenerateSolVerifier(inputdir string) error {
+	circuitPath := inputdir + "/circuit"
+	pkPath := inputdir + "/proving.key"
+	vkPath := inputdir + "/verifying.key"
+	_, err := os.Stat(circuitPath)
+
+	if os.IsNotExist(err) {
+		commonCircuitData, _ := types.ReadCommonCircuitData(inputdir + "/common_circuit_data.json")
+		proofWithPisData, _ := types.ReadProofWithPublicInputs(inputdir + "/proof_with_public_inputs.json")
+		proofWithPis := variables.DeserializeProofWithPublicInputs(proofWithPisData)
+
+		verifierOnlyCircuitRawData, _ := types.ReadVerifierOnlyCircuitData(inputdir + "/verifier_only_circuit_data.json")
+		verifierOnlyCircuitData := variables.DeserializeVerifierOnlyCircuitData(verifierOnlyCircuitRawData)
+
+		circuit := verifier.ExampleVerifierCircuit{
+			PublicInputsHash:        proofWithPis.PublicInputsHash,
+			Proof:                   proofWithPis.Proof,
+			PublicInputs:            proofWithPis.PublicInputs,
+			VerifierOnlyCircuitData: verifierOnlyCircuitData,
+			CommonCircuitData:       commonCircuitData,
+		}
+
+		var builder frontend.NewBuilder = r1cs.NewBuilder
+		obj.r1cs_circuit, _ = frontend.Compile(ecc.BN254.ScalarField(), builder, &circuit)
+		fR1CS, _ := os.Create(circuitPath)
+		obj.r1cs_circuit.WriteTo(fR1CS)
+		fR1CS.Close()
+	}
+
+	_, err = os.Stat(pkPath)
+	if os.IsNotExist(err) {
+		obj.pk, obj.vk, err = groth16.Setup(obj.r1cs_circuit)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		fPK, _ := os.Create(pkPath)
+		obj.pk.WriteTo(fPK)
+		fPK.Close()
+
+		if obj.vk != nil {
+			fVK, _ := os.Create(vkPath)
+			obj.vk.WriteTo(fVK)
+			fVK.Close()
+		}
+	}
+
+	if err := obj.generateVerifySol(inputdir); err != nil {
 		return err
 	}
 
-	if err := obj.generateVerifySol(inputdir, outputdir); err != nil {
+	
+	return nil
+}
+
+
+func (obj *SnarkProver) Prove(keypath string, inputdir string, outputdir string) error {
+	if err := obj.loadKeys(keypath); err != nil {
 		return err
 	}
 
+	
 	return obj.groth16ProofWithCache(obj.r1cs_circuit, inputdir, outputdir)
 }
