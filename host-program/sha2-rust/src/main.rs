@@ -62,7 +62,7 @@ async fn main() -> Result<()> {
         public_inputstream: vec![],
         private_inputstream: vec![],
         seg_size,
-        execute_only
+        execute_only,
     };
 
     //If the guest program does't have inputs, it does't need the setting.
