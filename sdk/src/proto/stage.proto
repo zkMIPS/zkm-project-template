@@ -42,10 +42,10 @@ message GenerateProofRequest {
     optional uint64 block_no = 4;
     uint32 seg_size = 5;
 
-    string signature = 6;
-    bytes public_input_stream = 7;
-    bytes private_input_stream = 8;
-    bool execute_only = 9;
+    string signature = 7;
+    bytes public_input_stream = 8;
+    bytes private_input_stream = 9;
+    bool execute_only = 10;
 }
 
 message GenerateProofResponse {
