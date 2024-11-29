@@ -84,12 +84,12 @@ impl NetworkProver {
         let sign_data = match request.block_no {
             Some(block_no) => {
                 format!(
-                    "{}&{}&{}&{}",
-                    request.proof_id, block_no, request.seg_size, request.args
+                    "{}&{}&{}",
+                    request.proof_id, block_no, request.seg_size
                 )
             }
             None => {
-                format!("{}&{}&{}", request.proof_id, request.seg_size, request.args)
+                format!("{}&{}", request.proof_id, request.seg_size)
             }
         };
         let signature = self.wallet.sign_message(sign_data).await.unwrap();
