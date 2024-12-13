@@ -10,6 +10,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  ZKM_SKIP_PROGRAM_BUILD: true
 
 jobs:
   build_and_test:
@@ -32,10 +33,6 @@ jobs:
         run: |
           chmod +x ./sdk/src/local/libsnark/compile.sh
           ./sdk/src/local/libsnark/compile.sh
-      - name: Install MIPS toolchain
-        run: |
-          chmod +x ./install_mips_rust_tool
-          ./install_mips_rust_tool
       - name: Cargo build
         run: cargo build --verbose --release
       - name: Cargo test
