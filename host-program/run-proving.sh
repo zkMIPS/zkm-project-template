@@ -29,9 +29,6 @@ if [[ "$program" =~ .*go$ ]];then
     cd $BASEDIR/../guest-program/$program
     GOOS=linux GOARCH=mips GOMIPS=softfloat go build -o $program
     export ELF_PATH=${BASEDIR}/../guest-program/$program/$program
-else
-    cd $BASEDIR/../guest-program/$program
-    cargo build -r --target=mips-unknown-linux-musl
 fi
 cd -
 
