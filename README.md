@@ -115,6 +115,8 @@ If successfully, it will generate the binary files in `target/release`/{`sha2-ru
 > [!NOTE]
 > You can run the guest program without generating a proof by setting the environmental variable `EXECUTE_ONLY` to "true".https://github.com/zkMIPS/zkm/issues/152
 
+> You can set the `ZKM_SKIP_PROGRAM_BUILD` environment variable to `true` to skip building the guest program when use `zkm_build::build_program`.
+
 ### 3. Generate groth16 proof and verifier contract
 
 > [!NOTE]
