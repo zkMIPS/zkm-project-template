@@ -8,6 +8,8 @@ use zkm_sdk::{prover::ClientCfg, prover::ProverInput, ProverClient};
 pub const DEFAULT_PROVER_NETWORK_RPC: &str = "https://152.32.186.45:20002";
 pub const DEFALUT_PROVER_NETWORK_DOMAIN: &str = "stage";
 
+const ELF_PATH: &str = "./guest-program/mem-alloc-vec/target/elf-compilation/mips-unknown-linux-musl/release/mem-alloc-vec";
+
 #[tokio::main]
 async fn main() -> Result<()> {
     env_logger::try_init().unwrap_or_default();
@@ -26,7 +28,7 @@ async fn main() -> Result<()> {
         .and_then(|seg| seg.parse::<bool>().ok())
         .unwrap_or(false);
 
-    let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
+    let elf_path = env::var("ELF_PATH").unwrap_or(ELF_PATH.to_string());
     let proof_results_path = env::var("PROOF_RESULTS_PATH").unwrap_or("../contracts".to_string());
     let vk_path = env::var("VERIFYING_KEY_PATH").unwrap_or("/tmp/input".to_string());
 
