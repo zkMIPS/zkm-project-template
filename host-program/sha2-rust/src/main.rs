@@ -8,8 +8,11 @@ use zkm_sdk::{prover::ClientCfg, prover::ProverInput, ProverClient};
 
 pub const DEFAULT_PROVER_NETWORK_RPC: &str = "https://152.32.186.45:20002";
 pub const DEFALUT_PROVER_NETWORK_DOMAIN: &str = "stage";
-const ELF_PATH: &str =
-    "../guest-program/sha2-rust/target/elf-compilation/mips-unknown-linux-musl/release/sha2-rust";
+
+const ELF_PATH: &str = concat!(
+    env!("CARGO_MANIFEST_DIR"),
+    "/../../guest-program/sha2-rust/target/elf-compilation/mips-unknown-linux-musl/release/sha2-rust"
+);
 
 #[tokio::main]
 async fn main() -> Result<()> {
