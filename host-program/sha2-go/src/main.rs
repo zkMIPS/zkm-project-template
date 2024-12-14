@@ -8,7 +8,7 @@ use zkm_sdk::{prover::ClientCfg, prover::ProverInput, ProverClient};
 
 pub const DEFAULT_PROVER_NETWORK_RPC: &str = "https://152.32.186.45:20002";
 pub const DEFALUT_PROVER_NETWORK_DOMAIN: &str = "stage";
-const ELF_PATH: &str = "./guest-program/sha2-go/sha2-go";
+const ELF_PATH: &str = "../guest-program/sha2-go/sha2-go";
 
 #[tokio::main]
 async fn main() -> Result<()> {
