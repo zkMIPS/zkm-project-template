@@ -9,6 +9,11 @@ use zkm_sdk::{prover::ClientCfg, prover::ProverInput, ProverClient};
 pub const DEFAULT_PROVER_NETWORK_RPC: &str = "https://152.32.186.45:20002";
 pub const DEFALUT_PROVER_NETWORK_DOMAIN: &str = "stage";
 
+const GUEST_TARGET_PATH: &str = concat!(
+    env!("CARGO_MANIFEST_DIR"),
+    "/../../guest-program/sha2-go/sha2-go"
+);
+
 #[tokio::main]
 async fn main() -> Result<()> {
     env_logger::try_init().unwrap_or_default();
@@ -26,7 +31,7 @@ async fn main() -> Result<()> {
         .and_then(|seg| seg.parse::<bool>().ok())
         .unwrap_or(false);
 
-    let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
+    let elf_path = env::var("ELF_PATH").unwrap_or(GUEST_TARGET_PATH.to_string());
     let args_parameter = env::var("ARGS").unwrap_or("data-to-hash".to_string());
     //let json_path = env::var("JSON_PATH").expect("JSON PATH is missing");
     let proof_results_path = env::var("PROOF_RESULTS_PATH").unwrap_or("../contracts".to_string());

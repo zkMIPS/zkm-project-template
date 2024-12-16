@@ -26,7 +26,7 @@ async fn main() -> Result<()> {
         .and_then(|seg| seg.parse::<bool>().ok())
         .unwrap_or(false);
 
-    let elf_path = env::var("ELF_PATH").expect("ELF PATH is missed");
+    let elf_path = env::var("ELF_PATH").unwrap_or(env!("GUEST_TARGET_PATH").to_string());
     let json_path = env::var("JSON_PATH").expect("JSON PATH is missing");
     let proof_results_path = env::var("PROOF_RESULTS_PATH").unwrap_or("../contracts".to_string());
     let vk_path = env::var("VERIFYING_KEY_PATH").unwrap_or("/tmp/input".to_string());

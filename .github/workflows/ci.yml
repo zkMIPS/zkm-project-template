@@ -10,6 +10,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  ZKM_SKIP_PROGRAM_BUILD: true
 
 jobs:
   build_and_test:

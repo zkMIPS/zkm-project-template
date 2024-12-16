@@ -60,6 +60,8 @@ cargo build --target=mips-unknown-linux-musl --release
 
 The compiled mips ELF is in the zkm-project-template/guest-program/{sha2-rust,mem-alloc-vec,revme}/target/mips-unknown-linux-musl/release/ .
 
+You can also integrate `zkm_build::build_program` into the compilation process of the host program.
+
 ## Remarks
 
 If the guest program need outputing some messages , it must use the runtime::commit(). Then, the messages can be catched in the host program: [`fn print_guest_execution_output() or print_guest_execution_output_struct()`](../sdk/src/lib.rs)
