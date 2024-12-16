@@ -11,7 +11,7 @@ pub const DEFALUT_PROVER_NETWORK_DOMAIN: &str = "stage";
 
 const ELF_PATH: &str = concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/../../guest-program/sha2-rust/target/elf-compilation/mips-unknown-linux-musl/release/sha2-rust"
+    "/../../guest-program/sha2-rust/elf/mips-unknown-linux-musl"
 );
 
 #[tokio::main]

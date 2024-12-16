@@ -9,7 +9,7 @@ pub const DEFAULT_PROVER_NETWORK_RPC: &str = "https://152.32.186.45:20002";
 pub const DEFALUT_PROVER_NETWORK_DOMAIN: &str = "stage";
 const ELF_PATH: &str = concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/../../guest-program/revme/target/elf-compilation/mips-unknown-linux-musl/release/revme"
+    "/../../guest-program/revme/elf/mips-unknown-linux-musl"
 );
 
 #[tokio::main]

@@ -10,7 +10,7 @@ pub const DEFALUT_PROVER_NETWORK_DOMAIN: &str = "stage";
 
 const ELF_PATH: &str = concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/../../guest-program/mem-alloc-vec/target/elf-compilation/mips-unknown-linux-musl/release/mem-alloc-vec"
+    "/../../guest-program/mem-alloc-vec/elf/mips-unknown-linux-musl"
 );
 
 #[tokio::main]
