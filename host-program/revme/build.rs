@@ -1,6 +1,11 @@
 fn main() {
-    zkm_build::build_program(&format!(
-        "{}/../../guest-program/revme",
-        env!("CARGO_MANIFEST_DIR")
-    ));
+    let guest_path = format!("{}/../../guest-program/revme", env!("CARGO_MANIFEST_DIR"));
+    zkm_build::build_program(&guest_path);
+    let guest_target_path = format!(
+        "{}/{}/{}",
+        guest_path,
+        zkm_build::DEFAULT_OUTPUT_DIR,
+        zkm_build::BUILD_TARGET
+    );
+    println!("cargo:rustc-env=GUEST_TARGET_PATH={}", guest_target_path);
 }
