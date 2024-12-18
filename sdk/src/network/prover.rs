@@ -160,6 +160,7 @@ impl Prover for NetworkProver {
                         stark_proof: vec![],
                         solidity_verifier: vec![],
                         public_values: vec![],
+                        total_steps: get_status_response.total_steps,
                     };
                     if !get_status_response.stark_proof_url.is_empty() {
                         proof_result.stark_proof =
