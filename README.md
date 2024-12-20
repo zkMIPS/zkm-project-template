@@ -11,6 +11,14 @@ There are two ways to prove the guest program:
 
 ![image](assets/temp-run-diagram.png)
 
+## Getting Started
+
+First to install zkm toolchain run the following command and follow the instructions:
+```sh
+curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/zkMIPS/toolchain/refs/heads/main/setup.sh | sh
+source ~/.zkm-toolchain/env
+```
+
 ## Template code structure
 
 > [!NOTE]
