@@ -21,6 +21,7 @@ const D: usize = 2;
 type C = PoseidonGoldilocksConfig;
 type F = <C as GenericConfig<D>>::F;
 
+#[allow(clippy::too_many_arguments)]
 pub fn prove_segments(
     seg_dir: &str,
     basedir: &str,
