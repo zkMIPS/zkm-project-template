@@ -20,8 +20,9 @@ pub fn prove_stark(
     state.input_stream.push(input.public_inputstream.clone());
     state.input_stream.push(input.private_inputstream.clone());
 
-    let (_total_steps, seg_num, state) = split_prog_into_segs(state, &seg_path, "", seg_size);
+    let (total_steps, seg_num, state) = split_prog_into_segs(state, &seg_path, "", seg_size);
     result.output_stream = state.public_values_stream.clone();
+    result.total_steps = total_steps as u64;
     if input.execute_only {
         return Ok(false);
     }
