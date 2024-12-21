@@ -27,12 +27,6 @@ pub fn prove_stark(
         return Ok(false);
     }
     log::info!("[The seg_num is:{} ]", &seg_num);
-    if seg_num == 1 {
-        let seg_file = format!("{seg_path}/{}", 0);
-        util::prove_single_seg_common(&seg_file, "", "", "")?;
-        Ok(false)
-    } else {
-        util::prove_multi_seg_common(&seg_path, "", "", "", storedir, seg_num, 0)?;
-        Ok(true)
-    }
+    util::prove_segments(&seg_path, "", storedir, "", "", seg_num, 0, vec![])?;
+    Ok(seg_num > 1)
 }
