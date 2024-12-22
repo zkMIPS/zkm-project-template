@@ -146,8 +146,12 @@ pub fn prove_segments(
         let wrapped_proof = wrapped_circuit.prove(&block_receipt.proof()).unwrap();
         wrapped_proof.save(outdir).unwrap();
 
+        let src_public_inputs = match &block_receipt {
+            Receipt::Segments(receipt) => &receipt.proof.public_inputs,
+            Receipt::Composite(recepit) => &recepit.program_receipt.proof.public_inputs,
+        };
         let block_public_inputs = serde_json::json!({
-            "public_inputs": wrapped_proof.proof.public_inputs,
+            "public_inputs": src_public_inputs,
         });
         let outdir_path = std::path::Path::new(outdir);
         let public_values_file = File::create(outdir_path.join("public_values.json"))?;
