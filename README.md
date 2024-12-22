@@ -1,11 +1,11 @@
 # ZKM Project Template
 
-This is a template for creating an end-to-end ZKM project which can generate the EVM-Compatible proof and the on chain verification contract.
+The Project Template allows the developer to create an end-to-end zkMIPS project and the on-chain Solidity verifier.
 
-There are two ways to prove the guest program:
+Two provers have been provided:
 
-- Use your local machine
-- Use ZKM proof network
+- Local Prover: Use your machine to run the prover and generate the proof by your end.
+- Network Prover: Use ZKM proof network to generate the proof via our Restful API. 
 
 ## Running diagram
 
