@@ -125,7 +125,10 @@ impl Prover for NetworkProver {
         timeout: Option<Duration>,
     ) -> anyhow::Result<Option<ProverResult>> {
         let start_time = Instant::now();
+        let mut split_start_time = Instant::now();
+        let mut split_end_time = Instant::now();
         let mut client = self.stage_client.clone();
+        let mut last_step = 0;
         loop {
             if let Some(timeout) = timeout {
                 if start_time.elapsed() > timeout {
@@ -143,14 +146,25 @@ impl Prover for NetworkProver {
                     //log::info!("generate_proof step: {}", get_status_response.step);
                     match get_status_response.step {
                         0 => log::info!("generate_proof : queuing the task."),
-                        1 => log::info!("generate_proof : splitting the task."),
-                        2 => log::info!("generate_proof : proving the task."),
+                        1 => {
+                            if last_step == 0 {
+                                split_start_time = Instant::now();
+                            }
+                            log::info!("generate_proof : splitting the task.");
+                        },
+                        2 => {
+                            if last_step == 1 {
+                                split_end_time = Instant::now();
+                            }
+                            log::info!("generate_proof : proving the task.");
+                        },
                         3 => log::info!("generate_proof : aggregating the proof."),
                         4 => log::info!("generate_proof : aggregating the proof."),
                         5 => log::info!("generate_proof : finalizing the proof."),
                         6 => log::info!("generate_proof : completing the proof."),
                         i32::MIN..=-1_i32 | 7_i32..=i32::MAX => todo!(),
                     }
+                    last_step = get_status_response.step;
                     sleep(Duration::from_secs(30)).await;
                 }
                 Some(Status::Success) => {
@@ -161,6 +175,7 @@ impl Prover for NetworkProver {
                         solidity_verifier: vec![],
                         public_values: vec![],
                         total_steps: get_status_response.total_steps,
+                        split_cost: split_end_time.duration_since(split_start_time).as_millis() as u64,
                     };
                     if !get_status_response.stark_proof_url.is_empty() {
                         proof_result.stark_proof =

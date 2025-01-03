@@ -29,6 +29,7 @@ pub struct ProverInput {
 #[derive(Debug, Default, Deserialize, Serialize, Clone)]
 pub struct ProverResult {
     pub total_steps: u64,
+    pub split_cost: u64,
     pub output_stream: Vec<u8>,
     pub proof_with_public_inputs: Vec<u8>,
     pub stark_proof: Vec<u8>,
