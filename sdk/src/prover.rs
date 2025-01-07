@@ -17,13 +17,16 @@ pub struct ClientCfg {
     pub private_key: Option<String>,
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Default, Deserialize, Serialize, Clone)]
 pub struct ProverInput {
     pub elf: Vec<u8>,
     pub public_inputstream: Vec<u8>,
     pub private_inputstream: Vec<u8>,
     pub seg_size: u32,
     pub execute_only: bool,
+    pub precompile: bool,
+    pub receipt_inputs: Vec<Vec<u8>>,
+    pub receipts: Vec<Vec<u8>>,
 }
 
 #[derive(Debug, Default, Deserialize, Serialize, Clone)]
@@ -35,6 +38,8 @@ pub struct ProverResult {
     pub stark_proof: Vec<u8>,
     pub solidity_verifier: Vec<u8>,
     pub public_values: Vec<u8>,
+    pub receipt: Vec<u8>,
+    pub elf_id: Vec<u8>,
 }
 
 #[async_trait]

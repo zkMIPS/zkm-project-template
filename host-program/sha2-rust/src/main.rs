@@ -61,6 +61,9 @@ async fn main() -> Result<()> {
         private_inputstream: vec![],
         seg_size,
         execute_only,
+        precompile: false,
+        receipt_inputs: vec![],
+        receipts: vec![],
     };
 
     //If the guest program does't have inputs, it does't need the setting.

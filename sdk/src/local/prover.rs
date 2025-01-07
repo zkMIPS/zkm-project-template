@@ -36,7 +36,7 @@ impl ProverTask {
         let outputdir = format!("/tmp/{}/output", self.proof_id);
         fs::create_dir_all(&inputdir).unwrap();
         fs::create_dir_all(&outputdir).unwrap();
-        let should_agg =
+        let (should_agg, receipt, elf_id) =
             crate::local::stark::prove_stark(&self.input, &inputdir, &mut result).unwrap();
         if self.input.execute_only {
             result.proof_with_public_inputs = vec![];
@@ -47,7 +47,7 @@ impl ProverTask {
                 "There is only one segment with segment size {}, will skip the aggregation!",
                 self.input.seg_size
             );
-        } else {
+        } else if !self.input.precompile {
             match crate::local::snark::prove_snark(&vk_path, &inputdir, &outputdir) {
                 Ok(()) => {
                     result.stark_proof =
@@ -65,6 +65,10 @@ impl ProverTask {
                     log::error!("prove_snark error : {}", e);
                 }
             }
+        }
+        if let Some(receipt) = receipt {
+            result.receipt.clone_from(&receipt);
+            result.elf_id.clone_from(&elf_id.unwrap());
         }
         self.result = Some(result);
         self.is_done = true;
@@ -141,7 +145,7 @@ impl Prover for LocalProver {
         }
         fs::create_dir_all(vk_path).unwrap();
 
-        let should_agg = crate::local::stark::prove_stark(input, vk_path, &mut result).unwrap();
+        let (should_agg, _, _) = crate::local::stark::prove_stark(input, vk_path, &mut result).unwrap();
         if !should_agg {
             log::info!("Setup: generating the stark proof false, please check the SEG_SIZE or other parameters.");
             bail!("Setup: generating the stark proof false, please check the SEG_SIZE or other parameters!");

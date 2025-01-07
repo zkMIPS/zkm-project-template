@@ -4,6 +4,7 @@ members = [
    "host-program/sha2-rust",
    "host-program/revme",
    "host-program/mem-alloc-vec",
+   "host-program/sha2-precompile",
    "sdk"
   ]
 resolver = "2"
