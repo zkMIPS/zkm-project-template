@@ -176,6 +176,7 @@ impl Prover for NetworkProver {
                         public_values: vec![],
                         total_steps: get_status_response.total_steps,
                         split_cost: split_end_time.duration_since(split_start_time).as_millis() as u64,
+                        ..Default::default()
                     };
                     if !get_status_response.stark_proof_url.is_empty() {
                         proof_result.stark_proof =
