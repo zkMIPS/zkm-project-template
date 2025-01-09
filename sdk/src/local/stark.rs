@@ -1,11 +1,12 @@
 use super::util;
 use crate::prover::{ProverInput, ProverResult};
 use elf::{endian::AnyEndian, ElfBytes};
+use plonky2::plonk::config::{GenericConfig, PoseidonGoldilocksConfig};
 use zkm_emulator::state::State;
 use zkm_emulator::utils::split_prog_into_segs;
 use zkm_prover::generation::state::{AssumptionReceipts, Receipt};
-use plonky2::plonk::config::{GenericConfig, PoseidonGoldilocksConfig};
 
+#[allow(clippy::type_complexity)]
 pub fn prove_stark(
     input: &ProverInput,
     storedir: &str,
@@ -39,10 +40,15 @@ pub fn prove_stark(
     type F = <C as GenericConfig<D>>::F;
     let mut receipts: AssumptionReceipts<F, C, D> = vec![];
     for receipt_data in input.receipts.iter() {
-        let receipt: Receipt<F, C, D> = bincode::deserialize(&receipt_data).map_err(|e| anyhow::anyhow!(e))?;
+        let receipt: Receipt<F, C, D> =
+            bincode::deserialize(receipt_data).map_err(|e| anyhow::anyhow!(e))?;
         receipts.push(receipt.into());
     }
     let receipt = util::prove_segments(&seg_path, "", storedir, "", "", seg_num, 0, receipts)?;
-    let receipt_data= bincode::serialize(&receipt).map_err(|e| anyhow::anyhow!(e))?;
-    Ok((seg_num > 1, Some(receipt_data), Some(receipt.claim().elf_id)))
+    let receipt_data = bincode::serialize(&receipt).map_err(|e| anyhow::anyhow!(e))?;
+    Ok((
+        seg_num > 1,
+        Some(receipt_data),
+        Some(receipt.claim().elf_id),
+    ))
 }
