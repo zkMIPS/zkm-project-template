@@ -53,7 +53,7 @@ pub fn prove_segments(
         &input_first,
         &config,
         &mut timing,
-        assumptions,
+        assumptions.clone(),
     )?;
 
     timing.filter(Duration::from_millis(100)).print();
@@ -69,7 +69,13 @@ pub fn prove_segments(
         let seg_reader = BufReader::new(File::open(seg_file)?);
         let input = segment_kernel(basedir, block, file, seg_reader);
         timing = TimingTree::new("prove root second", log::Level::Info);
-        let receipt = all_circuits.prove_root(&all_stark, &input, &config, &mut timing)?;
+        let receipt = all_circuits.prove_root_with_assumption(
+            &all_stark,
+            &input,
+            &config,
+            &mut timing,
+            assumptions,
+        )?;
         timing.filter(Duration::from_millis(100)).print();
 
         all_circuits.verify_root(receipt.clone())?;
