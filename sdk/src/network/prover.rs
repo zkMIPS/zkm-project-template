@@ -111,8 +111,15 @@ impl Prover for NetworkProver {
             public_input_stream: input.public_inputstream.clone(),
             private_input_stream: input.private_inputstream.clone(),
             execute_only: input.execute_only,
+            precompile: input.precompile,
             ..Default::default()
         };
+        for receipt in input.receipts.iter() {
+            request.receipt.push(receipt.clone());
+        }
+        for receipt_input in input.receipt_inputs.iter() {
+            request.receipt_input.push(receipt_input.clone());
+        }
         self.sign_ecdsa(&mut request).await;
         let mut client = self.stage_client.clone();
         let response = client.generate_proof(request).await?.into_inner();
@@ -176,6 +183,8 @@ impl Prover for NetworkProver {
                         public_values: vec![],
                         total_steps: get_status_response.total_steps,
                         split_cost: split_end_time.duration_since(split_start_time).as_millis() as u64,
+                        receipt: get_status_response.receipt,
+                        elf_id: get_status_response.elf_id,
                         ..Default::default()
                     };
                     if !get_status_response.stark_proof_url.is_empty() {

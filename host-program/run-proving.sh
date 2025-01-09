@@ -35,7 +35,7 @@ if [ "$program" == "sha2-rust" ];then
 elif [ "$program" == "mem-alloc-vec" ];then
      export SEG_SIZE=65536
 elif [ "$program" == "sha2-precompile" ];then
-     export SEG_SIZE=65536
+     export SEG_SIZE=16384
 fi
 
 echo "SEG_SIZE:$SEG_SIZE"
