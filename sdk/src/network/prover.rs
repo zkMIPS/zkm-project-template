@@ -158,13 +158,13 @@ impl Prover for NetworkProver {
                                 split_start_time = Instant::now();
                             }
                             log::info!("generate_proof : splitting the task.");
-                        },
+                        }
                         2 => {
                             if last_step == 1 {
                                 split_end_time = Instant::now();
                             }
                             log::info!("generate_proof : proving the task.");
-                        },
+                        }
                         3 => log::info!("generate_proof : aggregating the proof."),
                         4 => log::info!("generate_proof : aggregating the proof."),
                         5 => log::info!("generate_proof : finalizing the proof."),
@@ -182,10 +182,10 @@ impl Prover for NetworkProver {
                         solidity_verifier: vec![],
                         public_values: vec![],
                         total_steps: get_status_response.total_steps,
-                        split_cost: split_end_time.duration_since(split_start_time).as_millis() as u64,
+                        split_cost: split_end_time.duration_since(split_start_time).as_millis()
+                            as u64,
                         receipt: get_status_response.receipt,
                         elf_id: get_status_response.elf_id,
-                        ..Default::default()
                     };
                     if !get_status_response.stark_proof_url.is_empty() {
                         proof_result.stark_proof =
