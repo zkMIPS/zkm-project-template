@@ -61,7 +61,7 @@ Please refer to [this](guest-program/README.md) guide.
 
 ```sh
 cd zkm-project-template
-sdk/src/local/libsnark/compile.sh  # compile snark library
+sh sdk/src/local/libsnark/compile.sh  # compile snark library
 cargo build --release              # build host programs
 ```
 
@@ -101,7 +101,7 @@ This host program sends the private input pri_input = vec![5u8; 1024] and its ha
 Make any edits to [`run-proving.sh`](host-program/run-proving.sh) and run the program:
 
 ```sh
-cd zkm-project-template/host-program/sha2-rust
+cd zkm-project-template/host-program
 ./run-proving.sh sha2-rust
 ```
 
