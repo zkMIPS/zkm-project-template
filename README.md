@@ -86,7 +86,7 @@ If successfully, it will generate the binary files in `target/release`/{`sha2-ru
 > 5. The environment variable `SETUP_FLAG` is set to "true", it will generate  the proof key (pk), the verification key (vk) and the verifier contract and store them at the path indicated by `VERIFYING_KEY_PATH`.Then, the `SETUP_FLAG` should be set to "false" , next executing the host will  generate the snark proof using the same pk and vk.
 
 > [!WARNING]
->  The environmental variable `SEG_SIZE` in the run-xxx_proving.sh affects the final proof generation. 
+>  The environmental variable `SEG_SIZE` in the run_proving.sh affects the final proof generation. 
 
 >  The guest program's ELF with the input is split into segments according the SEG_SIZE, based on the cycle count.
 
