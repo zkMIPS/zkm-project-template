@@ -4,7 +4,7 @@
 use revm::{
     db::CacheState,
     interpreter::CreateScheme,
-    primitives::{calc_excess_blob_gas, keccak256, Bytecode, Env, SpecId, TransactTo, U256},
+    primitives::{calc_excess_blob_gas, Bytecode, Env, SpecId, TransactTo, U256, B256},
     Evm,
 };
 extern crate libc;
@@ -48,7 +48,7 @@ fn execute_test_suite(suite: TestSuite) -> Result<(), String> {
         for (address, info) in unit.pre {
             let acc_info = revm::primitives::AccountInfo {
                 balance: info.balance,
-                code_hash: keccak256(&info.code),
+                code_hash: B256::from(zkm_runtime::io::keccak(&info.code)),
                 code: Some(Bytecode::new_raw(info.code)),
                 nonce: info.nonce,
             };
