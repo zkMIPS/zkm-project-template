@@ -18,6 +18,7 @@ use zkm_prover::generation::state::{AssumptionReceipts, Receipt};
 
 const DEGREE_BITS_RANGE: [Range<usize>; 8] =
     [10..21, 12..22, 11..21, 8..21, 6..21, 6..21, 6..21, 13..23];
+
 const D: usize = 2;
 type C = PoseidonGoldilocksConfig;
 type F = <C as GenericConfig<D>>::F;

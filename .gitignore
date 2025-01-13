@@ -1,4 +1,9 @@
-/target
-/verifier/data/test_circuit
-/test-vectors/mips
+target
+verifier/data/test_circuit
+test-vectors/mips
 push.sh
+mips-zkm-zkvm-elf
+libsnark.h
+libsnark.so
+*.log
+Cargo.lock

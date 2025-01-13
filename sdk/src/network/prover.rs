@@ -1,6 +1,6 @@
 use common::tls::Config;
 use stage_service::stage_service_client::StageServiceClient;
-use stage_service::{GenerateProofRequest, GetStatusRequest};
+use stage_service::{GenerateProofRequest, GetStatusRequest, Step};
 
 use std::time::Instant;
 use tonic::transport::Endpoint;
@@ -66,11 +66,11 @@ impl NetworkProver {
             None => Endpoint::new(endpoint_para.to_owned())?,
         };
         let private_key = client_config
-            .private_key
+            .proof_network_privkey
             .to_owned()
-            .expect("PRIVATE_KEY must be set");
+            .expect("PROOF_NETWORK_PRVKEY must be set");
         if private_key.is_empty() {
-            panic!("Please set the PRIVATE_KEY");
+            panic!("Please set the PROOF_NETWORK_PRVKEY");
         }
         let stage_client = StageServiceClient::connect(endpoint).await?;
         let wallet = private_key.parse::<LocalWallet>().unwrap();
@@ -151,25 +151,27 @@ impl Prover for NetworkProver {
             match Status::from_i32(get_status_response.status as i32) {
                 Some(Status::Computing) => {
                     //log::info!("generate_proof step: {}", get_status_response.step);
-                    match get_status_response.step {
-                        0 => log::info!("generate_proof : queuing the task."),
-                        1 => {
+                    match Step::from_i32(get_status_response.step) {
+                        Some(Step::Init) => log::info!("generate_proof : queuing the task."),
+                        Some(Step::InSplit) => {
                             if last_step == 0 {
                                 split_start_time = Instant::now();
                             }
                             log::info!("generate_proof : splitting the task.");
                         }
-                        2 => {
+                        Some(Step::InProve) => {
                             if last_step == 1 {
                                 split_end_time = Instant::now();
                             }
                             log::info!("generate_proof : proving the task.");
                         }
-                        3 => log::info!("generate_proof : aggregating the proof."),
-                        4 => log::info!("generate_proof : aggregating the proof."),
-                        5 => log::info!("generate_proof : finalizing the proof."),
-                        6 => log::info!("generate_proof : completing the proof."),
-                        i32::MIN..=-1_i32 | 7_i32..=i32::MAX => todo!(),
+                        Some(Step::InAgg) => log::info!("generate_proof : aggregating the proof."),
+                        Some(Step::InAggAll) => {
+                            log::info!("generate_proof : aggregating all proofs.")
+                        }
+                        Some(Step::InFinal) => log::info!("generate_proof : finalizing the proof."),
+                        Some(Step::End) => log::info!("generate_proof : completing the proof."),
+                        None => todo!(),
                     }
                     last_step = get_status_response.step;
                     sleep(Duration::from_secs(30)).await;
