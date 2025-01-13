@@ -19,12 +19,9 @@ async fn main() -> Result<()> {
         .and_then(|seg| seg.parse::<bool>().ok())
         .unwrap_or(false);
 
-    let setup_flag = env::var("SETUP_FLAG")
-        .ok()
-        .and_then(|seg| seg.parse::<bool>().ok())
-        .unwrap_or(false);
-
     let elf_path = env::var("ELF_PATH").unwrap_or(env!("GUEST_TARGET_PATH").to_string());
+    let pre_elf_path =
+        env::var("PRE_ELF_PATH").unwrap_or(env!("PRE_GUEST_TARGET_PATH").to_string());
     let proof_results_path = env::var("PROOF_RESULTS_PATH").unwrap_or("../contracts".to_string());
     let vk_path = env::var("VERIFYING_KEY_PATH").unwrap_or("/tmp/input".to_string());
     let zkm_prover_type = env::var("ZKM_PROVER").expect("ZKM PROVER is missing");
@@ -37,8 +34,7 @@ async fn main() -> Result<()> {
     let domain_name = env::var("DOMAIN_NAME").unwrap_or("".to_string());
     let private_key = env::var("PROOF_NETWORK_PRVKEY").unwrap_or("".to_string());
 
-    let mut client_config: ClientCfg =
-        ClientCfg::new(zkm_prover_type.to_owned(), vk_path.to_owned());
+    let mut client_config: ClientCfg = ClientCfg::new(zkm_prover_type.to_owned(), vk_path);
 
     if !is_local_prover(&zkm_prover_type) {
         client_config.set_network(
@@ -56,28 +52,50 @@ async fn main() -> Result<()> {
     log::info!("new prover client,ok.");
 
     let mut prover_input = ProverInput {
-        elf: read(elf_path).unwrap(),
-        seg_size,
-        execute_only,
+        elf: read(pre_elf_path).unwrap(),
+        seg_size: 0,
+        precompile: true,
         ..Default::default()
     };
 
-    // If the guest program does't have inputs, it does't need the setting.
-    set_guest_input(&mut prover_input, None);
+    set_pre_guest_input(&mut prover_input, None);
 
-    // excuting the setup_and_generate_sol_verifier
-    if setup_flag {
-        match prover_client
-            .setup_and_generate_sol_verifier(&zkm_prover_type, &vk_path, &prover_input)
-            .await
-        {
-            Ok(()) => log::info!("Succussfully setup_and_generate_sol_verifier."),
-            Err(e) => {
-                log::info!("Error during setup_and_generate_sol_verifier: {}", e);
-                bail!("Failed to setup_and_generate_sol_verifier.");
-            }
+    let start = Instant::now();
+    let proving_result = prover_client.prover.prove(&prover_input, None).await;
+    let mut receipts = vec![];
+    let pre_elf_id: Vec<u8>;
+    match proving_result {
+        Ok(Some(prover_result)) => {
+            prover_client
+                .print_guest_execution_output(true, &prover_result)
+                .expect("print pre guest program excution's output false.");
+            receipts.push(prover_result.receipt);
+            pre_elf_id = prover_result.elf_id;
+            log::info!("pre_elf_id: {:?}", pre_elf_id);
+        }
+        Ok(None) => {
+            log::info!("Failed to generate proof.The result is None.");
+            bail!("Failed to generate proof.");
+        }
+        Err(e) => {
+            log::info!("Failed to generate proof. error: {}", e);
+            bail!("Failed to generate proof.");
         }
     }
+
+    let end = Instant::now();
+    let elapsed = end.duration_since(start);
+    log::info!("Elapsed time: {:?} secs", elapsed.as_secs());
+
+    let mut prover_input = ProverInput {
+        elf: read(elf_path).unwrap(),
+        seg_size,
+        execute_only,
+        receipts,
+        ..Default::default()
+    };
+
+    set_guest_input(&mut prover_input, &pre_elf_id);
 
     let start = Instant::now();
     let proving_result = prover_client.prover.prove(&prover_input, None).await;
@@ -117,8 +135,8 @@ async fn main() -> Result<()> {
     Ok(())
 }
 
-fn set_guest_input(input: &mut ProverInput, _param: Option<&str>) {
-    let num_bytes: usize = 1024; // Notice! : if this value is small, it will not generate the  proof.
+fn set_pre_guest_input(input: &mut ProverInput, _param: Option<&str>) {
+    let num_bytes: usize = 1024;
     let pri_input = vec![5u8; num_bytes];
     let mut hasher = Sha256::new();
     hasher.update(&pri_input);
@@ -136,4 +154,34 @@ fn set_guest_input(input: &mut ProverInput, _param: Option<&str>) {
 
     input.public_inputstream = pub_buf;
     input.private_inputstream = pri_buf;
+}
+
+fn set_guest_input(input: &mut ProverInput, elf_id: &Vec<u8>) {
+    let num_bytes: usize = 1024;
+    let pri_input = vec![5u8; num_bytes];
+    let mut hasher = Sha256::new();
+    hasher.update(&pri_input);
+    let result = hasher.finalize();
+    let output: [u8; 32] = result.into();
+
+    // assume the  arg[0] = hash(public input), and the arg[1] = public input.
+    let mut pre_pub_buf = Vec::new();
+    bincode::serialize_into(&mut pre_pub_buf, &output).expect("public_input serialization failed");
+
+    let mut hasher = Sha256::new();
+    hasher.update(output);
+    let result = hasher.finalize();
+    let output: [u8; 32] = result.into();
+
+    let public_input = output.to_vec();
+    let mut pub_buf = Vec::new();
+    bincode::serialize_into(&mut pub_buf, &public_input)
+        .expect("public_input serialization failed");
+
+    let mut elf_id_buf = Vec::new();
+    bincode::serialize_into(&mut elf_id_buf, elf_id).expect("elf_id serialization failed");
+
+    input.public_inputstream = pub_buf;
+    input.private_inputstream = pre_pub_buf;
+    input.receipt_inputs.push(elf_id_buf);
 }

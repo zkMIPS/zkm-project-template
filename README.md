@@ -62,7 +62,7 @@ Please refer to [this](guest-program/README.md) guide.
 ```sh
 cd zkm-project-template
 sh sdk/src/local/libsnark/compile.sh  # compile snark library
-cargo build --release              # build host programs
+cargo build --release                 # build host programs
 ```
 
 If successfully, it will generate the binary files in `target/release`/{`sha2-rust` ,`sha2-go` ,`revme`, `mem-alloc-vec`}
@@ -114,7 +114,7 @@ The result proof and contract file will be in the contracts/verifier and contrac
 
 > The proving task requires several stages: queuing, splitting, proving, aggregating and finalizing. Each stage involves a varying duration.
 
-Must set the `PRIVATE_KEY` and `ZKM_PROVER=network` in [`run-proving.sh`](host-program/run-proving.sh) and run the program:
+Must set the `PROOF_NETWORK_PRVKEY` and `ZKM_PROVER=network` in [`run-proving.sh`](host-program/run-proving.sh) and run the program:
 
 ```sh
 ./run-proving.sh sha2-rust

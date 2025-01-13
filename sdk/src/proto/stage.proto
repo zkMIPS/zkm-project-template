@@ -46,6 +46,9 @@ message GenerateProofRequest {
     bytes public_input_stream = 8;
     bytes private_input_stream = 9;
     bool execute_only = 10;
+    bool precompile = 11;
+    repeated bytes receipt_input = 12;
+    repeated bytes receipt = 13;
 }
 
 message GenerateProofResponse {
@@ -74,4 +77,6 @@ message GetStatusResponse {
     int32 step = 8; // Step
     string public_values_url = 9;
     uint64 total_steps = 10;
+    bytes receipt = 11;
+    bytes elf_id = 12;
 }
