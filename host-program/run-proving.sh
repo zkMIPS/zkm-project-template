@@ -16,7 +16,7 @@ export JSON_PATH=${BASEDIR}/test-vectors/test.json
 export PROOF_RESULTS_PATH=${BASEDIR}/../contracts
 export EXECUTE_ONLY=false
 export VERIFYING_KEY_PATH=${BASEDIR}/../contracts/src
-export SETUP_FLAG=false
+export KEY_GENERATION=true
 
 ##network proving
 export CA_CERT_PATH=${BASEDIR}/tool/ca.pem
