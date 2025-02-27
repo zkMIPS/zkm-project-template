@@ -18,7 +18,7 @@ async fn main() -> Result<()> {
         .and_then(|seg| seg.parse::<bool>().ok())
         .unwrap_or(false);
 
-    let setup_flag = env::var("SETUP_FLAG")
+    let key_generation = env::var("KEY_GENERATION")
         .ok()
         .and_then(|seg| seg.parse::<bool>().ok())
         .unwrap_or(false);
@@ -65,7 +65,7 @@ async fn main() -> Result<()> {
     set_guest_input(&mut prover_input, Some(&json_path));
 
     // excuting the setup_and_generate_sol_verifier
-    if setup_flag {
+    if key_generation {
         match prover_client
             .setup_and_generate_sol_verifier(&zkm_prover_type, &vk_path, &prover_input)
             .await
