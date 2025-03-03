@@ -83,7 +83,7 @@ If successfully, it will generate the binary files in `target/release`/{`sha2-ru
 
 > 4. The environment variable `VERIFYING_KEY_PATH` specifies the location of the verification key (vk). If this variable is not set to zkm-project-template/contracts/src, you should copy the  `VERIFYING_KEY_PATH`/verifier.sol to zkm-project-template/contracts/src/ after executing the host program.
 
-> 5. The environment variable `SETUP_FLAG` is set to "true", it will generate  the proof key (pk), the verification key (vk) and the verifier contract and store them at the path indicated by `VERIFYING_KEY_PATH`.Then, the `SETUP_FLAG` should be set to "false" , next executing the host will  generate the snark proof using the same pk and vk.
+> 5. The environment variable `KEY_GENERATION` is set to "true", it will generate  the proof key (pk), the verification key (vk) and the verifier contract and store them at the path indicated by `VERIFYING_KEY_PATH`.Then, the `KEY_GENERATION` should be set to "false" , next executing the host will  generate the snark proof using the same pk and vk.
 
 > [!WARNING]
 >  The environmental variable `SEG_SIZE` in the run_proving.sh affects the final proof generation. 
@@ -168,6 +168,6 @@ If successfully, it will generate `244.json` in the path test-vectors
 cp test-vectors/244.json zkm-project-template/host-program/test-vectors/
 ```
 
-Next, you need to edit the `JSON_PATH` variable in the [`run-proving.sh`](host-program/revme/run-proving.sh) to match the name of the  JSON file mentioned above.
+Next, you need to edit the `JSON_PATH` variable in the [`run-proving.sh`](host-program/run-proving.sh) to match the name of the  JSON file mentioned above.
 
 Then, you can execute the run-proving.sh by following the steps outlined in `Example 1: sha2-rust`.
