@@ -25,7 +25,7 @@ pub fn prove_snark(keypath: &str, inputdir: &str, outputdir: &str) -> anyhow::Re
 
     if !pk_file.exists() || !vk_file.exists() {
         panic!(
-            "The vk or pk doesn't exist in the path: {}. Please first set the KEY_GENERATION=true to run setup_and_generate_sol_verifier.",inputdir
+            "The vk or pk doesn't exist in the path: {}. Please first set the SETUP_FLAG=true to run setup_and_generate_sol_verifier.",inputdir
         );
     }
 

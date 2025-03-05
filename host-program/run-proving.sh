@@ -16,13 +16,12 @@ export JSON_PATH=${BASEDIR}/test-vectors/test.json
 export PROOF_RESULTS_PATH=${BASEDIR}/../contracts
 export EXECUTE_ONLY=false
 export VERIFYING_KEY_PATH=${BASEDIR}/../contracts/src
-export KEY_GENERATION=true
+export SETUP_FLAG=false
 
 ##network proving
 export CA_CERT_PATH=${BASEDIR}/tool/ca.pem
-export PROOF_NETWORK_PRVKEY=   ##The private key corresponding to the public key when registering in the https://www.zkm.io/apply
+export PRIVATE_KEY=   ##The private key corresponding to the public key when registering in the https://www.zkm.io/apply
 export ENDPOINT=https://152.32.186.45:20002    ##the test entry of zkm proof network
-export DOMAIN_NAME=stage
 
 echo "Compile guest-program ${program}"
 if [[ "$program" =~ .*go$ ]];then

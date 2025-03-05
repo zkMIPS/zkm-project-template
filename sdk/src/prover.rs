@@ -14,34 +14,7 @@ pub struct ClientCfg {
     pub cert_path: Option<String>,
     pub key_path: Option<String>,
     pub domain_name: Option<String>,
-    pub proof_network_privkey: Option<String>,
-}
-
-impl ClientCfg {
-    pub fn new(zkm_prover_type: String, vk_path: String) -> ClientCfg {
-        ClientCfg {
-            zkm_prover: zkm_prover_type,
-            vk_path,
-            ..Default::default()
-        }
-    }
-
-    pub fn set_network(
-        &mut self,
-        endpoint: String,
-        ca_cert_path: String,
-        cert_path: String,
-        key_path: String,
-        domain_name: String,
-        private_key: String,
-    ) {
-        self.endpoint = Some(endpoint);
-        self.ca_cert_path = Some(ca_cert_path);
-        self.cert_path = Some(cert_path);
-        self.key_path = Some(key_path);
-        self.domain_name = Some(domain_name);
-        self.proof_network_privkey = Some(private_key);
-    }
+    pub private_key: Option<String>,
 }
 
 #[derive(Debug, Default, Deserialize, Serialize, Clone)]
