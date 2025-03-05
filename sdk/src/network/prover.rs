@@ -1,6 +1,6 @@
 use common::tls::Config;
 use stage_service::stage_service_client::StageServiceClient;
-use stage_service::{GenerateProofRequest, GetStatusRequest, Step};
+use stage_service::{GenerateProofRequest, GetStatusRequest};
 
 use std::time::Instant;
 use tonic::transport::Endpoint;
@@ -26,34 +26,19 @@ pub struct NetworkProver {
 
 impl NetworkProver {
     pub async fn new(client_config: &ClientCfg) -> anyhow::Result<NetworkProver> {
-        let ca_cert_path = client_config
-            .ca_cert_path
-            .to_owned()
-            .expect("CA_CERT_PATH must be set");
-        let cert_path = client_config
-            .cert_path
-            .to_owned()
-            .expect("CERT_PATH must be set");
-        let key_path = client_config
-            .key_path
-            .to_owned()
-            .expect("KEY_PATH must be set");
+        let ca_cert_path = client_config.ca_cert_path.to_owned().expect("CA_CERT_PATH must be set");
+        let cert_path = client_config.cert_path.to_owned().expect("CERT_PATH must be set");
+        let key_path = client_config.key_path.to_owned().expect("KEY_PATH must be set");
         let ssl_config = if ca_cert_path.is_empty() {
             None
         } else {
             Some(Config::new(ca_cert_path, cert_path, key_path).await?)
         };
-        let endpoint_para = client_config
-            .endpoint
-            .to_owned()
-            .expect("ENDPOINT must be set");
+        let endpoint_para = client_config.endpoint.to_owned().expect("ENDPOINT must be set");
         let endpoint = match ssl_config {
             Some(config) => {
                 let mut tls_config = ClientTlsConfig::new().domain_name(
-                    client_config
-                        .domain_name
-                        .to_owned()
-                        .expect("DOMAIN_NAME must be set"),
+                    client_config.domain_name.to_owned().expect("DOMAIN_NAME must be set"),
                 );
                 if let Some(ca_cert) = config.ca_cert {
                     tls_config = tls_config.ca_certificate(ca_cert);
@@ -65,19 +50,14 @@ impl NetworkProver {
             }
             None => Endpoint::new(endpoint_para.to_owned())?,
         };
-        let private_key = client_config
-            .proof_network_privkey
-            .to_owned()
-            .expect("PROOF_NETWORK_PRVKEY must be set");
+        let private_key =
+            client_config.proof_network_privkey.to_owned().expect("PRIVATE_KEY must be set");
         if private_key.is_empty() {
-            panic!("Please set the PROOF_NETWORK_PRVKEY");
+            panic!("Please set the PRIVATE_KEY");
         }
         let stage_client = StageServiceClient::connect(endpoint).await?;
         let wallet = private_key.parse::<LocalWallet>().unwrap();
-        Ok(NetworkProver {
-            stage_client,
-            wallet,
-        })
+        Ok(NetworkProver { stage_client, wallet })
     }
 
     pub async fn sign_ecdsa(&self, request: &mut GenerateProofRequest) {
@@ -111,7 +91,7 @@ impl Prover for NetworkProver {
             public_input_stream: input.public_inputstream.clone(),
             private_input_stream: input.private_inputstream.clone(),
             execute_only: input.execute_only,
-            precompile: input.precompile,
+            precompile: input.composite_proof,
             ..Default::default()
         };
         for receipt in input.receipts.iter() {
@@ -143,35 +123,31 @@ impl Prover for NetworkProver {
                 }
             }
 
-            let get_status_request = GetStatusRequest {
-                proof_id: proof_id.to_string(),
-            };
+            let get_status_request = GetStatusRequest { proof_id: proof_id.to_string() };
             let get_status_response = client.get_status(get_status_request).await?.into_inner();
 
             match Status::from_i32(get_status_response.status as i32) {
                 Some(Status::Computing) => {
                     //log::info!("generate_proof step: {}", get_status_response.step);
-                    match Step::from_i32(get_status_response.step) {
-                        Some(Step::Init) => log::info!("generate_proof : queuing the task."),
-                        Some(Step::InSplit) => {
+                    match get_status_response.step {
+                        0 => log::info!("generate_proof : queuing the task."),
+                        1 => {
                             if last_step == 0 {
                                 split_start_time = Instant::now();
                             }
                             log::info!("generate_proof : splitting the task.");
                         }
-                        Some(Step::InProve) => {
+                        2 => {
                             if last_step == 1 {
                                 split_end_time = Instant::now();
                             }
                             log::info!("generate_proof : proving the task.");
                         }
-                        Some(Step::InAgg) => log::info!("generate_proof : aggregating the proof."),
-                        Some(Step::InAggAll) => {
-                            log::info!("generate_proof : aggregating all proofs.")
-                        }
-                        Some(Step::InFinal) => log::info!("generate_proof : finalizing the proof."),
-                        Some(Step::End) => log::info!("generate_proof : completing the proof."),
-                        None => todo!(),
+                        3 => log::info!("generate_proof : aggregating the proof."),
+                        4 => log::info!("generate_proof : aggregating the proof."),
+                        5 => log::info!("generate_proof : finalizing the proof."),
+                        6 => log::info!("generate_proof : completing the proof."),
+                        i32::MIN..=-1_i32 | 7_i32..=i32::MAX => todo!(),
                     }
                     last_step = get_status_response.step;
                     sleep(Duration::from_secs(30)).await;
@@ -208,10 +184,7 @@ impl Prover for NetworkProver {
                     return Ok(Some(proof_result));
                 }
                 _ => {
-                    log::error!(
-                        "generate_proof failed status: {}",
-                        get_status_response.status
-                    );
+                    log::error!("generate_proof failed status: {}", get_status_response.status);
                     //return Ok(None);
                     return Err(anyhow::anyhow!(
                         "generate_proof failed status: {}",

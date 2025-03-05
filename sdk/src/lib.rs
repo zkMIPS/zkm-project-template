@@ -16,7 +16,6 @@ use serde_json::to_writer;
 use sha2::{Digest, Sha256};
 
 use anyhow::Context;
-//use bincode;
 
 pub struct ProverClient {
     pub prover: Box<dyn Prover>,
@@ -76,8 +75,7 @@ pub fn save_data_to_file<P: AsRef<Path>, D: AsRef<[u8]>>(
 
     // Open the file and write the data
     let mut file = File::create(&output_path).context("Unable to create file")?;
-    file.write_all(data.as_ref())
-        .context("Failed to write to file")?;
+    file.write_all(data.as_ref()).context("Failed to write to file")?;
 
     let bytes_written = data.as_ref().len();
     log::info!("Successfully written {} bytes.", bytes_written);
@@ -127,13 +125,11 @@ pub fn update_public_inputs_with_bincode(
 impl ProverClient {
     pub async fn new(client_config: &ClientCfg) -> Self {
         #[allow(unreachable_code)]
-        match client_config.zkm_prover.as_str() {
-            "local" => Self {
-                prover: Box::new(LocalProver::new(&client_config.vk_path)),
-            },
-            "network" => Self {
-                prover: Box::new(NetworkProver::new(client_config).await.unwrap()),
-            },
+        match client_config.zkm_prover_type.as_str() {
+            "local" => Self { prover: Box::new(LocalProver::new(&client_config.vk_path)) },
+            "network" => {
+                Self { prover: Box::new(NetworkProver::new(client_config).await.unwrap()) }
+            }
             _ => panic!(
                 "Invalid value for ZKM_PROVER enviroment variable: expected 'local', or 'network'"
             ),
@@ -141,15 +137,11 @@ impl ProverClient {
     }
 
     pub fn local(vk_path: &str) -> Self {
-        Self {
-            prover: Box::new(LocalProver::new(vk_path)),
-        }
+        Self { prover: Box::new(LocalProver::new(vk_path)) }
     }
 
     pub async fn network(client_config: &ClientCfg) -> Self {
-        Self {
-            prover: Box::new(NetworkProver::new(client_config).await.unwrap()),
-        }
+        Self { prover: Box::new(NetworkProver::new(client_config).await.unwrap()) }
     }
 
     pub async fn setup_and_generate_sol_verifier(
@@ -160,9 +152,7 @@ impl ProverClient {
     ) -> anyhow::Result<()> {
         if is_local_prover(zkm_prover) {
             log::info!("Excuting the setup.");
-            self.prover
-                .setup_and_generate_sol_verifier(vk_path, prover_input, None)
-                .await?;
+            self.prover.setup_and_generate_sol_verifier(vk_path, prover_input, None).await?;
         }
 
         Ok(())
@@ -172,14 +162,12 @@ impl ProverClient {
         &self,
         prover_result: &ProverResult,
         input: &ProverInput,
-        proof_results_path: &String,
         zkm_prover_type: &str,
     ) -> anyhow::Result<()> {
         if prover_result.proof_with_public_inputs.is_empty() {
             if is_local_prover(zkm_prover_type) {
                 //local proving
                 log::info!("Fail: please try setting SEG_SIZE={}", input.seg_size / 2);
-                //return Err(anyhow::anyhow!("SEG_SIZE is excessively large."));
                 bail!("SEG_SIZE is excessively large.");
             } else {
                 //network proving
@@ -192,7 +180,7 @@ impl ProverClient {
             }
         }
         //1.snark proof
-        let output_dir = format!("{}/verifier", proof_results_path);
+        let output_dir = format!("{}/verifier", input.proof_results_path);
         log::info!("Save the snark proof:  ");
         save_data_to_file(
             &output_dir,
@@ -207,7 +195,7 @@ impl ProverClient {
         );
         match public_inputs {
             Ok(Some(inputs)) => {
-                let output_dir = format!("{}/verifier", proof_results_path);
+                let output_dir = format!("{}/verifier", input.proof_results_path);
                 log::info!("Save the public inputs:  ");
                 save_data_as_json(&output_dir, "public_inputs.json", &inputs)?;
             }
@@ -223,16 +211,12 @@ impl ProverClient {
 
         //3.contract,only for network proving
         if !is_local_prover(zkm_prover_type) {
-            let output_dir = format!("{}/src", proof_results_path);
+            let output_dir = format!("{}/src", input.proof_results_path);
             log::info!("Save the verifier contract:  ");
-            save_data_to_file(
-                &output_dir,
-                "verifier.sol",
-                &prover_result.solidity_verifier,
-            )?;
+            save_data_to_file(&output_dir, "verifier.sol", &prover_result.solidity_verifier)?;
         }
 
-        log::info!("Generating proof successfully .The snark proof and contract  are in the the path {}/{{verifier,src}} .", proof_results_path);
+        log::info!("Generating proof successfully .The snark proof and contract  are in the the path {}/{{verifier,src}} .", input.proof_results_path);
 
         Ok(())
     }
@@ -270,10 +254,7 @@ impl ProverClient {
         T: serde::de::DeserializeOwned + std::fmt::Debug, // Here we restrict T to be deserializable
     {
         if prover_result.output_stream.is_empty() {
-            log::info!(
-                "output_stream.len() is too short: {}",
-                prover_result.output_stream.len()
-            );
+            log::info!("output_stream.len() is too short: {}", prover_result.output_stream.len());
             bail!("output_stream.len() is too short.");
         }
         log::info!("Executing the guest program  successfully.");

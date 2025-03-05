@@ -29,10 +29,6 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: '1.22'
-      - name: Build Go library
-        run: |
-          chmod +x ./sdk/src/local/libsnark/compile.sh
-          ./sdk/src/local/libsnark/compile.sh
       - name: Cargo build
         run: cargo build --verbose --release
       - name: Cargo test
