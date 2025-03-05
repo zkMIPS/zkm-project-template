@@ -47,7 +47,7 @@ impl ProverTask {
                 "There is only one segment with segment size {}, will skip the aggregation!",
                 self.input.seg_size
             );
-        } else if !self.input.precompile {
+        } else if !self.input.composite_proof {
             match crate::local::snark::prove_snark(&vk_path, &inputdir, &outputdir) {
                 Ok(()) => {
                     result.stark_proof =
@@ -86,10 +86,7 @@ pub struct LocalProver {
 
 impl LocalProver {
     pub fn new(vk_path: &str) -> LocalProver {
-        LocalProver {
-            tasks: Arc::new(Mutex::new(HashMap::new())),
-            vk_path: vk_path.to_string(),
-        }
+        LocalProver { tasks: Arc::new(Mutex::new(HashMap::new())), vk_path: vk_path.to_string() }
     }
 }
 
@@ -99,10 +96,7 @@ impl Prover for LocalProver {
         let proof_id: String = uuid::Uuid::new_v4().to_string();
         let task: Arc<Mutex<ProverTask>> =
             Arc::new(Mutex::new(ProverTask::new(&proof_id, &self.vk_path, input)));
-        self.tasks
-            .lock()
-            .unwrap()
-            .insert(proof_id.clone(), task.clone());
+        self.tasks.lock().unwrap().insert(proof_id.clone(), task.clone());
         thread::spawn(move || {
             task.lock().unwrap().run();
         });

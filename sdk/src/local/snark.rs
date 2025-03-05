@@ -25,7 +25,7 @@ pub fn prove_snark(keypath: &str, inputdir: &str, outputdir: &str) -> anyhow::Re
 
     if !pk_file.exists() || !vk_file.exists() {
         panic!(
-            "The vk or pk doesn't exist in the path: {}. Please first set the SETUP_FLAG=true to run setup_and_generate_sol_verifier.",inputdir
+            "The vk or pk doesn't exist in the path: {}. Please first set the SNARK_SETUP=true to run setup_and_generate_sol_verifier.",inputdir
         );
     }
 
@@ -36,12 +36,7 @@ pub fn prove_snark(keypath: &str, inputdir: &str, outputdir: &str) -> anyhow::Re
     let mut result: *mut libc::c_char = std::ptr::null_mut();
 
     let ret = unsafe {
-        Stark2Snark(
-            keypath.as_ptr(),
-            inputdir.as_ptr(),
-            outputdir.as_ptr(),
-            &mut result,
-        )
+        Stark2Snark(keypath.as_ptr(), inputdir.as_ptr(), outputdir.as_ptr(), &mut result)
     };
     if ret == 0 {
         Ok(())

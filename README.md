@@ -61,7 +61,6 @@ Please refer to [this](guest-program/README.md) guide.
 
 ```sh
 cd zkm-project-template
-sh sdk/src/local/libsnark/compile.sh  # compile snark library
 cargo build --release                 # build host programs
 ```
 

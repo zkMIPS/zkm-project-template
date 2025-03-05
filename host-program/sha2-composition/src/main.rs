@@ -6,67 +6,26 @@ use std::fs::read;
 use std::time::Instant;
 use zkm_sdk::{prover::ClientCfg, prover::ProverInput, ProverClient};
 
-pub const DEFAULT_PROVER_NETWORK_RPC: &str = "https://152.32.186.45:20002";
-pub const DEFALUT_PROVER_NETWORK_DOMAIN: &str = "stage";
-
 #[tokio::main]
 async fn main() -> Result<()> {
     env_logger::try_init().unwrap_or_default();
-    let seg_size = env::var("SEG_SIZE")
-        .ok()
-        .and_then(|seg| seg.parse::<u32>().ok())
-        .unwrap_or(65536);
-
-    let execute_only = env::var("EXECUTE_ONLY")
-        .ok()
-        .and_then(|seg| seg.parse::<bool>().ok())
-        .unwrap_or(false);
-
-    let elf_path = env::var("ELF_PATH").unwrap_or(env!("GUEST_TARGET_PATH").to_string());
     let pre_elf_path =
         env::var("PRE_ELF_PATH").unwrap_or(env!("PRE_GUEST_TARGET_PATH").to_string());
-    let proof_results_path = env::var("PROOF_RESULTS_PATH").unwrap_or("../contracts".to_string());
-    let vk_path = env::var("VERIFYING_KEY_PATH").unwrap_or("/tmp/input".to_string());
+    let elf_path = std::env::var("ELF_PATH").unwrap_or(env!("GUEST_TARGET_PATH").to_string());
+    std::env::set_var("ELF_PATH", elf_path);
 
-    //network proving
-    let endpoint = env::var("ENDPOINT").unwrap_or(DEFAULT_PROVER_NETWORK_RPC.to_string());
-    let ca_cert_path = env::var("CA_CERT_PATH").unwrap_or("".to_string());
-    let cert_path = env::var("CERT_PATH").unwrap_or("".to_string());
-    let key_path = env::var("KEY_PATH").unwrap_or("".to_string());
-    let domain_name = env::var("DOMAIN_NAME").unwrap_or(DEFALUT_PROVER_NETWORK_DOMAIN.to_string());
-    let private_key = env::var("PRIVATE_KEY").unwrap_or("".to_string());
-    let zkm_prover_type = env::var("ZKM_PROVER").expect("ZKM PROVER is missing");
-
-    let client_config: ClientCfg = ClientCfg {
-        zkm_prover: zkm_prover_type.to_owned(),
-        endpoint: Some(endpoint),
-        ca_cert_path: Some(ca_cert_path),
-        cert_path: Some(cert_path),
-        key_path: Some(key_path),
-        domain_name: Some(domain_name),
-        private_key: Some(private_key),
-        vk_path: vk_path.to_owned(),
-    };
-
+    let (client_config, mut inner_prover_input) = ClientCfg::from_env(set_pre_guest_input);
     log::info!("new prover client:");
     let prover_client = ProverClient::new(&client_config).await;
     log::info!("new prover client,ok.");
-
-    let mut prover_input = ProverInput {
-        elf: read(pre_elf_path).unwrap(),
-        public_inputstream: vec![],
-        private_inputstream: vec![],
-        seg_size: 0,
-        execute_only: false,
-        precompile: true,
-        receipt_inputs: vec![],
-        receipts: vec![],
-    };
-
-    set_pre_guest_input(&mut prover_input, None);
+    let outer_seg_size = inner_prover_input.seg_size;
+    let outer_elf = inner_prover_input.elf;
+    inner_prover_input.seg_size = 0;
+    inner_prover_input.elf = read(pre_elf_path).unwrap();
+    inner_prover_input.composite_proof = true;
 
     let start = Instant::now();
-    let proving_result = prover_client.prover.prove(&prover_input, None).await;
+    let proving_result = prover_client.prover.prove(&inner_prover_input, None).await;
     let mut receipts = vec![];
     let pre_elf_id: Vec<u8>;
     match proving_result {
@@ -93,14 +52,11 @@ async fn main() -> Result<()> {
     log::info!("Elapsed time: {:?} secs", elapsed.as_secs());
 
     let mut prover_input = ProverInput {
-        elf: read(elf_path).unwrap(),
-        public_inputstream: vec![],
-        private_inputstream: vec![],
-        seg_size,
-        execute_only,
-        precompile: false,
-        receipt_inputs: vec![],
+        elf: outer_elf,
+        seg_size: outer_seg_size,
+        execute_only: inner_prover_input.execute_only,
         receipts,
+        ..Default::default()
     };
 
     set_guest_input(&mut prover_input, &pre_elf_id);
@@ -109,14 +65,13 @@ async fn main() -> Result<()> {
     let proving_result = prover_client.prover.prove(&prover_input, None).await;
     match proving_result {
         Ok(Some(prover_result)) => {
-            if !execute_only {
+            if !inner_prover_input.execute_only {
                 //excute the guest program and generate the proof
                 prover_client
                     .process_proof_results(
                         &prover_result,
                         &prover_input,
-                        &proof_results_path,
-                        &zkm_prover_type,
+                        &client_config.zkm_prover_type,
                     )
                     .expect("process proof results error");
             } else {

@@ -46,9 +46,5 @@ pub fn prove_stark(
     }
     let receipt = util::prove_segments(&seg_path, "", storedir, "", "", seg_num, 0, receipts)?;
     let receipt_data = bincode::serialize(&receipt).map_err(|e| anyhow::anyhow!(e))?;
-    Ok((
-        seg_num > 1,
-        Some(receipt_data),
-        Some(receipt.claim().elf_id),
-    ))
+    Ok((seg_num > 1, Some(receipt_data), Some(receipt.claim().elf_id)))
 }

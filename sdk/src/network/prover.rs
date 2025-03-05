@@ -26,34 +26,19 @@ pub struct NetworkProver {
 
 impl NetworkProver {
     pub async fn new(client_config: &ClientCfg) -> anyhow::Result<NetworkProver> {
-        let ca_cert_path = client_config
-            .ca_cert_path
-            .to_owned()
-            .expect("CA_CERT_PATH must be set");
-        let cert_path = client_config
-            .cert_path
-            .to_owned()
-            .expect("CERT_PATH must be set");
-        let key_path = client_config
-            .key_path
-            .to_owned()
-            .expect("KEY_PATH must be set");
+        let ca_cert_path = client_config.ca_cert_path.to_owned().expect("CA_CERT_PATH must be set");
+        let cert_path = client_config.cert_path.to_owned().expect("CERT_PATH must be set");
+        let key_path = client_config.key_path.to_owned().expect("KEY_PATH must be set");
         let ssl_config = if ca_cert_path.is_empty() {
             None
         } else {
             Some(Config::new(ca_cert_path, cert_path, key_path).await?)
         };
-        let endpoint_para = client_config
-            .endpoint
-            .to_owned()
-            .expect("ENDPOINT must be set");
+        let endpoint_para = client_config.endpoint.to_owned().expect("ENDPOINT must be set");
         let endpoint = match ssl_config {
             Some(config) => {
                 let mut tls_config = ClientTlsConfig::new().domain_name(
-                    client_config
-                        .domain_name
-                        .to_owned()
-                        .expect("DOMAIN_NAME must be set"),
+                    client_config.domain_name.to_owned().expect("DOMAIN_NAME must be set"),
                 );
                 if let Some(ca_cert) = config.ca_cert {
                     tls_config = tls_config.ca_certificate(ca_cert);
@@ -65,19 +50,14 @@ impl NetworkProver {
             }
             None => Endpoint::new(endpoint_para.to_owned())?,
         };
-        let private_key = client_config
-            .private_key
-            .to_owned()
-            .expect("PRIVATE_KEY must be set");
+        let private_key =
+            client_config.proof_network_privkey.to_owned().expect("PRIVATE_KEY must be set");
         if private_key.is_empty() {
             panic!("Please set the PRIVATE_KEY");
         }
         let stage_client = StageServiceClient::connect(endpoint).await?;
         let wallet = private_key.parse::<LocalWallet>().unwrap();
-        Ok(NetworkProver {
-            stage_client,
-            wallet,
-        })
+        Ok(NetworkProver { stage_client, wallet })
     }
 
     pub async fn sign_ecdsa(&self, request: &mut GenerateProofRequest) {
@@ -111,7 +91,7 @@ impl Prover for NetworkProver {
             public_input_stream: input.public_inputstream.clone(),
             private_input_stream: input.private_inputstream.clone(),
             execute_only: input.execute_only,
-            precompile: input.precompile,
+            precompile: input.composite_proof,
             ..Default::default()
         };
         for receipt in input.receipts.iter() {
@@ -143,9 +123,7 @@ impl Prover for NetworkProver {
                 }
             }
 
-            let get_status_request = GetStatusRequest {
-                proof_id: proof_id.to_string(),
-            };
+            let get_status_request = GetStatusRequest { proof_id: proof_id.to_string() };
             let get_status_response = client.get_status(get_status_request).await?.into_inner();
 
             match Status::from_i32(get_status_response.status as i32) {
@@ -206,10 +184,7 @@ impl Prover for NetworkProver {
                     return Ok(Some(proof_result));
                 }
                 _ => {
-                    log::error!(
-                        "generate_proof failed status: {}",
-                        get_status_response.status
-                    );
+                    log::error!("generate_proof failed status: {}", get_status_response.status);
                     //return Ok(None);
                     return Err(anyhow::anyhow!(
                         "generate_proof failed status: {}",

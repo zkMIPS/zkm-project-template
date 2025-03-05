@@ -16,20 +16,8 @@ use zkm_prover::cpu::kernel::assembler::segment_kernel;
 use zkm_prover::fixed_recursive_verifier::AllRecursiveCircuits;
 use zkm_prover::generation::state::{AssumptionReceipts, Receipt};
 
-const DEGREE_BITS_RANGE: [Range<usize>; 12] = [
-    10..21,
-    12..22,
-    11..21,
-    8..21,
-    6..10,
-    6..10,
-    6..16,
-    6..16,
-    6..16,
-    6..16,
-    6..21,
-    13..23,
-];
+const DEGREE_BITS_RANGE: [Range<usize>; 12] =
+    [10..21, 12..22, 11..21, 8..21, 6..10, 6..10, 6..16, 6..16, 6..16, 6..16, 6..21, 13..23];
 
 const D: usize = 2;
 type C = PoseidonGoldilocksConfig;
@@ -146,9 +134,7 @@ pub fn prove_segments(
 
     log::info!(
         "proof size: {:?}",
-        serde_json::to_string(&agg_receipt.proof().proof)
-            .unwrap()
-            .len()
+        serde_json::to_string(&agg_receipt.proof().proof).unwrap().len()
     );
     let final_receipt = if seg_file_number > 1 {
         let block_receipt = all_circuits.prove_block(None, &agg_receipt)?;
