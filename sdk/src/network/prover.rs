@@ -13,6 +13,7 @@ use tokio::time::sleep;
 use tokio::time::Duration;
 
 use async_trait::async_trait;
+use anyhow::{bail, Result};
 
 #[derive(Clone)]
 pub struct Config {
@@ -24,7 +25,7 @@ pub mod stage_service {
     tonic::include_proto!("stage.v1");
 }
 
-use crate::network::prover::stage_service::Status;
+use crate::network::prover::stage_service::{Status, Step};
 
 pub struct NetworkProver {
     pub stage_client: StageServiceClient<Channel>,
@@ -32,7 +33,7 @@ pub struct NetworkProver {
 }
 
 impl NetworkProver {
-    pub async fn new(client_config: &ClientCfg) -> anyhow::Result<NetworkProver> {
+    pub async fn new(client_config: &ClientCfg) -> Result<NetworkProver> {
         let ca_cert_path = client_config.ca_cert_path.to_owned().expect("CA_CERT_PATH must be set");
         let cert_path = client_config.cert_path.to_owned().expect("CERT_PATH must be set");
         let key_path = client_config.key_path.to_owned().expect("KEY_PATH must be set");
@@ -82,7 +83,7 @@ impl NetworkProver {
         request.signature = signature.to_string();
     }
 
-    pub async fn download_file(url: &str) -> anyhow::Result<Vec<u8>> {
+    pub async fn download_file(url: &str) -> Result<Vec<u8>> {
         let response = reqwest::get(url).await?;
         let content = response.bytes().await?;
         Ok(content.to_vec())
@@ -91,7 +92,7 @@ impl NetworkProver {
 
 #[async_trait]
 impl Prover for NetworkProver {
-    async fn request_proof<'a>(&self, input: &'a ProverInput) -> anyhow::Result<String> {
+    async fn request_proof<'a>(&self, input: &'a ProverInput) -> Result<String> {
         let proof_id = uuid::Uuid::new_v4().to_string();
         let mut request = GenerateProofRequest {
             proof_id: proof_id.clone(),
@@ -119,7 +120,7 @@ impl Prover for NetworkProver {
         &self,
         proof_id: &'a str,
         timeout: Option<Duration>,
-    ) -> anyhow::Result<Option<ProverResult>> {
+    ) -> Result<Option<ProverResult>> {
         let start_time = Instant::now();
         let mut split_start_time = Instant::now();
         let mut split_end_time = Instant::now();
@@ -128,7 +129,7 @@ impl Prover for NetworkProver {
         loop {
             if let Some(timeout) = timeout {
                 if start_time.elapsed() > timeout {
-                    return Err(anyhow::anyhow!("Proof generation timed out."));
+                    bail!("Proof generation timed out.");
                 }
             }
 
@@ -138,25 +139,24 @@ impl Prover for NetworkProver {
             match Status::from_i32(get_status_response.status as i32) {
                 Some(Status::Computing) => {
                     //log::info!("generate_proof step: {}", get_status_response.step);
-                    match get_status_response.step {
-                        0 => log::info!("generate_proof : queuing the task."),
-                        1 => {
+                    match Step::from_i32(get_status_response.step).unwrap() {
+                        Step::Init => log::info!("generate_proof : queuing the task."),
+                        Step::InSplit => {
                             if last_step == 0 {
                                 split_start_time = Instant::now();
                             }
                             log::info!("generate_proof : splitting the task.");
                         }
-                        2 => {
+                        Step::InProve => {
                             if last_step == 1 {
                                 split_end_time = Instant::now();
                             }
                             log::info!("generate_proof : proving the task.");
                         }
-                        3 => log::info!("generate_proof : aggregating the proof."),
-                        4 => log::info!("generate_proof : aggregating the proof."),
-                        5 => log::info!("generate_proof : finalizing the proof."),
-                        6 => log::info!("generate_proof : completing the proof."),
-                        i32::MIN..=-1_i32 | 7_i32..=i32::MAX => todo!(),
+                        Step::InAgg => log::info!("generate_proof : aggregating the proof."),
+                        Step::InAggAll => log::info!("generate_proof : aggregating the proof."),
+                        Step::InFinal => log::info!("generate_proof : finalizing the proof."),
+                        Step::End => log::info!("generate_proof : completing the proof."),
                     }
                     last_step = get_status_response.step;
                     sleep(Duration::from_secs(30)).await;
@@ -194,11 +194,10 @@ impl Prover for NetworkProver {
                 }
                 _ => {
                     log::error!("generate_proof failed status: {}", get_status_response.status);
-                    //return Ok(None);
-                    return Err(anyhow::anyhow!(
+                    bail!(
                         "generate_proof failed status: {}",
                         get_status_response.status
-                    ));
+                    );
                 }
             }
         }
@@ -209,9 +208,7 @@ impl Prover for NetworkProver {
         _vk_path: &'a str,
         _input: &'a ProverInput,
         _timeout: Option<Duration>,
-    ) -> anyhow::Result<()> {
-        log::info!("The proof network does not support the method.");
-
+    ) -> Result<()> {
         panic!("The proof network does not support the method!");
     }
 
@@ -219,7 +216,7 @@ impl Prover for NetworkProver {
         &self,
         input: &'a ProverInput,
         timeout: Option<Duration>,
-    ) -> anyhow::Result<Option<ProverResult>> {
+    ) -> Result<Option<ProverResult>> {
         log::info!("calling request_proof.");
         let proof_id = self.request_proof(input).await?;
         log::info!("calling wait_proof, proof_id={}", proof_id);
@@ -231,13 +228,10 @@ async fn get_cert_and_identity(
     ca_cert_path: String,
     cert_path: String,
     key_path: String,
-) -> anyhow::Result<(Option<Certificate>, Option<Identity>)> {
+) -> Result<(Option<Certificate>, Option<Identity>)> {
     let ca_cert_path = Path::new(&ca_cert_path);
     let cert_path = Path::new(&cert_path);
     let key_path = Path::new(&key_path);
-    // if !ca_cert_path.is_file() || !cert_path.is_file() || !key_path.is_file() {
-    //     bail!("both ca_cert_path, cert_path and key_path should be valid file")
-    // }
     let mut ca: Option<Certificate> = None;
     let mut identity: Option<Identity> = None;
     if ca_cert_path.is_file() {

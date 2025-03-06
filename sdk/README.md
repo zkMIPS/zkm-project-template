@@ -26,7 +26,7 @@ zkm-sdk = { git = "https://github.com/zkMIPS/zkm-project-template", branch = "ma
 
 ## Don't use the libsnark
 
-1. Set the environment variable `NO_USE_SNARK=true` .
+1. Set the environment variable `USE_LOCAL_PROVER=true` .
   
 2. Import the SDK
    
