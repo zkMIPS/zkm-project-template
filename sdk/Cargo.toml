@@ -13,11 +13,10 @@ async-trait = "0.1"
 
 zkm-prover = { git = "https://github.com/zkMIPS/zkm", branch = "main", default-features = false }
 zkm-emulator = { git = "https://github.com/zkMIPS/zkm", branch = "main", default-features = false }
-common = { git = "https://github.com/zkMIPS/zkm-prover", branch = "main", default-features = false } 
 plonky2 = { git = "https://github.com/zkMIPS/plonky2.git", branch = "zkm_dev" }
 #starky = { git = "https://github.com/zkMIPS/plonky2.git", branch = "zkm_dev" }
 
-tonic = "0.8.1"
+tonic = { version = "0.8.1", features = ["tls", "transport"] }
 prost = "0.11.0"
 
 reqwest = { version = "0.11", features = ["rustls-tls"] }
