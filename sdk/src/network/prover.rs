@@ -12,8 +12,8 @@ use ethers::signers::{LocalWallet, Signer};
 use tokio::time::sleep;
 use tokio::time::Duration;
 
-use async_trait::async_trait;
 use anyhow::{bail, Result};
+use async_trait::async_trait;
 
 #[derive(Clone)]
 pub struct Config {
@@ -139,24 +139,27 @@ impl Prover for NetworkProver {
             match Status::from_i32(get_status_response.status as i32) {
                 Some(Status::Computing) => {
                     //log::info!("generate_proof step: {}", get_status_response.step);
-                    match Step::from_i32(get_status_response.step).unwrap() {
-                        Step::Init => log::info!("generate_proof : queuing the task."),
-                        Step::InSplit => {
+                    match Step::from_i32(get_status_response.step) {
+                        Some(Step::Init) => log::info!("generate_proof : queuing the task."),
+                        Some(Step::InSplit) => {
                             if last_step == 0 {
                                 split_start_time = Instant::now();
                             }
                             log::info!("generate_proof : splitting the task.");
                         }
-                        Step::InProve => {
+                        Some(Step::InProve) => {
                             if last_step == 1 {
                                 split_end_time = Instant::now();
                             }
                             log::info!("generate_proof : proving the task.");
                         }
-                        Step::InAgg => log::info!("generate_proof : aggregating the proof."),
-                        Step::InAggAll => log::info!("generate_proof : aggregating the proof."),
-                        Step::InFinal => log::info!("generate_proof : finalizing the proof."),
-                        Step::End => log::info!("generate_proof : completing the proof."),
+                        Some(Step::InAgg) => log::info!("generate_proof : aggregating the proof."),
+                        Some(Step::InAggAll) => {
+                            log::info!("generate_proof : aggregating the proof.")
+                        }
+                        Some(Step::InFinal) => log::info!("generate_proof : finalizing the proof."),
+                        Some(Step::End) => log::info!("generate_proof : completing the proof."),
+                        None => todo!(),
                     }
                     last_step = get_status_response.step;
                     sleep(Duration::from_secs(30)).await;
@@ -194,10 +197,7 @@ impl Prover for NetworkProver {
                 }
                 _ => {
                     log::error!("generate_proof failed status: {}", get_status_response.status);
-                    bail!(
-                        "generate_proof failed status: {}",
-                        get_status_response.status
-                    );
+                    bail!("generate_proof failed status: {}", get_status_response.status);
                 }
             }
         }
