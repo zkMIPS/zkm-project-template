@@ -74,7 +74,7 @@ message GetStatusResponse {
     string stark_proof_url = 5;
     string solidity_verifier_url = 6;
     bytes output_stream = 7;
-    int32 step = 8; // Step
+    Step step = 8; // Step
     string public_values_url = 9;
     uint64 total_steps = 10;
     bytes receipt = 11;

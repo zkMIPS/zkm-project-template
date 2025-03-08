@@ -16,7 +16,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         panic!("Go build failed");
     }
 
-    if let Some(_snark_flag) = std::env::var_os("NO_USE_SNARK") {
+    if std::env::var_os("USE_LOCAL_PROVER").is_some() {
         tonic_build::configure()
             .protoc_arg("--experimental_allow_proto3_optional")
             .compile(&["src/proto/stage.proto"], &["src/proto"])?;
