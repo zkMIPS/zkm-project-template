@@ -33,15 +33,16 @@ pub struct NetworkProver {
 }
 
 impl NetworkProver {
-    pub async fn new(client_config: &ClientCfg) -> Result<NetworkProver> {
-        let ca_cert_path = client_config.ca_cert_path.to_owned().expect("CA_CERT_PATH must be set");
-        let cert_path = client_config.cert_path.to_owned().expect("CERT_PATH must be set");
-        let key_path = client_config.key_path.to_owned().expect("KEY_PATH must be set");
-        let ssl_config = if ca_cert_path.is_empty() {
+    pub async fn new(client_config: &ClientCfg) -> anyhow::Result<NetworkProver> {
+        let ssl_config = if client_config.ca_cert_path.as_ref().is_none() {
             None
         } else {
-            let (ca_cert, identity) =
-                get_cert_and_identity(ca_cert_path, cert_path, key_path).await?;
+            let (ca_cert, identity) = get_cert_and_identity(
+                client_config.ca_cert_path.as_ref().expect("CA_CERT_PATH not set"),
+                client_config.cert_path.as_ref().expect("CERT_PATH not set"),
+                client_config.key_path.as_ref().expect("KEY_PATH not set"),
+            )
+            .await?;
             Some(Config { ca_cert, identity })
         };
         let endpoint_para = client_config.endpoint.to_owned().expect("ENDPOINT must be set");
@@ -225,13 +226,16 @@ impl Prover for NetworkProver {
 }
 
 async fn get_cert_and_identity(
-    ca_cert_path: String,
-    cert_path: String,
-    key_path: String,
-) -> Result<(Option<Certificate>, Option<Identity>)> {
-    let ca_cert_path = Path::new(&ca_cert_path);
-    let cert_path = Path::new(&cert_path);
-    let key_path = Path::new(&key_path);
+    ca_cert_path: &str,
+    cert_path: &str,
+    key_path: &str,
+) -> anyhow::Result<(Option<Certificate>, Option<Identity>)> {
+    let ca_cert_path = Path::new(ca_cert_path);
+    let cert_path = Path::new(cert_path);
+    let key_path = Path::new(key_path);
+    // if !ca_cert_path.is_file() || !cert_path.is_file() || !key_path.is_file() {
+    //     bail!("both ca_cert_path, cert_path and key_path should be valid file")
+    // }
     let mut ca: Option<Certificate> = None;
     let mut identity: Option<Identity> = None;
     if ca_cert_path.is_file() {

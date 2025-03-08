@@ -32,10 +32,7 @@ impl ClientCfg {
         let snark_setup =
             env::var("SNARK_SETUP").ok().and_then(|seg| seg.parse::<bool>().ok()).unwrap_or(false);
 
-        let guest_input = match env::var("ARGS") {
-            Ok(input) => Some(input),
-            _ => None,
-        };
+        let guest_input = env::var("ARGS").ok();
         let elf_path = env::var("ELF_PATH").expect("ELF not found");
         println!("{}", elf_path);
         let proof_results_path =
