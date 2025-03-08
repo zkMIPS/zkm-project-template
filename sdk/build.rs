@@ -17,7 +17,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     if let Some(_) = std::env::var_os("USE_LOCAL_PROVER") {
-        println!("11111111111111");
         tonic_build::configure()
             .protoc_arg("--experimental_allow_proto3_optional")
             .compile(&["src/proto/stage.proto"], &["src/proto"])?;
