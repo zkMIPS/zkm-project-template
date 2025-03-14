@@ -1,9 +1,7 @@
 use crate::prover::{Prover, ProverInput, ProverResult};
-use anyhow::bail;
 use async_trait::async_trait;
 use std::collections::HashMap;
 use std::fs;
-use std::path::Path;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
@@ -48,7 +46,7 @@ impl ProverTask {
                 self.input.seg_size
             );
         } else if !self.input.composite_proof {
-            match crate::local::snark::prove_snark(&vk_path, &inputdir, &outputdir) {
+            match zkm_recursion::as_groth16(&vk_path, &inputdir, &outputdir) {
                 Ok(()) => {
                     result.stark_proof =
                         std::fs::read(format!("{}/proof_with_public_inputs.json", inputdir))
@@ -122,39 +120,6 @@ impl Prover for LocalProver {
             }
             log::info!("Waiting the proof result.");
             sleep(Duration::from_secs(30)).await;
-        }
-    }
-
-    async fn setup_and_generate_sol_verifier<'a>(
-        &self,
-        vk_path: &'a str,
-        input: &'a ProverInput,
-        _timeout: Option<Duration>,
-    ) -> anyhow::Result<()> {
-        let mut result = ProverResult::default();
-        let path = Path::new(vk_path);
-
-        if path.is_dir() {
-            fs::remove_dir_all(vk_path).unwrap();
-        }
-        fs::create_dir_all(vk_path).unwrap();
-
-        let (should_agg, _, _) =
-            crate::local::stark::prove_stark(input, vk_path, &mut result).unwrap();
-        if !should_agg {
-            log::info!("Setup: generating the stark proof false, please check the SEG_SIZE or other parameters.");
-            bail!("Setup: generating the stark proof false, please check the SEG_SIZE or other parameters!");
-        }
-
-        match crate::local::snark::setup_and_generate_sol_verifier(vk_path) {
-            Ok(()) => {
-                log::info!("setup_and_generate_sol_verifier successfully, the verify key and verifier contract are in the {}", vk_path);
-                Ok(())
-            }
-            Err(e) => {
-                log::error!("setup_and_generate_sol_verifier error : {}", e);
-                bail!("setup_and_generate_sol_verifier error");
-            }
         }
     }
 

@@ -204,15 +204,6 @@ impl Prover for NetworkProver {
         }
     }
 
-    async fn setup_and_generate_sol_verifier<'a>(
-        &self,
-        _vk_path: &'a str,
-        _input: &'a ProverInput,
-        _timeout: Option<Duration>,
-    ) -> Result<()> {
-        panic!("The proof network does not support the method!");
-    }
-
     async fn prove<'a>(
         &self,
         input: &'a ProverInput,

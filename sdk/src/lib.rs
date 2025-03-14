@@ -144,20 +144,6 @@ impl ProverClient {
         Self { prover: Box::new(NetworkProver::new(client_config).await.unwrap()) }
     }
 
-    pub async fn setup_and_generate_sol_verifier(
-        &self,
-        zkm_prover: &str,
-        vk_path: &str,
-        prover_input: &ProverInput,
-    ) -> anyhow::Result<()> {
-        if is_local_prover(zkm_prover) {
-            log::info!("Excuting the setup.");
-            self.prover.setup_and_generate_sol_verifier(vk_path, prover_input, None).await?;
-        }
-
-        Ok(())
-    }
-
     pub fn process_proof_results(
         &self,
         prover_result: &ProverResult,

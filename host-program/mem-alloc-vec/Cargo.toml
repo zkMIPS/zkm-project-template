@@ -7,6 +7,8 @@ edition = "2021"
 
 [dependencies]
 zkm-sdk = { path = "../../sdk", features = ["snark"] }
+zkm-recursion = {git = "https://github.com/zkMIPS/zkm", branch = "main", default-features = false }
+
 #tonic = "0.8.1"
 tokio = { version = "1.21.0", features = ["macros", "rt-multi-thread", "signal"] }
 log = { version = "0.4.14", default-features = false }

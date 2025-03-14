@@ -16,13 +16,7 @@ async fn main() -> Result<()> {
 
     //excuting the setup_and_generate_sol_verifier
     if prover_input.snark_setup {
-        match prover_client
-            .setup_and_generate_sol_verifier(
-                &client_config.zkm_prover_type,
-                &client_config.vk_path,
-                &prover_input,
-            )
-            .await
+        match zkm_recursion::groth16_setup(&client_config.vk_path)
         {
             Ok(()) => log::info!("Succussfully setup_and_generate_sol_verifier."),
             Err(e) => {
