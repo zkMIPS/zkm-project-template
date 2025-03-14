@@ -26,13 +26,11 @@ pub fn prove_segments(
     seg_start_id: usize,
     assumptions: AssumptionReceipts<F, C, D>,
 ) -> anyhow::Result<Receipt<F, C, D>> {
-
     let total_timing = TimingTree::new("prove total time", log::Level::Info);
     let all_stark = AllStark::<F, D>::default();
     let config = StarkConfig::standard_fast_config();
     // Preprocess all circuits.
     let all_circuits = create_recursive_circuit();
-
 
     let seg_file = format!("{}/{}", seg_dir, seg_start_id);
     log::info!("Process segment {}", seg_file);
@@ -74,7 +72,6 @@ pub fn prove_segments(
         // We can duplicate the proofs here because the state hasn't mutated.
         agg_receipt = aggregate_proof(&all_circuits, agg_receipt, receipt, false, false)?;
 
-
         is_agg = true;
         base_seg = seg_start_id + 2;
         seg_num -= 1;
@@ -103,19 +100,12 @@ pub fn prove_segments(
         all_circuits.verify_root(root_receipt.clone())?;
 
         // We can duplicate the proofs here because the state hasn't mutated.
-        let new_agg_receipt = aggregate_proof(
-            &all_circuits,
-            root_receipt_first,
-            root_receipt,
-            false,
-            false,
-        )?;
+        let new_agg_receipt =
+            aggregate_proof(&all_circuits, root_receipt_first, root_receipt, false, false)?;
 
         // We can duplicate the proofs here because the state hasn't mutated.
-        agg_receipt =
-            aggregate_proof(&all_circuits, agg_receipt, new_agg_receipt, is_agg, true)?;
+        agg_receipt = aggregate_proof(&all_circuits, agg_receipt, new_agg_receipt, is_agg, true)?;
         is_agg = true;
-
     }
 
     log::info!(
