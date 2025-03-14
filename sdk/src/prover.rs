@@ -112,12 +112,7 @@ pub trait Prover {
         proof_id: &'a str,
         timeout: Option<Duration>,
     ) -> anyhow::Result<Option<ProverResult>>;
-    async fn setup_and_generate_sol_verifier<'a>(
-        &self,
-        vk_path: &'a str,
-        input: &'a ProverInput,
-        timeout: Option<Duration>,
-    ) -> anyhow::Result<()>;
+
     async fn prove<'a>(
         &self,
         input: &'a ProverInput,
