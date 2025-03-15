@@ -84,6 +84,8 @@ If successfully, it will generate the binary files in `target/release`/{`sha2-ru
 
 > 5. The environment variable `KEY_GENERATION` is set to "true", it will generate  the proof key (pk), the verification key (vk) and the verifier contract and store them at the path indicated by `VERIFYING_KEY_PATH`.Then, the `KEY_GENERATION` should be set to "false" , next executing the host will  generate the snark proof using the same pk and vk.
 
+> 6. The degree bits for tables can be configured using environment variables such as `ARITHMETIC`, `CPU`, etc. For example, if the error "Error: Missing preprocessed circuits for Cpu table with size 12" appears, resolve it by running: `export CPU="12..13"`.
+
 > [!WARNING]
 >  The environmental variable `SEG_SIZE` in the run_proving.sh affects the final proof generation. 
 
@@ -91,6 +93,7 @@ If successfully, it will generate the binary files in `target/release`/{`sha2-ru
 
 >  When generating proofs on the local machine, if the log shows "[the seg_num is:1 ]", please reduce SEG_SIZE or increase the input. If generating proofs through the proof network, SEG_SIZE must be within the range [65536, 262144]. 
 
+>  The SEG_SIZE also affects the tables' degree bits. 
 ### Example 1 : `sha2-rust`
 
 This host program sends the private input pri_input = vec![5u8; 1024] and its hash (hash(pri_input)) to the guest program for verification of the hash value.
