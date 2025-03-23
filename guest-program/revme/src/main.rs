@@ -3,8 +3,7 @@
 
 use revm::{
     db::CacheState,
-    interpreter::CreateScheme,
-    primitives::{calc_excess_blob_gas, Bytecode, Env, SpecId, TransactTo, U256, B256},
+    primitives::{calc_excess_blob_gas, Bytecode, Env, SpecId, TransactTo, B256},
     Evm,
 };
 extern crate libc;
@@ -128,20 +127,15 @@ fn execute_test_suite(suite: TestSuite) -> Result<(), String> {
                     .and_then(Option::as_deref)
                     .unwrap_or_default()
                     .iter()
-                    .map(|item| {
-                        (
-                            item.address,
-                            item.storage_keys
-                                .iter()
-                                .map(|key| U256::from_be_bytes(key.0))
-                                .collect::<Vec<_>>(),
-                        )
+                    .map(|item| revm::primitives::AccessListItem {
+                        address: item.address,
+                        storage_keys: item.storage_keys.clone(),
                     })
                     .collect();
 
                 let to = match unit.transaction.to {
                     Some(add) => TransactTo::Call(add),
-                    None => TransactTo::Create(CreateScheme::Create),
+                    None => TransactTo::Create,
                 };
                 env.tx.transact_to = to;
 
@@ -156,8 +150,8 @@ fn execute_test_suite(suite: TestSuite) -> Result<(), String> {
                     .build();
                 let mut evm = Evm::builder()
                     .with_db(&mut state)
-                    .modify_env(|e| *e = env.clone())
-                    .spec_id(spec_id)
+                    .modify_env(|e| **e = env.clone())
+                    .with_spec_id(spec_id)
                     .build();
 
                 // do the deed
