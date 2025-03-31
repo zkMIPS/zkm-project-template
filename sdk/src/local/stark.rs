@@ -5,6 +5,7 @@ use plonky2::plonk::config::{GenericConfig, PoseidonGoldilocksConfig};
 use zkm_emulator::state::State;
 use zkm_emulator::utils::split_prog_into_segs;
 use zkm_prover::generation::state::{AssumptionReceipts, Receipt};
+use util::{F, C, D};
 
 #[allow(clippy::type_complexity)]
 pub fn prove_stark(
@@ -35,9 +36,6 @@ pub fn prove_stark(
         return Ok((false, None, None));
     }
     log::info!("[The seg_num is:{} ]", &seg_num);
-    const D: usize = 2;
-    type C = PoseidonGoldilocksConfig;
-    type F = <C as GenericConfig<D>>::F;
     let mut receipts: AssumptionReceipts<F, C, D> = vec![];
     for receipt_data in input.receipts.iter() {
         let receipt: Receipt<F, C, D> =
