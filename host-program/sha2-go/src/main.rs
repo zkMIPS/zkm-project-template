@@ -15,16 +15,6 @@ async fn main() -> Result<()> {
     let (client_config, prover_input) = ClientCfg::from_env(set_guest_input);
     let prover_client = ProverClient::new(&client_config).await;
     log::info!("new prover client,ok.");
-    //excuting the setup_and_generate_sol_verifier
-    if prover_input.snark_setup {
-        match zkm_recursion::groth16_setup(&client_config.vk_path) {
-            Ok(()) => log::info!("Succussfully setup_and_generate_sol_verifier."),
-            Err(e) => {
-                log::info!("Error during setup_and_generate_sol_verifier: {}", e);
-                bail!("Failed to setup_and_generate_sol_verifier.");
-            }
-        }
-    }
 
     let start = Instant::now();
     let proving_result = prover_client.prover.prove(&prover_input, None).await;

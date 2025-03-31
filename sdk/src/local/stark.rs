@@ -1,11 +1,10 @@
 use super::util;
 use crate::prover::{ProverInput, ProverResult};
 use elf::{endian::AnyEndian, ElfBytes};
-use plonky2::plonk::config::{GenericConfig, PoseidonGoldilocksConfig};
+use util::{C, D, F};
 use zkm_emulator::state::State;
 use zkm_emulator::utils::split_prog_into_segs;
 use zkm_prover::generation::state::{AssumptionReceipts, Receipt};
-use util::{F, C, D};
 
 #[allow(clippy::type_complexity)]
 pub fn prove_stark(
