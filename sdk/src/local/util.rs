@@ -114,12 +114,12 @@ pub fn prove_segments(
     );
 
     let final_receipt = if seg_file_number > 1 {
-        all_circuits.prove_block(None, &agg_receipt)?
+        let receipt = all_circuits.prove_block(None, &agg_receipt)?;
+        wrap_stark_bn254(&all_circuits, agg_receipt, outdir).unwrap();
+        receipt
     } else {
         agg_receipt.clone()
     };
-
-    wrap_stark_bn254(&all_circuits, agg_receipt, outdir).unwrap();
 
     log::info!("build finish");
 
