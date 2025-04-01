@@ -80,7 +80,7 @@ If successfully, it will generate the binary files in `target/release`/{`sha2-ru
 
 > 3. If the environmental variable `PROOF_RESULTS_PATH` is not set, the proof results file will be saved in zkm-project-template/contracts/{src, verifier}; if the environmental variable `PROOF_RESULTS_PATH` is set, after the proof is completed, the proof results file needs to be copied from from 'PROOF_RESULTS_PATH'/{src, verifier} to the corresponding zkm-project-template/contracts/{src, verifier}. 
 
-> 4. The environment variable `KEY_PATH` specifies the location of the proving and verifying key. If this variable is not set to zkm-project-template/contracts/src, you should copy the  `KEY_PATH`/verifier.sol to zkm-project-template/contracts/src/ after executing the host program.
+> 4. The environment variable `KEY_PATH` specifies the location of the proving and verifying key. 
 
 > 5. The environment variable `SNARK_SETUP` is set to "true", it will generate  the proving key(pk), the verifying key(vk) and the verifier contract and store them at the path indicated by `KEY_PATH`.Then, the `SNARK_SETUP` should be set to "false" , next executing the host will  generate the snark proof using the same pk and vk.
 
