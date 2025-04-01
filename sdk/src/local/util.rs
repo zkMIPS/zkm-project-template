@@ -11,9 +11,9 @@ use zkm_prover::cpu::kernel::assembler::segment_kernel;
 use zkm_prover::generation::state::{AssumptionReceipts, Receipt};
 use zkm_recursion::{aggregate_proof, create_recursive_circuit, wrap_stark_bn254};
 
-const D: usize = 2;
-type C = PoseidonGoldilocksConfig;
-type F = <C as GenericConfig<D>>::F;
+pub(crate) const D: usize = 2;
+pub(crate) type C = PoseidonGoldilocksConfig;
+pub(crate) type F = <C as GenericConfig<D>>::F;
 
 #[allow(clippy::too_many_arguments)]
 pub fn prove_segments(

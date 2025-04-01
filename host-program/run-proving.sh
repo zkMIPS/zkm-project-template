@@ -14,7 +14,7 @@ export ARGS="711e9609339e92b03ddc0a211827dba421f38f9ed8b9d806e1ffdd8c15ffa03d wo
 export JSON_PATH=${BASEDIR}/test-vectors/test.json
 export PROOF_RESULTS_PATH=${BASEDIR}/../contracts
 export EXECUTE_ONLY=false
-export VERIFYING_KEY_PATH=${BASEDIR}/../contracts/src
+export KEY_PATH=${BASEDIR}/../keys
 export SNARK_SETUP=${SNARK_SETUP-false}
 
 ##network proving

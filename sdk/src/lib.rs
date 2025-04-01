@@ -126,7 +126,9 @@ impl ProverClient {
     pub async fn new(client_config: &ClientCfg) -> Self {
         #[allow(unreachable_code)]
         match client_config.zkm_prover_type.as_str() {
-            "local" => Self { prover: Box::new(LocalProver::new(&client_config.vk_path)) },
+            "local" => Self {
+                prover: Box::new(LocalProver::new(client_config.key_path.as_ref().unwrap())),
+            },
             "network" => {
                 Self { prover: Box::new(NetworkProver::new(client_config).await.unwrap()) }
             }
@@ -136,8 +138,8 @@ impl ProverClient {
         }
     }
 
-    pub fn local(vk_path: &str) -> Self {
-        Self { prover: Box::new(LocalProver::new(vk_path)) }
+    pub fn local(key_path: &str) -> Self {
+        Self { prover: Box::new(LocalProver::new(key_path)) }
     }
 
     pub async fn network(client_config: &ClientCfg) -> Self {

@@ -13,25 +13,27 @@ pub struct ProverTask {
     input: ProverInput,
     result: Option<ProverResult>,
     is_done: bool,
-    vk_path: String,
+    key_path: String,
 }
 
 impl ProverTask {
-    fn new(proof_id: &str, vk_path: &str, input: &ProverInput) -> ProverTask {
+    fn new(proof_id: &str, key_path: &str, input: &ProverInput) -> ProverTask {
         ProverTask {
             proof_id: proof_id.to_string(),
             input: input.clone(),
             result: None,
             is_done: false,
-            vk_path: vk_path.to_string(),
+            key_path: key_path.to_string(),
         }
     }
 
     fn run(&mut self) {
         let mut result = ProverResult::default();
-        let vk_path = self.vk_path.to_owned();
+        let key_path = self.key_path.to_owned();
         let inputdir = format!("/tmp/{}/input", self.proof_id);
         let outputdir = format!("/tmp/{}/output", self.proof_id);
+        log::debug!("key_path: {key_path}, input: {inputdir}, output: {outputdir}");
+        fs::create_dir_all(&key_path).unwrap();
         fs::create_dir_all(&inputdir).unwrap();
         fs::create_dir_all(&outputdir).unwrap();
         let (should_agg, receipt, elf_id) =
@@ -46,7 +48,31 @@ impl ProverTask {
                 self.input.seg_size
             );
         } else if !self.input.composite_proof {
-            match zkm_recursion::as_groth16(&vk_path, &inputdir, &outputdir) {
+            //excuting the setup_and_generate_sol_verifier
+            if self.input.snark_setup {
+                match zkm_recursion::groth16_setup(&inputdir) {
+                    Ok(()) => {
+                        log::info!("Succussfully setup_and_generate_sol_verifier at {inputdir}.")
+                    }
+                    Err(e) => {
+                        log::info!("Error during setup_and_generate_sol_verifier: {}", e);
+                        panic!("Failed to setup_and_generate_sol_verifier.");
+                    }
+                }
+                let target_files = [
+                    "proving.key",
+                    "verifying.key",
+                    "circuit",
+                    "common_circuit_data.json",
+                    "verifier_only_circuit_data.json",
+                    "verifier.sol",
+                ];
+                target_files.iter().for_each(|f| {
+                    std::fs::rename(format!("{inputdir}/{f}"), format!("{key_path}/{f}")).unwrap();
+                });
+            }
+
+            match zkm_recursion::as_groth16(&key_path, &inputdir, &outputdir) {
                 Ok(()) => {
                     result.stark_proof =
                         std::fs::read(format!("{}/proof_with_public_inputs.json", inputdir))
@@ -79,12 +105,12 @@ impl ProverTask {
 
 pub struct LocalProver {
     tasks: Arc<Mutex<HashMap<String, Arc<Mutex<ProverTask>>>>>,
-    vk_path: String,
+    key_path: String,
 }
 
 impl LocalProver {
-    pub fn new(vk_path: &str) -> LocalProver {
-        LocalProver { tasks: Arc::new(Mutex::new(HashMap::new())), vk_path: vk_path.to_string() }
+    pub fn new(key_path: &str) -> LocalProver {
+        LocalProver { tasks: Arc::new(Mutex::new(HashMap::new())), key_path: key_path.to_string() }
     }
 }
 
@@ -93,7 +119,7 @@ impl Prover for LocalProver {
     async fn request_proof<'a>(&self, input: &'a ProverInput) -> anyhow::Result<String> {
         let proof_id: String = uuid::Uuid::new_v4().to_string();
         let task: Arc<Mutex<ProverTask>> =
-            Arc::new(Mutex::new(ProverTask::new(&proof_id, &self.vk_path, input)));
+            Arc::new(Mutex::new(ProverTask::new(&proof_id, &self.key_path, input)));
         self.tasks.lock().unwrap().insert(proof_id.clone(), task.clone());
         thread::spawn(move || {
             task.lock().unwrap().run();
@@ -128,7 +154,6 @@ impl Prover for LocalProver {
         input: &'a ProverInput,
         timeout: Option<Duration>,
     ) -> anyhow::Result<Option<ProverResult>> {
-        log::info!("Calling request_proof.");
         let proof_id = self.request_proof(input).await?;
         log::info!("Calling wait_proof, proof_id={}", proof_id);
         self.wait_proof(&proof_id, timeout).await

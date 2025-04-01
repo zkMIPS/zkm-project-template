@@ -9,7 +9,6 @@ use tokio::time::Duration;
 #[derive(Debug, Default, Clone)]
 pub struct ClientCfg {
     pub zkm_prover_type: String,
-    pub vk_path: String,
     //pub setup_flag: bool,
     pub endpoint: Option<String>,
     pub ca_cert_path: Option<String>,
@@ -37,7 +36,6 @@ impl ClientCfg {
         println!("{}", elf_path);
         let proof_results_path =
             env::var("PROOF_RESULTS_PATH").unwrap_or("../contracts".to_string());
-        let vk_path = env::var("VERIFYING_KEY_PATH").unwrap_or("/tmp/input".to_string());
         let zkm_prover_type = env::var("ZKM_PROVER").expect("ZKM PROVER is missing");
 
         // network proving
@@ -70,7 +68,6 @@ impl ClientCfg {
                 key_path,
                 domain_name,
                 proof_network_privkey,
-                vk_path,
             },
             prover_input,
         )
