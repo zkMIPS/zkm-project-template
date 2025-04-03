@@ -7,7 +7,7 @@ use std::thread;
 use std::time::Duration;
 use std::time::Instant;
 use tokio::time::sleep;
-
+use anyhow::bail;
 pub struct ProverTask {
     proof_id: String,
     input: ProverInput,
@@ -32,7 +32,7 @@ impl ProverTask {
         let key_path = self.key_path.to_owned();
         let inputdir = format!("/tmp/{}/input", self.proof_id);
         let outputdir = format!("/tmp/{}/output", self.proof_id);
-        log::debug!("key_path: {key_path}, input: {inputdir}, output: {outputdir}");
+        println!("input: {}", self.input);
         fs::create_dir_all(&key_path).unwrap();
         fs::create_dir_all(&inputdir).unwrap();
         fs::create_dir_all(&outputdir).unwrap();
@@ -138,7 +138,7 @@ impl Prover for LocalProver {
         loop {
             if let Some(timeout) = timeout {
                 if start_time.elapsed() > timeout {
-                    return Err(anyhow::anyhow!("Proof generation timed out."));
+                    bail!("Proof generation timed out.");
                 }
             }
             if task.lock().unwrap().is_done() {
