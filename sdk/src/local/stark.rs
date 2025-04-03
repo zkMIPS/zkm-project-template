@@ -34,7 +34,7 @@ pub fn prove_stark(
     if input.execute_only {
         return Ok((false, None, None));
     }
-    log::info!("[The seg_num is:{} ]", &seg_num);
+    log::info!("The seg_num is:{}", &seg_num);
     let mut receipts: AssumptionReceipts<F, C, D> = vec![];
     for receipt_data in input.receipts.iter() {
         let receipt: Receipt<F, C, D> =

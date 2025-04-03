@@ -1,4 +1,4 @@
-set -e
+set -xe
 if [ $# -lt 1 ]; then
     echo "usage: ./run_proving  revme or sha2-rust or sha2-go or mem-alloc-vec"
     exit 1
@@ -14,7 +14,7 @@ export ARGS="711e9609339e92b03ddc0a211827dba421f38f9ed8b9d806e1ffdd8c15ffa03d wo
 export JSON_PATH=${BASEDIR}/test-vectors/test.json
 export PROOF_RESULTS_PATH=${BASEDIR}/../contracts
 export EXECUTE_ONLY=false
-export KEY_PATH=${BASEDIR}/../keys
+export KEY_PATH=${KEY_PATH-"${BASEDIR}/../keys"}
 export SNARK_SETUP=${SNARK_SETUP-false}
 
 ##network proving

@@ -68,14 +68,15 @@ pub fn save_data_to_file<P: AsRef<Path>, D: AsRef<[u8]>>(
 ) -> anyhow::Result<()> {
     // Create the output directory
     let output_dir = output_dir.as_ref();
-    fs::create_dir_all(output_dir).context("Failed to create output directory")?;
+    log::info!("create dir: {}", output_dir.display());
+    fs::create_dir_all(output_dir)?;
 
     // Build the full file path
     let output_path = output_dir.join(file_name);
 
     // Open the file and write the data
-    let mut file = File::create(&output_path).context("Unable to create file")?;
-    file.write_all(data.as_ref()).context("Failed to write to file")?;
+    let mut file = File::create(&output_path)?;
+    file.write_all(data.as_ref())?;
 
     let bytes_written = data.as_ref().len();
     log::info!("Successfully written {} bytes.", bytes_written);
@@ -169,7 +170,6 @@ impl ProverClient {
         }
         //1.snark proof
         let output_dir = format!("{}/verifier", input.proof_results_path);
-        log::info!("Save the snark proof:  ");
         save_data_to_file(
             &output_dir,
             "snark_proof_with_public_inputs.json",
@@ -204,7 +204,7 @@ impl ProverClient {
             save_data_to_file(&output_dir, "verifier.sol", &prover_result.solidity_verifier)?;
         }
 
-        log::info!("Generating proof successfully .The snark proof and contract  are in the the path {}/{{verifier,src}} .", input.proof_results_path);
+        log::info!("Generating proof successfully .The snark proof and contract are in the the path {}/{{verifier,src}} .", input.proof_results_path);
 
         Ok(())
     }

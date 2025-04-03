@@ -14,10 +14,10 @@ async fn main() -> Result<()> {
     let elf_path = std::env::var("ELF_PATH").unwrap_or(env!("GUEST_TARGET_PATH").to_string());
     std::env::set_var("ELF_PATH", elf_path);
 
+    // Here we can not run the groth16 setup, since we only have one segment.
     let (client_config, mut inner_prover_input) = ClientCfg::from_env(set_pre_guest_input);
-    log::info!("new prover client:");
+    log::info!("create prover client");
     let prover_client = ProverClient::new(&client_config).await;
-    log::info!("new prover client,ok.");
     let outer_seg_size = inner_prover_input.seg_size;
     let outer_elf = inner_prover_input.elf;
     inner_prover_input.seg_size = 0;
@@ -38,8 +38,7 @@ async fn main() -> Result<()> {
             log::info!("pre_elf_id: {:?}", pre_elf_id);
         }
         Ok(None) => {
-            log::info!("Failed to generate proof.The result is None.");
-            bail!("Failed to generate proof.");
+            bail!("Failed to generate proof due to void result.");
         }
         Err(e) => {
             log::info!("Failed to generate proof. error: {}", e);
@@ -56,6 +55,8 @@ async fn main() -> Result<()> {
         seg_size: outer_seg_size,
         execute_only: inner_prover_input.execute_only,
         receipts,
+        snark_setup: inner_prover_input.snark_setup,
+        proof_results_path: inner_prover_input.proof_results_path,
         ..Default::default()
     };
 
