@@ -67,6 +67,7 @@ impl ProverTask {
                     "verifier_only_circuit_data.json",
                     "verifier.sol",
                 ];
+                std::fs::create_dir_all(format!("{inputdir}")).unwrap();
                 target_files.iter().for_each(|f| {
                     std::fs::copy(format!("{inputdir}/{f}"), format!("{key_path}/{f}")).unwrap();
                 });

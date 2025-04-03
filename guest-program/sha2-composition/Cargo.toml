@@ -5,6 +5,6 @@ name = "sha2-precompile"
 edition = "2021"
 
 [dependencies]
-#zkm-runtime = { git = "https://github.com/zkMIPS/zkm.git"}
-zkm-runtime = { path = "../../../zkm/runtime/entrypoint" }
+zkm-runtime = { git = "https://github.com/zkMIPS/zkm.git"}
+#zkm-runtime = { path = "../../../zkm/runtime/entrypoint" }
 sha2 = { version = "0.10.8", default-features = false }
