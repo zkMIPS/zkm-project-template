@@ -68,7 +68,7 @@ impl ProverTask {
                     "verifier.sol",
                 ];
                 target_files.iter().for_each(|f| {
-                    std::fs::rename(format!("{inputdir}/{f}"), format!("{key_path}/{f}")).unwrap();
+                    std::fs::copy(format!("{inputdir}/{f}"), format!("{key_path}/{f}")).unwrap();
                 });
             }
 

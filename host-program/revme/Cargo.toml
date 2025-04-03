@@ -7,16 +7,16 @@ edition = "2021"
 
 [dependencies]
 zkm-sdk = { path = "../../sdk", features = ["snark"] }
-zkm-recursion = {git = "https://github.com/zkMIPS/zkm", branch = "main", default-features = false }
+zkm-recursion = { workspace = true, default-features = false }
 
 tokio = { version = "1.21.0", features = ["macros", "rt-multi-thread", "signal"] }
-#ethers = "2.0.14"
 log = { version = "0.4.14", default-features = false }
 env_logger = "0.10.0"
 anyhow = "1.0.75"
+
 [build-dependencies]
 tonic-build = "0.8.0"
-zkm-build = { git = "https://github.com/zkMIPS/zkm", branch = "main", default-features = false }
+zkm-build = { workspace = true, default-features = false }
 
 [features]
 test = []

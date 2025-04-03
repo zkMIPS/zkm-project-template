@@ -41,6 +41,6 @@ echo "SEG_SIZE:$SEG_SIZE"
 echo "BASEDIR:$BASEDIR"
 echo "ZKM_PROVER:$ZKM_PROVER"
 
-nohup $BASEDIR/../target/release/$program  >./$program-$ZKM_PROVER-proving.log 2>&1 &
+$BASEDIR/../target/release/$program
 
 echo "Check out the log: tail -f $program-$ZKM_PROVER-proving.log"

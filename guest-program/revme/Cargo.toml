@@ -5,9 +5,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-zkm-runtime = { git = "https://github.com/zkMIPS/zkm" }
+#zkm-runtime = { git = "https://github.com/zkMIPS/zkm" }
 ##just testing
-#zkm-runtime = { path = "../../../zkm/runtime/entrypoint" }
+zkm-runtime = { path = "../../../zkm/runtime/entrypoint" }
 
 revm = { git = "https://github.com/zkMIPS/revm", branch = "zkm", default-features = false, features = [ "serde" ] }
 models = { git = "https://github.com/zkMIPS/revme", branch = "feat/zkm", package = "models" }
