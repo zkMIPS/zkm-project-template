@@ -1,4 +1,5 @@
 use crate::prover::{Prover, ProverInput, ProverResult};
+use anyhow::bail;
 use async_trait::async_trait;
 use std::collections::HashMap;
 use std::fs;
@@ -7,7 +8,6 @@ use std::thread;
 use std::time::Duration;
 use std::time::Instant;
 use tokio::time::sleep;
-
 pub struct ProverTask {
     proof_id: String,
     input: ProverInput,
@@ -32,7 +32,6 @@ impl ProverTask {
         let key_path = self.key_path.to_owned();
         let inputdir = format!("/tmp/{}/input", self.proof_id);
         let outputdir = format!("/tmp/{}/output", self.proof_id);
-        log::debug!("key_path: {key_path}, input: {inputdir}, output: {outputdir}");
         fs::create_dir_all(&key_path).unwrap();
         fs::create_dir_all(&inputdir).unwrap();
         fs::create_dir_all(&outputdir).unwrap();
@@ -44,19 +43,18 @@ impl ProverTask {
             result.solidity_verifier = vec![];
         } else if !should_agg {
             log::info!(
-                "There is only one segment with segment size {}, will skip the aggregation!",
+                "There is only one segment with segment size {}, will skip the aggregation, and if this program contains composite proof, you need to fetch the Groth16 setup key in advance",
                 self.input.seg_size
             );
-        } else if !self.input.composite_proof {
+        } else {
             //excuting the setup_and_generate_sol_verifier
             if self.input.snark_setup {
                 match zkm_recursion::groth16_setup(&inputdir) {
                     Ok(()) => {
-                        log::info!("Succussfully setup_and_generate_sol_verifier at {inputdir}.")
+                        log::info!("Run groth16 setup and save results at {inputdir}.")
                     }
                     Err(e) => {
-                        log::info!("Error during setup_and_generate_sol_verifier: {}", e);
-                        panic!("Failed to setup_and_generate_sol_verifier.");
+                        panic!("Failed to run groth16 setup due to {:?}", e);
                     }
                 }
                 let target_files = [
@@ -67,26 +65,29 @@ impl ProverTask {
                     "verifier_only_circuit_data.json",
                     "verifier.sol",
                 ];
+                std::fs::create_dir_all(&key_path).unwrap();
                 target_files.iter().for_each(|f| {
-                    std::fs::rename(format!("{inputdir}/{f}"), format!("{key_path}/{f}")).unwrap();
+                    std::fs::copy(format!("{inputdir}/{f}"), format!("{key_path}/{f}")).unwrap();
                 });
             }
-
-            match zkm_recursion::as_groth16(&key_path, &inputdir, &outputdir) {
-                Ok(()) => {
-                    result.stark_proof =
-                        std::fs::read(format!("{}/proof_with_public_inputs.json", inputdir))
-                            .unwrap();
-                    result.proof_with_public_inputs =
-                        std::fs::read(format!("{}/snark_proof_with_public_inputs.json", outputdir))
-                            .unwrap();
-                    //result.solidity_verifier =
-                    //    std::fs::read(format!("{}/verifier.sol", outputdir)).unwrap();
-                    result.public_values =
-                        std::fs::read(format!("{}/public_values.json", inputdir)).unwrap();
-                }
-                Err(e) => {
-                    log::error!("prove_snark error : {}", e);
+            result.stark_proof =
+                std::fs::read(format!("{}/proof_with_public_inputs.json", inputdir)).unwrap();
+            if !self.input.composite_proof {
+                match zkm_recursion::as_groth16(&key_path, &inputdir, &outputdir) {
+                    Ok(()) => {
+                        result.proof_with_public_inputs = std::fs::read(format!(
+                            "{}/snark_proof_with_public_inputs.json",
+                            outputdir
+                        ))
+                        .unwrap();
+                        //result.solidity_verifier =
+                        //    std::fs::read(format!("{}/verifier.sol", outputdir)).unwrap();
+                        result.public_values =
+                            std::fs::read(format!("{}/public_values.json", inputdir)).unwrap();
+                    }
+                    Err(e) => {
+                        log::error!("prove_snark error : {}", e);
+                    }
                 }
             }
         }
@@ -137,7 +138,7 @@ impl Prover for LocalProver {
         loop {
             if let Some(timeout) = timeout {
                 if start_time.elapsed() > timeout {
-                    return Err(anyhow::anyhow!("Proof generation timed out."));
+                    bail!("Proof generation timed out.");
                 }
             }
             if task.lock().unwrap().is_done() {

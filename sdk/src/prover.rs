@@ -33,7 +33,6 @@ impl ClientCfg {
 
         let guest_input = env::var("ARGS").ok();
         let elf_path = env::var("ELF_PATH").expect("ELF not found");
-        println!("{}", elf_path);
         let proof_results_path =
             env::var("PROOF_RESULTS_PATH").unwrap_or("../contracts".to_string());
         let zkm_prover_type = env::var("ZKM_PROVER").expect("ZKM PROVER is missing");
