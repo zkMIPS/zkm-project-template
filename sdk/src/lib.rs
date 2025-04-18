@@ -172,7 +172,7 @@ impl ProverClient {
     pub async fn prove(
         &self,
         input: &ProverInput,
-        output_dir: &str,
+        output_dir: Option<String>,
         timeout: Option<Duration>,
     ) -> Result<ProverResult, ZKMProverError> {
         let proving_result = self.prover.prove(input, timeout).await;
@@ -182,11 +182,14 @@ impl ProverClient {
                     if prover_result.proof_with_public_inputs.is_empty() {
                         return Err(ZKMProverError::SegSizeTooBig());
                     }
-                    let output_path = Path::new(output_dir);
-                    let proof_result_path = output_path.join("snark_proof_with_public_inputs.json");
-                    let mut f = file::new(&proof_result_path.to_string_lossy());
-                    f.write(prover_result.proof_with_public_inputs.as_slice())
-                        .map_err(ZKMProverError::IoError)?;
+                    if let Some(output_dir) = output_dir {
+                        let output_path = Path::new(&output_dir);
+                        let proof_result_path =
+                            output_path.join("snark_proof_with_public_inputs.json");
+                        let mut f = file::new(&proof_result_path.to_string_lossy());
+                        f.write(prover_result.proof_with_public_inputs.as_slice())
+                            .map_err(ZKMProverError::IoError)?;
+                    }
                 }
                 Ok(prover_result)
             }

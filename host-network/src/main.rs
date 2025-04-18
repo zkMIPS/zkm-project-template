@@ -25,9 +25,7 @@ async fn main() -> anyhow::Result<()> {
     prover_input.set_guest_input(guest_input.buffer);
 
     let start = Instant::now();
-
-    client.prove(&prover_input, &output_dir, None).await.expect("failed to generate proof");
-
+    client.prove(&prover_input, Some(output_dir), None).await.expect("failed to generate proof");
     let end = Instant::now();
     let elapsed = end.duration_since(start);
     log::info!("Elapsed time: {:?} secs", elapsed.as_secs(),);
