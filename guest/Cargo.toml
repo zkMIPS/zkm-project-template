@@ -1,0 +1,10 @@
+[package]
+name = "fibonacci"
+version = "1.0.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+alloy-sol-types = { workspace = true }
+fibonacci-lib = { path = "../lib" }
+zkm-zkvm = { git = "https://github.com/zkMIPS/zkMIPS.git" }

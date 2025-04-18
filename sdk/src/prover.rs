@@ -1,9 +1,9 @@
+use std::default::Default;
+use std::env;
+
 use async_trait::async_trait;
 use serde::Deserialize;
 use serde::Serialize;
-use std::default::Default;
-use std::env;
-use std::fs::read;
 use tokio::time::Duration;
 
 #[derive(Debug, Default, Clone)]
@@ -19,25 +19,8 @@ pub struct ClientCfg {
 }
 
 impl ClientCfg {
-    pub fn from_env(
-        set_guest_input: fn(&mut ProverInput, Option<&str>),
-    ) -> (ClientCfg, ProverInput) {
-        let seg_size =
-            env::var("SEG_SIZE").ok().and_then(|seg| seg.parse::<u32>().ok()).unwrap_or(65536);
-
-        let execute_only =
-            env::var("EXECUTE_ONLY").ok().and_then(|seg| seg.parse::<bool>().ok()).unwrap_or(false);
-
-        let snark_setup =
-            env::var("SNARK_SETUP").ok().and_then(|seg| seg.parse::<bool>().ok()).unwrap_or(false);
-
-        let guest_input = env::var("ARGS").ok();
-        let elf_path = env::var("ELF_PATH").expect("ELF not found");
-        let proof_results_path =
-            env::var("PROOF_RESULTS_PATH").unwrap_or("../contracts".to_string());
+    pub fn from_env() -> ClientCfg {
         let zkm_prover_type = env::var("ZKM_PROVER").expect("ZKM PROVER is missing");
-
-        // network proving
         let endpoint = env::var("ENDPOINT").map_or(None, |endpoint| Some(endpoint.to_string()));
         let ca_cert_path = env::var("CA_CERT_PATH").map_or(None, |path| Some(path.to_string()));
         let cert_path = env::var("CERT_PATH").map_or(None, |x| Some(x.to_string()));
@@ -46,30 +29,15 @@ impl ClientCfg {
         let proof_network_privkey =
             env::var("PROOF_NETWORK_PRVKEY").map_or(None, |x| Some(x.to_string()));
 
-        let mut prover_input = ProverInput {
-            elf: read(elf_path).expect("Read ELF error"),
-            seg_size,
-            execute_only,
-            snark_setup,
-            proof_results_path,
-            ..Default::default()
-        };
-
-        //If the guest program does't have inputs, it does't need the setting.
-        set_guest_input(&mut prover_input, guest_input.as_deref());
-
-        (
-            ClientCfg {
-                zkm_prover_type,
-                endpoint,
-                ca_cert_path,
-                cert_path,
-                key_path,
-                domain_name,
-                proof_network_privkey,
-            },
-            prover_input,
-        )
+        ClientCfg {
+            zkm_prover_type,
+            endpoint,
+            ca_cert_path,
+            cert_path,
+            key_path,
+            domain_name,
+            proof_network_privkey,
+        }
     }
 }
 
@@ -85,6 +53,37 @@ pub struct ProverInput {
     pub receipt_inputs: Vec<Vec<u8>>,
     pub receipts: Vec<Vec<u8>>,
     pub proof_results_path: String,
+}
+
+impl ProverInput {
+    pub fn from_env() -> ProverInput {
+        let seg_size =
+            env::var("SEG_SIZE").ok().and_then(|seg| seg.parse::<u32>().ok()).unwrap_or(262144);
+        let execute_only =
+            env::var("EXECUTE_ONLY").ok().and_then(|seg| seg.parse::<bool>().ok()).unwrap_or(false);
+        let snark_setup =
+            env::var("SNARK_SETUP").ok().and_then(|seg| seg.parse::<bool>().ok()).unwrap_or(false);
+        let proof_results_path =
+            env::var("PROOF_RESULTS_PATH").unwrap_or("../contracts".to_string());
+
+        ProverInput {
+            seg_size,
+            execute_only,
+            snark_setup,
+            proof_results_path,
+            ..Default::default()
+        }
+    }
+
+    pub fn set_elf(&mut self, elf: &[u8]) {
+        self.elf = Vec::from(elf);
+    }
+
+    pub fn set_guest_input(&mut self, input: Vec<Vec<u8>>) {
+        let mut pri_buf = Vec::new();
+        bincode::serialize_into(&mut pri_buf, &input).expect("input serialization failed");
+        self.private_inputstream = pri_buf;
+    }
 }
 
 #[derive(Debug, Default, Deserialize, Serialize, Clone)]

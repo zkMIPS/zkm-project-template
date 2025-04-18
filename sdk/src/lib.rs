@@ -1,21 +1,26 @@
+pub mod input;
 pub mod local;
 pub mod network;
 pub mod prover;
 
-use anyhow::bail;
-use local::prover::LocalProver;
-use network::prover::NetworkProver;
-use prover::{ClientCfg, Prover, ProverInput, ProverResult};
-use serde::{Deserialize, Serialize};
 use std::fs;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
 
+use anyhow::Context;
+use anyhow::{bail, Result};
+use common::file;
+use local::prover::LocalProver;
+use network::prover::NetworkProver;
+use prover::{ClientCfg, Prover, ProverInput, ProverResult};
+use serde::{Deserialize, Serialize};
 use serde_json::to_writer;
 use sha2::{Digest, Sha256};
+use thiserror::Error;
+use tokio::time::Duration;
 
-use anyhow::Context;
+pub use input::GuestInput;
 
 pub struct ProverClient {
     pub prover: Box<dyn Prover>,
@@ -33,8 +38,20 @@ pub struct Roots {
     root: Vec<u64>,
 }
 
-pub const LOCAL_PROVER: &str = "local";
+pub const LOCAL_PROVER: &str = "local"; // for v0.3.0
 pub const NETWORK_PROVER: &str = "network";
+
+#[derive(Error, Debug)]
+pub enum ZKMProverError {
+    #[error("failed to generate proof: {0}")]
+    ProvingError(anyhow::Error),
+    #[error("failed to generate proof: the result is None")]
+    ProvingResultNone,
+    #[error("the result is empty, please set SEG_SIZE to half of its original value")]
+    SegSizeTooBig(),
+    #[error("io error: {0}")]
+    IoError(std::io::Error),
+}
 
 pub fn is_local_prover(zkm_prover: &str) -> bool {
     zkm_prover.to_lowercase() == *LOCAL_PROVER
@@ -139,12 +156,43 @@ impl ProverClient {
         }
     }
 
+    pub async fn form_env() -> Self {
+        let client_config = ClientCfg::from_env();
+        Self::new(&client_config).await
+    }
+
     pub fn local(key_path: &str) -> Self {
         Self { prover: Box::new(LocalProver::new(key_path)) }
     }
 
     pub async fn network(client_config: &ClientCfg) -> Self {
         Self { prover: Box::new(NetworkProver::new(client_config).await.unwrap()) }
+    }
+
+    pub async fn prove(
+        &self,
+        input: &ProverInput,
+        output_dir: &str,
+        timeout: Option<Duration>,
+    ) -> Result<ProverResult, ZKMProverError> {
+        let proving_result = self.prover.prove(input, timeout).await;
+        match proving_result {
+            Ok(Some(prover_result)) => {
+                if !input.execute_only {
+                    if prover_result.proof_with_public_inputs.is_empty() {
+                        return Err(ZKMProverError::SegSizeTooBig());
+                    }
+                    let output_path = Path::new(output_dir);
+                    let proof_result_path = output_path.join("snark_proof_with_public_inputs.json");
+                    let mut f = file::new(&proof_result_path.to_string_lossy());
+                    f.write(prover_result.proof_with_public_inputs.as_slice())
+                        .map_err(ZKMProverError::IoError)?;
+                }
+                Ok(prover_result)
+            }
+            Ok(_) => Err(ZKMProverError::ProvingResultNone),
+            Err(e) => Err(ZKMProverError::ProvingError(e)),
+        }
     }
 
     pub fn process_proof_results(

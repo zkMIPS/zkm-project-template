@@ -50,7 +50,9 @@ $ anvil
 ### Deploy
 
 ```shell
-$ forge script script/verifier.s.sol:VerifierScript --rpc-url https://eth-sepolia.g.alchemy.com/v2/RH793ZL_pQkZb7KttcWcTlOjPrN0BjOW --private-key df4bc5647fdb9600ceb4943d4adff3749956a8512e5707716357b13d5ee687d9
+$ forge script script/ZKMVerifierGroth16.s.sol:ZKMVerifierGroth16Script --rpc-url <your_rpc_url> --private-key <your_private_key>
+
+$ forge script script/ZKMVerifierPlonk.s.sol:ZKMVerifierPlonkScript --rpc-url <your_rpc_url> --private-key <your_private_key>
 ```
 
 ### Cast
