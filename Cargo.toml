@@ -1,32 +1,10 @@
 [workspace]
 members = [
-   "host-program/sha2-go",
-   "host-program/sha2-rust",
-   "host-program/revme",
-   "host-program/mem-alloc-vec",
-   "host-program/sha2-composition",
-   "sdk"
-  ]
+  "guest",
+   "host",
+   "lib"
+]
 resolver = "2"
 
 [workspace.dependencies]
-zkm-prover    = { git = "https://github.com/zkMIPS/zkm", branch = "main", default-features = false }
-zkm-emulator  = { git = "https://github.com/zkMIPS/zkm", branch = "main", default-features = false }
-zkm-recursion = { git = "https://github.com/zkMIPS/zkm", branch = "main", default-features = false }
-zkm-build     = { git = "https://github.com/zkMIPS/zkm", branch = "main", default-features = false }
-
-#zkm-prover    = { path = "../zkm/prover", default-features = false }
-#zkm-emulator  = { path = "../zkm/emulator", default-features = false }
-#zkm-recursion = { path = "../zkm/recursion", default-features = false }
-#zkm-build     = { path = "../zkm/build", default-features = false }
-
-[profile.release]
-opt-level = 3
-
-[profile.bench]
-opt-level = 3
-
-[profile.fast]
-inherits = "release"
-debug = true
-debug-assertions = true
+alloy-sol-types = "1.0"

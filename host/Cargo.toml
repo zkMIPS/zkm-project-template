@@ -1,0 +1,28 @@
+[package]
+name = "fibonacci-host"
+version = "1.0.0"
+edition = "2024"
+default-run = "fibonacci-host"
+publish = false
+
+[[bin]]
+name = "evm"
+path = "bin/evm.rs"
+
+[[bin]]
+name = "vkey"
+path = "bin/vkey.rs"
+
+[dependencies]
+alloy-sol-types = { workspace = true }
+clap = { version = "4.0", features = ["derive", "env"] }
+dotenv = "0.15.0"
+hex = "0.4.3"
+serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
+serde = { version = "1.0.200", default-features = false, features = ["derive"] }
+tracing = "0.1.40"
+fibonacci-lib = { path = "../lib" }
+zkm-sdk = { git = "https://github.com/zkMIPS/zkMIPS.git" }
+
+[build-dependencies]
+zkm-build = { git = "https://github.com/zkMIPS/zkMIPS.git" }

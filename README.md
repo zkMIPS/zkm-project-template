@@ -55,7 +55,7 @@ git clone https://github.com/zkMIPS/zkm-project-template.git
 
 ### 1. Build the guest program ELF
 
-Please refer to [this](guest-program/README.md) guide.
+Please refer to [this](guest/README.md) guide.
 
 ### 2. Build the host program
 
@@ -100,10 +100,10 @@ This host program sends the private input pri_input = vec![5u8; 1024] and its ha
 
 #### Local Proving
 
-Make any edits to [`run-proving.sh`](host-program/run-proving.sh) and run the program:
+Make any edits to [`run-proving.sh`](host/run-proving.sh) and run the program:
 
 ```sh
-cd zkm-project-template/host-program
+cd zkm-project-template/host
 ./run-proving.sh sha2-rust
 ```
 
@@ -116,7 +116,7 @@ The result proof and contract file will be in the contracts/verifier and contrac
 
 > The proving task requires several stages: queuing, splitting, proving, aggregating and finalizing. Each stage involves a varying duration.
 
-Must set the `PROOF_NETWORK_PRVKEY` and `ZKM_PROVER=network` in [`run-proving.sh`](host-program/run-proving.sh) and run the program:
+Must set the `PROOF_NETWORK_PRVKEY` and `ZKM_PROVER=network` in [`run-proving.sh`](host/run-proving.sh) and run the program:
 
 ```sh
 ./run-proving.sh sha2-rust
@@ -167,9 +167,9 @@ RPC_URL=http://localhost:8545 CHAIN_ID=1337 BLOCK_NO=244 RUST_LOG=debug SUITE_JS
 If successfully, it will generate `244.json` in the path test-vectors
 
 ```sh
-cp test-vectors/244.json zkm-project-template/host-program/test-vectors/
+cp test-vectors/244.json zkm-project-template/host/test-vectors/
 ```
 
-Next, you need to edit the `JSON_PATH` variable in the [`run-proving.sh`](host-program/run-proving.sh) to match the name of the  JSON file mentioned above.
+Next, you need to edit the `JSON_PATH` variable in the [`run-proving.sh`](host/run-proving.sh) to match the name of the  JSON file mentioned above.
 
 Then, you can execute the run-proving.sh by following the steps outlined in `Example 1: sha2-rust`.
