@@ -55,6 +55,7 @@ struct ZKMFibonacciProofFixture {
 fn main() {
     // Setup the logger.
     zkm_sdk::utils::setup_logger();
+    dotenv::dotenv().ok();
 
     // Parse the command line arguments.
     let args = EVMArgs::parse();

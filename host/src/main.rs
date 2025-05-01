@@ -26,7 +26,10 @@ struct Args {
     execute: bool,
 
     #[arg(long)]
-    prove: bool,
+    core: bool,
+
+    #[arg(long)]
+    compressed: bool,
 
     #[arg(long, default_value = "20")]
     n: u32,
@@ -40,8 +43,8 @@ fn main() {
     // Parse the command line arguments.
     let args = Args::parse();
 
-    if args.execute == args.prove {
-        eprintln!("Error: You must specify either --execute or --prove");
+    if args.execute == args.core && args.compressed == args.execute {
+        eprintln!("Error: You must specify either --execute or --core or --compress");
         std::process::exit(1);
     }
 
@@ -77,12 +80,13 @@ fn main() {
         // Setup the program for proving.
         let (pk, vk) = client.setup(FIBONACCI_ELF);
 
-        // Generate the proof
-        let proof = client
-            .prove(&pk, stdin)
-            .run()
-            .expect("failed to generate proof");
-
+        // Generate the Core proof
+        let proof = match args.core {
+            true =>  client.prove(&pk, stdin).run().expect("failed to generate Core proof"),
+            false => {
+                client.prove(&pk, stdin).compressed().run().expect("failed to generate Compressed Proof")
+            },
+        };
         println!("Successfully generated proof!");
 
         // Verify the proof.
