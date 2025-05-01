@@ -1,4 +1,4 @@
-use zkm_sdk::{include_elf, HashableKey, Prover, ProverClient};
+use zkm_sdk::{HashableKey, ProverClient, include_elf};
 
 /// The ELF (executable and linkable format) file for the Succinct RISC-V zkVM.
 pub const FIBONACCI_ELF: &[u8] = include_elf!("fibonacci");

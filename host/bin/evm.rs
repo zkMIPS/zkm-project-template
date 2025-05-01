@@ -17,7 +17,7 @@ use clap::{Parser, ValueEnum};
 use fibonacci_lib::PublicValuesStruct;
 use serde::{Deserialize, Serialize};
 use zkm_sdk::{
-    include_elf, HashableKey, ProverClient, ZKMProofWithPublicValues, ZKMStdin, ZKMVerifyingKey,
+    HashableKey, ProverClient, ZKMProofWithPublicValues, ZKMStdin, ZKMVerifyingKey, include_elf,
 };
 
 /// The ELF (executable and linkable format) file for the zkMIPS zkVM.

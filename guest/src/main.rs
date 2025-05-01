@@ -10,7 +10,7 @@
 zkm_zkvm::entrypoint!(main);
 
 use alloy_sol_types::SolType;
-use fibonacci_lib::{fibonacci, PublicValuesStruct};
+use fibonacci_lib::{PublicValuesStruct, fibonacci};
 
 pub fn main() {
     // Read an input to the program.

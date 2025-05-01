@@ -7,13 +7,17 @@
 //! ```
 //! or
 //! ```shell
-//! RUST_LOG=info cargo run --release -- --prove
+//! RUST_LOG=info cargo run --release -- --core
+//! ```
+//! or
+//! ```shell
+//! RUST_LOG=info cargo run --release -- --compressed
 //! ```
 
 use alloy_sol_types::SolType;
 use clap::Parser;
 use fibonacci_lib::PublicValuesStruct;
-use zkm_sdk::{include_elf, ProverClient, ZKMStdin};
+use zkm_sdk::{ProverClient, ZKMStdin, include_elf};
 
 /// The ELF (executable and linkable format) file for the zkMIPS zkVM.
 pub const FIBONACCI_ELF: &[u8] = include_elf!("fibonacci");
@@ -44,7 +48,7 @@ fn main() {
     let args = Args::parse();
 
     if args.execute == args.core && args.compressed == args.execute {
-        eprintln!("Error: You must specify either --execute or --core or --compress");
+        eprintln!("Error: You must specify either --execute, --core, or --compress");
         std::process::exit(1);
     }
 
@@ -81,11 +85,14 @@ fn main() {
         let (pk, vk) = client.setup(FIBONACCI_ELF);
 
         // Generate the Core proof
-        let proof = match args.core {
-            true =>  client.prove(&pk, stdin).run().expect("failed to generate Core proof"),
-            false => {
-                client.prove(&pk, stdin).compressed().run().expect("failed to generate Compressed Proof")
-            },
+        let proof = if args.core {
+            client.prove(&pk, stdin).run().expect("failed to generate Core proof")
+        } else {
+            client
+                .prove(&pk, stdin)
+                .compressed()
+                .run()
+                .expect("failed to generate Compressed Proof")
         };
         println!("Successfully generated proof!");
 
