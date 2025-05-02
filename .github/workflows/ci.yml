@@ -29,6 +29,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@nightly
       - run: curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/zkMIPS/toolchain/refs/heads/main/setup.sh | sh
-      - run: source ~/.zkm-toolchain/env && cd crates/test-artifacts && cargo build && cd ../..
+      - run: source ~/.zkm-toolchain/env
+      - name: Install Dependencies
+        run: sudo apt install protobuf-compiler
       - run: rustup component add clippy
       - run: cargo clippy --all-targets -- -D warnings
