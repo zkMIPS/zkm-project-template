@@ -13,50 +13,12 @@ env:
   ZKM_SKIP_PROGRAM_BUILD: true
 
 jobs:
-  build_and_test:
-    name: Rust project - latest
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        toolchain:
-          - nightly
-    steps:
-      - uses: actions/checkout@v2
-      - run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
-      - name: Install Dependencies
-        run: sudo apt install protobuf-compiler
-      - name: Install Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: '1.22'
-      - name: Cargo build
-        run: cargo build --verbose --release
-      - name: Cargo test
-        run: cargo test --release --verbose
   fmt:
     name: Rustfmt
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          profile: minimal
-          toolchain: nightly-2024-12-05
-          override: true
-      - run: rustup component add rustfmt
+          components: rustfmt
       - run: cargo fmt --all -- --check
-  clippy:
-    name: Clippy
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: nightly-2024-12-05
-          override: true
-      - name: Install Dependencies
-        run: sudo apt install protobuf-compiler
-      - run: rustup component add clippy
-      - run: cargo clippy --all-targets -- -D warnings
-

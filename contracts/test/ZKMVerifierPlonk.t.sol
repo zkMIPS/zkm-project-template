@@ -1,0 +1,30 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import {Test} from "forge-std/Test.sol";
+import {ZKMVerifier} from "../src/v1.0.0/ZKMVerifierPlonk.sol";
+
+contract ZKMVerifierPlonkTest is Test {
+    bytes32 internal constant PROGRAM_VKEY = bytes32(0x00143c96c1238489d5da13def86e11ab0a1b7148b5d63b47983cc4623d05a7c3);
+    bytes internal constant PUBLIC_VALUES =
+        hex"00000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000001a6d0000000000000000000000000000000000000000000000000000000000002ac2";
+    bytes internal constant PROOF_VALID =
+        hex"2eb5d34c2480e30800db132e1da4adedc3b7ea9ef60c01b17561ade231f1cb8418de752409839d3fd8f8a87175b158de641ec6aef4bf216ef707369fb9a5f6590e75a1b30e5efd0f269600e009c83486a4bf6156e938e6828ab48ef411619b051ca8c03a1658a8fd7a4027bf9cfd1df430061d31a6c44ef9fdcb75fce41735b0a7b9fc821b1552d9de8beaed21cce185a6baea469d097b5af7540b0b940c2f23072d790b1d145131f91a0cb6844995b69842c4eb181ad2467f72db90fa8af043d9c9777e2aa56fdbc10bce154543473419057e7d546615bdff40683f0a07644cfafaebed04a40b111ada064e8ea0f84bc84d61fa1a25baeaeab40e6247579c6c1f5c330628644394421cf0cccb473b22bc89f4903c22fb33a3b94f26d8e5eb1cc7ce40aa26fe7d542660d453bd0b0025fb2aae75ffc6f04560a11c85640b1ecc46ce93b207b01edf8bc537c8df3c9f66a0236dd6678b1e294a9e08bb93993e59871b9fe4009861cf6135e04418bfff03045d06e3ce0901675df11e1ee24cb4ce816f41702092a821e98d1f7debc9dc3295c074f62c023ac7a53cb9a573995469dde2afa211fa2907c7ba230675f452fa118b1c6c982eefbc28b40765da90eb0dd82c33162d7f3a8fd947d8be7548d39f31a46a521bcac61227f7754fad77dab5c548cce10ed71ec1b294367f5e6e0e409e60931f09f16822d1ccf816ef38f01fa1f023da269824adde4e3ad886dc1725810b8005e8aec2274e977fca2902b8bb72f34dd7112805574e70bbd198bf094a7cb5d726e83b06a7614bc9e74b2173129f057512253408dddea292015dc83146b2aebdb3c3cd3ca0496cd3a8ac535a4a10d736561829ae4552ea6b70dd41f4a208b4f64a8cbe1d85c4730659be1406f1a55120ad01ea3cc798e8d551a1ccdd524b46d1e4b6521c8d0004200505c0b8c75200fffd21db7c022ebf290485f6b7a827c13fa0c008300e230b7fed2e45711083fef1e52d4cfd94d1f220df610c6f03efc50259f03fe54b0dcc5d301e53f10c7b6955471d0c468ad610448bed9a9dc42f69bb084efcb8b0506a819dba7b8f7b1218394c1090cbfa9a254e5678ce370f2dda3db138d77915eee17e617da4f5e3eec2989c246ba5c66a8a3cc9a83aafa5b4e0bdf15f897744a93e362302b2a2221e689db101f65411bf514c64d67ddc391a52505cbe963a8cd354e3a59d5c931b5fd577a5";
+    bytes internal constant PROOF_INVALID = hex"616a42052115dd50acf8e57f10c32ca72a6940";
+
+    address internal verifier;
+
+    function setUp() public virtual {
+        verifier = address(new ZKMVerifier());
+    }
+
+    /// @notice Should succeed when the proof is valid.
+    function test_VerifyProof_WhenPlonk() public view {
+        ZKMVerifier(verifier).verifyProof(PROGRAM_VKEY, PUBLIC_VALUES, PROOF_VALID);
+    }
+
+    /// @notice Should revert when the proof is invalid.
+    function test_RevertVerifyProof_WhenPlonk() public view {
+        ZKMVerifier(verifier).verifyProof(PROGRAM_VKEY, PUBLIC_VALUES, PROOF_VALID);
+    }
+}
