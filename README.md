@@ -95,7 +95,7 @@ cargo run --release --bin evm -- --system plonk
 These commands will also generate fixtures that can be used to test verification of zkMIPS proofs in Solidity.
 
 >[!NOTE]
-> Do not set `ZKM_PROVER=network` when generating a core, compressed or PLONK proof—the network prover only supports Groth16. .
+> Do not set `ZKM_PROVER=network` when generating a core, compressed or PLONK proof — the network prover only supports Groth16.
 
 
 ### Retrieve the Verification Key
