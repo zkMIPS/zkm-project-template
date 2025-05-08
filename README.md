@@ -115,8 +115,8 @@ each of which can take varying amounts of time. Before running the prover, ensur
 ```env
 ZKM_PROVER=network
 ZKM_PRIVATE_KEY=
-CERT_PATH=
-KEY_PATH=
+SSL_CERT_PATH=
+SSL_KEY_PATH=
 ```
 
 ### Deploy the Verifier Contract
